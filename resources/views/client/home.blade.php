@@ -1,0 +1,1 @@
+@extends('master.client.layout.app');
