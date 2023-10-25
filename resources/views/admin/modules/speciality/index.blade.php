@@ -125,17 +125,6 @@
         });
         //-----End datatable inizialitation
 
-        //----Modal
-        $(document).on('click', '#btn-add', function() {
-            $('#modal-add-specialities').modal('show');
-        });
-
-        $(".btn-cancel").click(function() {
-            $('#modal-add-specialities').modal('hide');
-            clearForm();
-        });
-        //----End Modal
-
         //----form environtment
         let ajaxUrl = "{{ route('admin.speciality.store') }}";
         let ajaxType = "POST";
@@ -147,6 +136,19 @@
             preview.innerHTML = '';
         }
         //---End Form environment
+
+        //----Modal
+        $(document).on('click', '#btn-add', function(e) {
+            $('#modal-add-specialities').modal('show');
+            $('#title').text('Add Specialities');
+            $("#btn-submit-text").text("Save");
+        });
+
+        $(".btn-cancel").click(function() {
+            $('#modal-add-specialities').modal('hide');
+            clearForm();
+        });
+        //----End Modal
 
         //------ Submit Data
         $('#speciality-form').on('submit', function(e) {
@@ -191,6 +193,9 @@
                         clearForm();
                         $('#modal-add-specialities').modal('hide');
                         $('#datatable').DataTable().ajax.reload();
+                        ajaxUrl = "{{ route('admin.speciality.store') }}";
+                        ajaxType = "POST";
+                        
                         Toast.fire({
                             icon: 'success',
                             title: response.message,
@@ -225,6 +230,7 @@
         //------ Load data to edit
         $(document).on('click', '#btn-edit', function(e) {
             $('#modal-add-specialities').modal('show');
+            $('#title').text('Edit Specialities');
 
             var id = $(this).data('id');
             var url = $(this).data('url');
@@ -250,7 +256,6 @@
                 url    : url,
                 success: function(response) {
                     
-                    $("#item-loading").hide(500);
                     if (response.status == 404) {
                         clearForm();
                         $('#modal-add-specialities').modal('hide');

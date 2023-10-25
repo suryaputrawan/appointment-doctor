@@ -3,7 +3,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Specialities</h5>
+                <h5 class="modal-title" id="title"></h5>
             </div>
             <div class="modal-body">
                 <form id="speciality-form">
@@ -11,7 +11,7 @@
                     <div class="row form-row">
                         <div class="col-12 col-sm-12">
                             <div class="form-group">
-                                <label>Specialities</label>
+                                <label>Specialities <span class="text-danger">*</span></label>
                                 <input name="speciality" id="speciality" type="text" class="form-control" value="{{ old('speciality') }}">
                                 <p id="error-speciality" style="color: red" class="error"></p>
                             </div>
@@ -20,7 +20,7 @@
                     <div class="row form-row">
                         <div class="col-12 col-sm-12">
                             <div class="form-group">
-                                <label>Image <span class="text-danger">(Max: 1Mb, Format: PNG)</span></label>
+                                <label>Image <span class="text-danger">(Max: 1Mb, Format: PNG) *</span></label>
                                 <input name="picture" id="picture-upload" type="file" class="form-control" accept=".png" onchange="previewImages()">
                                 <p id="error-picture" style="color: red" class="error"></p>
                             </div>

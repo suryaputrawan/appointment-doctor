@@ -89,7 +89,7 @@ class SpecialityController extends Controller
         } else {
             DB::beginTransaction();
             try {
-                $karyawan = Speciality::create([
+                Speciality::create([
                     'name'          => $request->speciality,
                     'picture'       => request('picture') ? $request->file('picture')->store('images/specialities') : null
                 ]);
@@ -149,7 +149,6 @@ class SpecialityController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // $id = Crypt::decryptString($id);
         $data = Speciality::find($id);
 
         $validator = Validator::make([
