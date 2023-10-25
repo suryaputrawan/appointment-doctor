@@ -141,6 +141,8 @@
             $("#about-me").val("");
             var preview = document.querySelector('#preview');
             preview.innerHTML = '';
+            ajaxUrl = "{{ route('admin.doctor.store') }}";
+            ajaxType = "POST";
         }
         //---End Form environment
 
@@ -200,8 +202,6 @@
                         clearForm();
                         $('#modal-add-doctor').modal('hide');
                         $('#datatable').DataTable().ajax.reload();
-                        ajaxUrl = "{{ route('admin.doctor.store') }}";
-                        ajaxType = "POST";
 
                         Toast.fire({
                             icon: 'success',

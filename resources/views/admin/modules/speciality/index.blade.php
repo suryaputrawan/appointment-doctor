@@ -134,6 +134,8 @@
             $('#speciality-form').find('.error').text("");
             var preview = document.querySelector('#preview');
             preview.innerHTML = '';
+            ajaxUrl = "{{ route('admin.speciality.store') }}";
+            ajaxType = "POST";
         }
         //---End Form environment
 
@@ -193,9 +195,7 @@
                         clearForm();
                         $('#modal-add-specialities').modal('hide');
                         $('#datatable').DataTable().ajax.reload();
-                        ajaxUrl = "{{ route('admin.speciality.store') }}";
-                        ajaxType = "POST";
-                        
+
                         Toast.fire({
                             icon: 'success',
                             title: response.message,
