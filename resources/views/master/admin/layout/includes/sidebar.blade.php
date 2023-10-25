@@ -12,8 +12,8 @@
                 <li class="menu-title"> 
                     <span>Master</span>
                 </li>
-                <li class=""> 
-                    <a href="#"><i class="fe fe-user-plus"></i> <span>Doctors</span></a>
+                <li class="{{ request()->routeIs('admin.doctor.index') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.doctor.index') }}"><i class="fe fe-user-plus"></i> <span>Doctors</span></a>
                 </li>
                 <li class="{{ request()->routeIs('admin.speciality.index') ? 'active' : '' }}"> 
                     <a href="{{ route('admin.speciality.index') }}"><i class="fe fe-users"></i> <span>Specialities</span></a>
