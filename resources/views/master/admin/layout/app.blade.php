@@ -4,6 +4,9 @@
 <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
+
         <title>Appointment - Dashboard</title>
 		
 		<!-- Favicon -->
@@ -18,7 +21,7 @@
 		<!-- Feathericon CSS -->
         <link rel="stylesheet" href="{{ asset('assets/admin/css/feathericon.min.css') }}">
 		
-		<link rel="stylesheet" href="{{ asset('assets/admin/plugins/morris/morris.css') }}">
+		{{-- <link rel="stylesheet" href="{{ asset('assets/admin/plugins/morris/morris.css') }}"> --}}
 		
 		<!-- Main CSS -->
         <link rel="stylesheet" href="{{ asset('assets/admin/css/style.css') }}">
@@ -49,9 +52,7 @@
                 <div class="content container-fluid">
 					
 					<!-- Page Header -->
-					<div class="page-header">
-                        @yield('content')
-					</div>
+                    @yield('content')
 					<!-- /Page Header -->
 				</div>			
 			</div>
@@ -70,15 +71,70 @@
 		<!-- Slimscroll JS -->
         <script src="{{ asset('assets/admin/plugins/slimscroll/jquery.slimscroll.min.js') }}"></script>
 		
-		<script src="{{ asset('assets/admin/plugins/raphael/raphael.min.js') }}"></script>    
-		<script src="{{ asset('assets/admin/plugins/morris/morris.min.js') }}"></script>  
-		<script src="{{ asset('assets/admin/js/chart.morris.js') }}"></script>
+		<script src="{{ asset('assets/admin/plugins/raphael/raphael.min.js') }}"></script>
 
         @stack('plugin-script')
 		
 		<!-- Custom JS -->
 		<script  src="{{ asset('assets/admin/js/script.js') }}"></script>
-        @stack('custom-script')
+
+        <script>
+            //----Delete data
+            $(document).ready(function() {
+                const swalWithBootstrapButtonsConfirm = Swal.mixin();
+                const swalWithBootstrapButtons = Swal.mixin();
+
+                $(document).on('click', '.delete-item', function(e) {
+                    e.preventDefault();
+                    var id = $(this).data('id');
+                    var url = $(this).data('url');
+                    var label = $(this).data('label');
+
+                    swalWithBootstrapButtonsConfirm.fire({
+                        title: `Yakin ingin menghapus [ ${label} ] ?`,
+                        text: "Data yang sudah di hapus tidak bisa dikembalikan!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Hapus data',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true,
+                        showLoaderOnConfirm: true,
+                        preConfirm: () => {
+                            return $.ajax({
+                                type: "POST",
+                                dataType: "JSON",
+                                url: url,
+                                data: {
+                                    "_method": 'DELETE',
+                                    "_token": "{{ csrf_token() }}",
+                                }
+                            }).then((data) => {
+                                let message = 'Data has been deleted..!';
+                                if (data.message) {
+                                    message = data.message;
+                                }
+                                swalWithBootstrapButtons.fire('Berhasil!', message, 'success');
+                                $('#datatable').DataTable().ajax.reload();
+                            }, (data) => {
+                                let message = '';
+                                if (data.responseJSON.message) {
+                                    message = data.responseJSON.message;
+                                }
+                                swalWithBootstrapButtons.fire('Oops!', `Gagal menghapus data, ${message}`, 'error');
+                                if (data.status === 404) {
+                                    $('#datatable').DataTable().ajax.reload();
+                                }
+                            });
+                        },
+                        allowOutsideClick: () => !swalWithBootstrapButtons.isLoading(),
+                        backdrop: true
+                    });
+                });
+            });
+            //----End Delete data
+        </script>
+
+        @stack('custom-scripts')
 		
     </body>
 

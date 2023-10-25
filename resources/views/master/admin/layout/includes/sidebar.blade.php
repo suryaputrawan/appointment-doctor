@@ -15,6 +15,9 @@
                 <li class=""> 
                     <a href="#"><i class="fe fe-user-plus"></i> <span>Doctors</span></a>
                 </li>
+                <li class="{{ request()->routeIs('admin.speciality.index') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.speciality.index') }}"><i class="fe fe-users"></i> <span>Specialities</span></a>
+                </li>
                 {{-- <li> 
                     <a href="appointment-list.html"><i class="fe fe-layout"></i> <span>Appointments</span></a>
                 </li>
