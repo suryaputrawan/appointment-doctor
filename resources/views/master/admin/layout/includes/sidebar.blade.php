@@ -5,8 +5,15 @@
                 <li class="menu-title"> 
                     <span>Main</span>
                 </li>
-                <li class="active"> 
-                    <a href="index.html"><i class="fe fe-home"></i> <span>Dashboard</span></a>
+                <li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.dashboard') }}"><i class="fe fe-home"></i> <span>Dashboard</span></a>
+                </li>
+
+                <li class="menu-title"> 
+                    <span>Master</span>
+                </li>
+                <li class=""> 
+                    <a href="#"><i class="fe fe-user-plus"></i> <span>Doctors</span></a>
                 </li>
                 {{-- <li> 
                     <a href="appointment-list.html"><i class="fe fe-layout"></i> <span>Appointments</span></a>
