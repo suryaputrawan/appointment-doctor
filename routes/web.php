@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DoctorController;
+use App\Http\Controllers\Admin\DoctorEducationController;
 use App\Http\Controllers\Admin\SpecialityController;
 
 Route::get('/', function () {
@@ -19,4 +20,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::resource('speciality', SpecialityController::class);
     Route::resource('doctor', DoctorController::class);
+
+    Route::get('doctor-education/list/{id}', [DoctorEducationController::class, 'list'])->name('doctor-education.list');
+    Route::resource('doctor-education', DoctorEducationController::class);
 });

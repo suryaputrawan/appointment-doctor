@@ -115,6 +115,7 @@
                                 }
                                 swalWithBootstrapButtons.fire('Berhasil!', message, 'success');
                                 $('#datatable').DataTable().ajax.reload();
+                                $('#datatable-education').DataTable().ajax.reload();
                             }, (data) => {
                                 let message = '';
                                 if (data.responseJSON.message) {
@@ -123,6 +124,7 @@
                                 swalWithBootstrapButtons.fire('Oops!', `Gagal menghapus data, ${message}`, 'error');
                                 if (data.status === 404) {
                                     $('#datatable').DataTable().ajax.reload();
+                                    $('#datatable-education').DataTable().ajax.reload();
                                 }
                             });
                         },
