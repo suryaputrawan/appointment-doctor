@@ -8,6 +8,7 @@ use App\Models\Speciality;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\DoctorEducation;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -51,16 +52,16 @@ class DoctorController extends Controller
                 ->addColumn('speciality', function ($data) {
                     return $data->speciality ? $data->speciality->name : '';
                 })
-                ->addColumn('picture', function ($data) {
-                    return $data->picture ? '<img src="' . $data->takePicture . '" alt="Gambar" width="50">' : '';
+                ->addColumn('doctor', function ($data) {
+                    return $data->picture ? '<img class="avatar-img rounded-circle mr-3" src="' . $data->takePicture . '" alt="Gambar" width="50">' . $data->name : '';
                 })
-                ->rawColumns(['action', 'picture', 'speciality'])
+                ->rawColumns(['action', 'doctor', 'speciality'])
                 ->make(true);
         }
 
         return view('admin.modules.doctor.index', [
-            'pageTitle'     => 'Doctors',
-            'breadcrumb'    => 'Doctors',
+            'pageTitle'     => 'List of Doctors',
+            'breadcrumb'    => 'Doctor List',
             'specialities'  => Speciality::orderBy('name', 'asc')->get(),
         ]);
     }
@@ -241,6 +242,7 @@ class DoctorController extends Controller
         try {
             $id = Crypt::decryptString($id);
             $data = Doctor::find($id);
+            $doctorEducations = DoctorEducation::where('doctor_id', $id)->get();
 
             if (!$data) {
                 return response()->json([
@@ -249,12 +251,22 @@ class DoctorController extends Controller
                 ], 404);
             }
 
-            //Kondisi apabila terdapat path gambar pada tabel slider
+            //Kondisi apabila terdapat path gambar pada tabel
             if ($data->picture != null) {
                 Storage::delete($data->picture);
+                $data->delete();
+            } else {
+                $data->delete();
             }
+            //End kondisi
 
-            $data->delete();
+            //---Check apakah terdapat data pada tabel education
+            if ($doctorEducations != null) {
+                foreach ($doctorEducations as $doctorEducation) {
+                    $doctorEducation->delete();
+                }
+            }
+            //---End check
 
             DB::commit();
 

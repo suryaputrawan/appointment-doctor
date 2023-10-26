@@ -30,9 +30,8 @@
                             <table id="datatable" class="datatable table table-stripped" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20px">NO</th>
-                                        <th>NAMA</th>
-                                        <th>ICON</th>
+                                        <th style="width: 20px">#</th>
+                                        <th>Speciality</th>
                                         <th style="width: 100px">ACTION</th>
                                     </tr>
                                 </thead>
@@ -118,8 +117,7 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
-                { data: "name", name: "name", orderable: true  },
-                { data: "icon", name: "icon", orderable: false, searchable: false  },
+                { data: "speciality", name: "speciality", orderable: true  },
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
             ],
         });

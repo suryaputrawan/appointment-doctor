@@ -47,10 +47,10 @@ class SpecialityController extends Controller
                     </div>';
                     return $group;
                 })
-                ->addColumn('icon', function ($data) {
-                    return $data->picture ? '<img src="' . $data->takePicture . '" alt="Gambar" width="50">' : '';
+                ->addColumn('speciality', function ($data) {
+                    return $data->picture ? '<img src="' . $data->takePicture . '" alt="Gambar" width="50" class="mr-3">' . $data->name : '';
                 })
-                ->rawColumns(['action', 'icon'])
+                ->rawColumns(['action', 'speciality'])
                 ->make(true);
         }
 

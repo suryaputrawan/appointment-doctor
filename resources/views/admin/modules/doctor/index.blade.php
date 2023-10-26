@@ -14,6 +14,7 @@
                 <h3 class="page-title">{{ $pageTitle }}</h3>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item">Doctors</li>
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
@@ -32,10 +33,10 @@
                             <table id="datatable" class="datatable table table-stripped" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20px">NO</th>
-                                        <th>PICTURE</th>
-                                        <th>NAME</th>
-                                        <th>SPECIALITY</th>
+                                        <th style="width: 20px">#</th>
+                                        <th>Doctor Name</th>
+                                        <th>Specialization</th>
+                                        <th>Speciality</th>
                                         <th style="width: 100px">ACTION</th>
                                     </tr>
                                 </thead>
@@ -122,9 +123,9 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
-                { data: "picture", name: "picture", orderable: false, searchable: false  },
-                { data: "name", name: "name", orderable: true  },
-                { data: "speciality", name: "speciality", orderable: true  },  
+                { data: "doctor", name: "doctor", orderable: true  },
+                { data: "specialization", name: "specialization", orderable: false, searchable: false },
+                { data: "speciality", name: "speciality", orderable: true },  
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
             ],
         });
