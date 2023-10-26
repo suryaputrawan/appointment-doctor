@@ -55,7 +55,16 @@ class DoctorController extends Controller
                 ->addColumn('doctor', function ($data) {
                     return $data->picture ? '<img class="avatar-img rounded-circle mr-3" src="' . $data->takePicture . '" alt="Gambar" width="50">' . $data->name : '';
                 })
-                ->rawColumns(['action', 'doctor', 'speciality'])
+                ->addColumn('educations', function ($data) {
+                    $education = DoctorEducation::where('doctor_id', $data->id)->get();
+
+                    if ($education != null) {
+                        return $data->doctorEducation()->implode('university_name', ', ');
+                    } else {
+                        return '';
+                    }
+                })
+                ->rawColumns(['action', 'doctor', 'speciality', 'educations'])
                 ->make(true);
         }
 
