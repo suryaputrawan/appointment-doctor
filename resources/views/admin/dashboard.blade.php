@@ -1,4 +1,4 @@
-@extends('master.admin.layout.app')
+@extends('master.admin.layout.app', ['title' => 'Dashboard'])
 
 @section('content')
     <div class="page-header">

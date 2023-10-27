@@ -1,8 +1,10 @@
-@extends('master.admin.layout.app', ['title' => 'Specialities'])
+@extends('master.admin.layout.app', ['title' => 'Services'])
 
 @push('plugin-style')
     <!-- Datatables CSS -->
     <link rel="stylesheet" href="{{ asset('assets/admin/plugins/datatables/datatables.min.css') }}">
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/select2.min.css') }}">
 @endpush
 
 @section('content')
@@ -31,7 +33,8 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 20px">#</th>
-                                        <th>Speciality</th>
+                                        <th>Service Name</th>
+                                        <th>Description</th>
                                         <th style="width: 100px">ACTION</th>
                                     </tr>
                                 </thead>
@@ -46,7 +49,7 @@
     </div>
 
     {{-- Modal Action --}}
-    @include('admin.modules.speciality.modal.action')
+    @include('admin.modules.service.modal.action')
     {{-- End Modal Action --}}
 
 @endsection
@@ -55,6 +58,7 @@
     <!-- Datatables JS -->
     <script src="{{ asset('assets/admin/plugins/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/admin/plugins/datatables/datatables.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/select2.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 
@@ -103,7 +107,7 @@
 
         let dataTable = $("#datatable").DataTable({
             ...tableOptions,
-            ajax: "{{ route('admin.speciality.index') }}?type=datatable",
+            ajax: "{{ route('admin.services.index') }}?type=datatable",
             processing: true,
             serverSide : true,
             responsive: false,
@@ -117,41 +121,43 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
-                { data: "speciality", name: "speciality", orderable: true  },
+                { data: "service_name", name: "service_name", orderable: true  },
+                { data: "description", name: "description", orderable: false, searchable: false  },
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
             ],
         });
         //-----End datatable inizialitation
 
         //----form environtment
-        let ajaxUrl = "{{ route('admin.speciality.store') }}";
+        let ajaxUrl = "{{ route('admin.services.store') }}";
         let ajaxType = "POST";
 
         function clearForm() {
-            $("#speciality-form").find('input').val("");
-            $('#speciality-form').find('.error').text("");
+            $("#service-form").find('input').val("");
+            $('#service-form').find('.error').text("");
+            $("#description").val("");
             var preview = document.querySelector('#preview');
             preview.innerHTML = '';
-            ajaxUrl = "{{ route('admin.speciality.store') }}";
+            ajaxUrl = "{{ route('admin.services.store') }}";
             ajaxType = "POST";
         }
         //---End Form environment
 
         //----Modal
-        $(document).on('click', '#btn-add', function(e) {
-            $('#modal-add-specialities').modal('show');
-            $('#title').text('Add Specialities');
+        $(document).on('click', '#btn-add', function() {
+            $('#modal-add-service').modal('show');
+            $('#title').text('Add Service');
             $("#btn-submit-text").text("Save");
         });
 
         $(".btn-cancel").click(function() {
-            $('#modal-add-specialities').modal('hide');
+            $('#modal-add-service').modal('hide');
             clearForm();
         });
         //----End Modal
 
         //------ Submit Data
-        $('#speciality-form').on('submit', function(e) {
+        $('#service-form').on('submit', function(e) {
             e.preventDefault();
 
             var submitButton = $(this).find("button[type='submit']");
@@ -162,7 +168,7 @@
             var formData = new FormData(this);
             formData.append("_method", ajaxType)
 
-            $('#speciality-form').find('.error').text("");
+            $('#service-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -191,7 +197,7 @@
 
                     if (response.status == 200) {
                         clearForm();
-                        $('#modal-add-specialities').modal('hide');
+                        $('#modal-add-service').modal('hide');
                         $('#datatable').DataTable().ajax.reload();
 
                         Toast.fire({
@@ -199,8 +205,11 @@
                             title: response.message,
                         });
                     } else if (response.status == 400) {
-                        $.each(response.errors.speciality, function(key, error) {
-                            $('#error-speciality').append(error);
+                        $.each(response.errors.name, function(key, error) {
+                            $('#error-name').append(error);
+                        });
+                        $.each(response.errors.description, function(key, error) {
+                            $('#error-description').append(error);
                         });
                         $.each(response.errors.picture, function(key, error) {
                             $('#error-picture').append(error);
@@ -227,13 +236,14 @@
 
         //------ Load data to edit
         $(document).on('click', '#btn-edit', function(e) {
-            $('#modal-add-specialities').modal('show');
-            $('#title').text('Edit Specialities');
+            e.preventDefault();
+            $('#modal-add-service').modal('show');
+            $('#title').text('Edit Service');
 
             var id = $(this).data('id');
             var url = $(this).data('url');
 
-            $('#speciality-form').find('.error').text("");
+            $('#service-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -253,24 +263,24 @@
                 type   : "GET",
                 url    : url,
                 success: function(response) {
-                    
                     if (response.status == 404) {
                         clearForm();
-                        $('#modal-add-specialities').modal('hide');
+                        $('#modal-add-service').modal('hide');
                         Toast.fire({
                             icon: 'warning',
                             title: response.message,
                         });
                     } else {
-                        ajaxUrl = "{{ route('admin.speciality.index') }}/"+response.data.id;
+                        ajaxUrl = "{{ route('admin.services.index') }}/"+response.data.id;
                         ajaxType = "PUT";
 
-                        $('#speciality').val(response.data.name);
+                        $('#name').val(response.data.name);
+                        $('#description').val(response.data.description);
                         $('#preview').eq(0).html('<img src="/storage/'+response.data.picture+'"height="150" alt="Preview Gambar">');
                     }
                 },
                 error: function(response){
-                    $('#modal-add-specialities').modal('hide');
+                    $('#modal-add-doctor').modal('hide');
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',

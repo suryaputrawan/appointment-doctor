@@ -7,7 +7,7 @@
 
         <meta name="csrf-token" content="{{ csrf_token() }}" />
 
-        <title>Appointment - Dashboard</title>
+        <title>Appointment - {{ $title }}</title>
 		
 		<!-- Favicon -->
         <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/admin/img/favicon.png') }}">

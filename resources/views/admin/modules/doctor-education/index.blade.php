@@ -1,4 +1,4 @@
-@extends('master.admin.layout.app')
+@extends('master.admin.layout.app', ['title' => 'Doctor Educations'])
 
 @push('plugin-style')
     <!-- Datatables CSS -->
@@ -160,6 +160,7 @@
 
         $(".btn-clear").click(function() {
             clearForm();
+            $('#title').text('Add Doctor Education');
         });
         //----End Modal
 

@@ -5,11 +5,13 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\DoctorEducationController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SpecialityController;
 
-Route::get('/', function () {
-    return view('client.home');
+Route::name('client.')->group(function () {
+    include 'client.php';
 });
+
 
 Route::get('/admin', [AuthController::class, 'showloginform'])->name('login');
 Route::post('/admin/postlogin', [AuthController::class, 'postlogin'])->name('postlogin');
@@ -23,4 +25,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('doctor-education/list/{id}', [DoctorEducationController::class, 'list'])->name('doctor-education.list');
     Route::resource('doctor-education', DoctorEducationController::class);
+
+    Route::resource('services', ServiceController::class);
 });
