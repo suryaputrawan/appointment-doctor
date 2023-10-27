@@ -7,13 +7,13 @@
                 <span></span>
             </span>
         </a>
-        <a href="index-2.html" class="navbar-brand logo">
+        <a href="{{ route('client.home') }}" class="navbar-brand logo">
             <img src="{{ asset('assets/client/img/SiloamCanggu-Logo.png') }}" class="img-fluid" alt="Logo">
         </a>
     </div>
     <div class="main-menu-wrapper">
         <div class="menu-header">
-            <a href="index-2.html" class="menu-logo">
+            <a href="{{ route('client.home') }}" class="menu-logo">
                 <img src="{{ asset('assets/client/img/logo.png') }}" class="img-fluid" alt="Logo">
             </a>
             <a id="menu_close" class="menu-close" href="javascript:void(0);">
@@ -21,10 +21,14 @@
             </a>
         </div>
         <ul class="main-nav">
-            <li class="active">
-                <a href="index-2.html">Home</a>
+            <li class="{{ request()->routeIs('client.home') ? 'active' : '' }}">
+                <a href="{{ route('client.home') }}">Home</a>
             </li>
-            <li class="has-submenu">
+            <li>
+                <a href="{{ route('login') }}" target="_blank">Admin</a>
+            </li>
+
+            {{-- <li class="has-submenu">
                 <a href="#">Doctors <i class="fas fa-chevron-down"></i></a>
                 <ul class="submenu">
                     <li><a href="doctor-dashboard.html">Doctor Dashboard</a></li>
@@ -80,7 +84,7 @@
             </li>
             <li class="login-link">
                 <a href="login.html">Login / Signup</a>
-            </li>
+            </li> --}}
         </ul>		 
     </div>		 
     <ul class="nav header-navbar-rht">
@@ -93,8 +97,8 @@
                 <p class="contact-info-header"> +62 361 9348888</p>
             </div>
         </li>
-        <li class="nav-item">
+        {{-- <li class="nav-item">
             <a class="nav-link header-login" href="login.html">login / Signup </a>
-        </li>
+        </li> --}}
     </ul>
 </nav>

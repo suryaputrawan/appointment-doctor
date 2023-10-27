@@ -132,35 +132,30 @@
 				@include('master.client.layout.includes.header')
 			</header>
 			<!-- /Header -->
+
+            <!-- Breadcrumb-->
+            @yield('breadcrumb')
+            <!-- /Breadcrumb -->
+
+            <!-- Page Content -->
+            @yield('content')
+            <!-- /Page Content -->
 			
 			<!-- Home Banner -->
-			<section class="section section-search">
-				@include('master.client.layout.includes.banner')
-			</section>
+            @yield('banner')
 			<!-- /Home Banner -->
 			  
 			<!-- Clinic and Specialities -->
-			<section class="section section-specialities">
-                <div class="container-fluid">
-                    @yield('specialities')
-                </div>
-			</section>	 
+            @yield('specialities')
+			 
 			<!-- Clinic and Specialities -->
 		  
 			<!-- Popular Section -->
-			<section class="section section-doctor">
-				<div class="container-fluid">
-				   @yield('doctor')
-				</div>
-			</section>
+            @yield('doctor')
 			<!-- /Popular Section -->
 		   
 		   <!-- Availabe Features -->
-		   <section class="section section-features">
-				<div class="container-fluid">
-				   @yield('services')
-				</div>
-			</section>		
+           @yield('services')		
 			<!-- Availabe Features -->
 			
 			<!-- Footer -->
@@ -181,6 +176,8 @@
 		
 		<!-- Slick JS -->
 		<script src="{{ asset('assets/client/js/slick.js') }}"></script>
+
+        @stack('script')
 		
 		<!-- Custom JS -->
 		<script src="{{ asset('assets/client/js/script.js') }}"></script>
