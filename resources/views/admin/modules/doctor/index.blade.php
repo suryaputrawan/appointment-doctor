@@ -37,7 +37,6 @@
                                         <th>Doctor Name</th>
                                         <th>Specialization</th>
                                         <th>Speciality</th>
-                                        <th>Educations</th>
                                         <th style="width: 100px">ACTION</th>
                                     </tr>
                                 </thead>
@@ -127,7 +126,6 @@
                 { data: "doctor", name: "doctor", orderable: true  },
                 { data: "specialization", name: "specialization", orderable: false, searchable: false },
                 { data: "speciality", name: "speciality", orderable: true },  
-                { data: "educations", name: "educations", orderable: false, searchable: false },  
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
             ],
         });

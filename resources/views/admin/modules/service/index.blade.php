@@ -33,9 +33,9 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 20px">#</th>
+                                        <th style="width: 100px">ACTION</th>
                                         <th>Service Name</th>
                                         <th>Description</th>
-                                        <th style="width: 100px">ACTION</th>
                                     </tr>
                                 </thead>
                                 <tbody class="align-middle">
@@ -121,9 +121,9 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
+                { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
                 { data: "service_name", name: "service_name", orderable: true  },
                 { data: "description", name: "description", orderable: false, searchable: false  },
-                { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
             ],
         });
         //-----End datatable inizialitation
