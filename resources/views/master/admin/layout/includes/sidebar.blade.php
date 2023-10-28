@@ -29,6 +29,9 @@
                         </li>
                     </ul>
                 </li>
+                <li class="{{ request()->routeIs('admin.companies.index') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.companies.index') }}"><i class="fa fa-building-o" aria-hidden="true"></i> <span>Company</span></a>
+                </li>
                 {{-- <li> 
                     <a href="appointment-list.html"><i class="fe fe-layout"></i> <span>Appointments</span></a>
                 </li>

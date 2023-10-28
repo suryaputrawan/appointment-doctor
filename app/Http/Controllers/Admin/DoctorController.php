@@ -186,7 +186,7 @@ class DoctorController extends Controller
             'specialization'        => 'required|min:3',
             'specialities'          => 'required',
             'about_me'              => 'required|min:5',
-            'picture'               => request('picture') ? 'mimes:pnjpg,jpeg,pngg|max:1000' : '',
+            'picture'               => request('picture') ? 'mimes:jpg,jpeg,png|max:1000' : '',
         ]);
 
         if ($validator->fails()) {

@@ -1,4 +1,4 @@
-@extends('master.admin.layout.app', ['title' => 'Doctor Educations'])
+@extends('master.admin.layout.app', ['title' => 'Company'])
 
 @push('plugin-style')
     <!-- Datatables CSS -->
@@ -14,9 +14,13 @@
                 <h3 class="page-title">{{ $pageTitle }}</h3>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item">Doctors</li>
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
+            </div>
+            <div class="col-sm-5 col">
+                <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
+                    Add
+                </a>
             </div>
         </div>
         
@@ -28,13 +32,14 @@
                             <table id="datatable" class="datatable table table-stripped" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20px">#</th>
+                                        <th>#</th>
                                         <th style="width: 100px">ACTION</th>
-                                        <th>Doctor Name</th>
-                                        <th>Educations</th>
+                                        <th>Company Name</th>
+                                        <th>Address</th>
+                                        <th>Email</th>
                                     </tr>
                                 </thead>
-                                <tbody class="align-middle">
+                                <tbody>
                                 </tbody>
                             </table>
                         </div>
@@ -45,7 +50,7 @@
     </div>
 
     {{-- Modal Action --}}
-    @include('admin.modules.doctor-education.modal.action')
+    @include('admin.modules.company.modal.action')
     {{-- End Modal Action --}}
 
 @endsection
@@ -60,6 +65,60 @@
 
 @push('custom-scripts')
 <script type="text/javascript">
+    //Preview Image
+    function previewImagesLogo() {
+        var preview = document.querySelector('#preview');
+        preview.innerHTML = '';
+        var files = document.querySelector('input[type=file]').files;
+    
+        function readAndPreview(file) {
+            // Make sure `file.name` matches our extensions criteria
+            if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
+                var reader = new FileReader();
+                reader.addEventListener('load', function() {
+                    var image = new Image();
+                    image.height = 150;
+                    image.title = file.name;
+                    image.src = this.result;
+                    preview.appendChild(image);
+                }, false);
+    
+                reader.readAsDataURL(file);
+            }
+        }
+    
+        if (files) {
+            [].forEach.call(files, readAndPreview);
+        }
+    };
+
+    function previewImagesIcon() {
+        var previewIcon = document.querySelector('#preview-icon');
+        previewIcon.innerHTML = '';
+        var files = document.querySelector('#icon').files;
+    
+        function readAndPreview(file) {
+            // Make sure `file.name` matches our extensions criteria
+            if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
+                var reader = new FileReader();
+                reader.addEventListener('load', function() {
+                    var image = new Image();
+                    image.height = 150;
+                    image.title = file.name;
+                    image.src = this.result;
+                    previewIcon.appendChild(image);
+                }, false);
+    
+                reader.readAsDataURL(file);
+            }
+        }
+    
+        if (files) {
+            [].forEach.call(files, readAndPreview);
+        }
+    };
+    //---End preview image
+
     $(document).ready(function() {
 
         //datatable initialization
@@ -76,10 +135,10 @@
 
         let dataTable = $("#datatable").DataTable({
             ...tableOptions,
-            ajax: "{{ route('admin.doctor-education.index') }}?type=datatable",
+            ajax: "{{ route('admin.companies.index') }}?type=datatable",
             processing: true,
             serverSide : true,
-            responsive: false,
+            responsive: true,
             destroy: true,
             columns: [
                 {
@@ -91,81 +150,46 @@
                     className: "text-center",
                 },
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
-                { data: "name", name: "name", orderable: true  },
-                { data: "educations", name: "educations", orderable: false, searchable: false },
+                { data: "company_name", name: "company_name", orderable: true  },
+                { data: "address", name: "address", orderable: false, searchable: false },
+                { data: "email", name: "email", orderable: true, searchable: false },  
             ],
         });
         //-----End datatable inizialitation
 
         //----form environtment
-        let ajaxUrl = "{{ route('admin.doctor-education.store') }}";
+        let ajaxUrl = "{{ route('admin.companies.store') }}";
         let ajaxType = "POST";
 
         function clearForm() {
-            $("#university").val("");
-            $("#specialization").val("");
-            $("#start-year").val("");
-            $("#end-year").val("");
-            $('#doctor-education-form').find('.error').text("");
+            $("#company-form").find('input').val("");
+            $('#company-form').find('.error').text("");
 
-            ajaxUrl = "{{ route('admin.doctor-education.store') }}";
+            var preview = document.querySelector('#preview');
+            var previewIcon = document.querySelector('#preview-icon');
+            preview.innerHTML = '';
+            previewIcon.innerHTML = '';
+
+            ajaxUrl = "{{ route('admin.companies.store') }}";
             ajaxType = "POST";
-
-            $("#btn-submit-text").text("Save");
         }
         //---End Form environment
 
         //----Modal
-        $(document).on('click', '#btn-add', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            var nama = $(this).data('name');
-            var url = $(this).data('url');
-
-            $('#modal-add-doctor-education').modal('show');
-            $('#title').text('Add Doctor Education');
-            $('#title-span').text(nama);
-            $('#doctor-id').val(id);
+        $(document).on('click', '#btn-add', function() {
+            $('#modal-add-company').modal('show');
+            $('#title').text('Add Company');
             $("#btn-submit-text").text("Save");
-
-            $("#datatable-education").DataTable({
-                ...tableOptions,
-                ajax: `${url}?type=datatable`,
-                processing: true,
-                serverSide : true,
-                responsive: false,
-                destroy: true,
-                columns: [
-                    {
-                        data: "id",
-                        render: function (data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        },
-                        orderable: false, searchable: false,
-                        className: "text-center",
-                    },
-                    { data: "university_name", name: "university_name", orderable: true  },
-                    { data: "specialization", name: "specialization", orderable: true  },
-                    { data: "year", name: "year", orderable: false, searchable: false  },
-                    { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
-                ],
-            });
         });
 
         $(".btn-cancel").click(function() {
-            $('#modal-add-doctor-education').modal('hide');
+            $('#modal-add-company').modal('hide');
             clearForm();
-            $('#datatable').DataTable().ajax.reload();
-        });
-
-        $(".btn-clear").click(function() {
-            clearForm();
-            $('#title').text('Add Doctor Education');
         });
         //----End Modal
 
         //------ Submit Data
-        $('#doctor-education-form').on('submit', function(e) {
+        $('#company-form').on('submit', function(e) {
             e.preventDefault();
 
             var submitButton = $(this).find("button[type='submit']");
@@ -173,10 +197,12 @@
             submitButton.prop('disabled',true);
             submitButtonLoading.toggle();
 
+            $('.btn-cancel').toggle();
+
             var formData = new FormData(this);
             formData.append("_method", ajaxType)
 
-            $('#doctor-education-form').find('.error').text("");
+            $('#company-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -205,25 +231,43 @@
 
                     if (response.status == 200) {
                         clearForm();
-                        $('#title').text('Add Doctor Education');
-                        $('#datatable-education').DataTable().ajax.reload();
+                        $('.btn-cancel').toggle();
+                        $('#modal-add-company').modal('hide');
+                        $('#datatable').DataTable().ajax.reload();
 
                         Toast.fire({
                             icon: 'success',
                             title: response.message,
                         });
                     } else if (response.status == 400) {
-                        $.each(response.errors.university, function(key, error) {
-                            $('#error-university').append(error);
+                        $('.btn-cancel').toggle();
+                        
+                        $.each(response.errors.name, function(key, error) {
+                            $('#error-name').append(error);
                         });
-                        $.each(response.errors.specialization, function(key, error) {
-                            $('#error-specialization').append(error);
+                        $.each(response.errors.address, function(key, error) {
+                            $('#error-address').append(error);
                         });
-                        $.each(response.errors.start_year, function(key, error) {
-                            $('#error-start-year').append(error);
+                        $.each(response.errors.phone, function(key, error) {
+                            $('#error-phone').append(error);
                         });
-                        $.each(response.errors.end_year, function(key, error) {
-                            $('#error-end-year').append(error);
+                        $.each(response.errors.whatsapp, function(key, error) {
+                            $('#error-whatsapp').append(error);
+                        });
+                        $.each(response.errors.email, function(key, error) {
+                            $('#error-email').append(error);
+                        });
+                        $.each(response.errors.instagram, function(key, error) {
+                            $('#error-instagram').append(error);
+                        });
+                        $.each(response.errors.facebook, function(key, error) {
+                            $('#error-facebook').append(error);
+                        });
+                        $.each(response.errors.logo, function(key, error) {
+                            $('#error-logo').append(error);
+                        });
+                        $.each(response.errors.icon, function(key, error) {
+                            $('#error-icon').append(error);
                         });
                     } else {
                         Toast.fire({
@@ -236,6 +280,8 @@
                     submitButton.prop('disabled',false);
                     submitButtonLoading.toggle();
 
+                    $('.btn-cancel').toggle();
+
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
@@ -246,19 +292,15 @@
         //------ End Submit Data
 
         //------ Load data to edit
-        $(document).on('click', '#btn-edit-education', function(e) {
+        $(document).on('click', '#btn-edit', function(e) {
             e.preventDefault();
+            $('#modal-add-company').modal('show');
+            $('#title').text('Edit Company');
 
             var id = $(this).data('id');
             var url = $(this).data('url');
-            var nama = $(this).data('name');
-            var doctorId = $(this).data('doctor-id');
 
-            $('#title').text('Edit Doctor Education');
-            $('#title-span').text(nama);
-            $('#doctor-id').val(doctorId);
-
-            $('#doctor-education-form').find('.error').text("");
+            $('#company-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -272,32 +314,37 @@
                 }
             });
 
-            $("#item-loading").show(500);
             $("#btn-submit-text").text("Save Change");
 
             $.ajax({
                 type   : "GET",
                 url    : url,
                 success: function(response) {
-                    $("#item-loading").hide(500);
                     if (response.status == 404) {
                         clearForm();
-
+                        $('#modal-add-company').modal('hide');
                         Toast.fire({
                             icon: 'warning',
                             title: response.message,
                         });
                     } else {
-                        ajaxUrl = "{{ route('admin.doctor-education.index') }}/"+response.data.id;
+                        ajaxUrl = "{{ route('admin.companies.index') }}/"+response.data.id;
                         ajaxType = "PUT";
 
-                        $('#university').val(response.data.university_name);
-                        $('#specialization').val(response.data.specialization);
-                        $('#start-year').val(response.data.start_year);
-                        $('#end-year').val(response.data.end_year);
+                        $('#name').val(response.data.name);
+                        $('#address').val(response.data.address);
+                        $('#phone').val(response.data.phone);
+                        $('#whatsapp').val(response.data.whatsapp);
+                        $('#email').val(response.data.email);
+                        $('#instagram').val(response.data.instagram);
+                        $('#facebook').val(response.data.facebook);
+
+                        $('#preview').eq(0).html('<img src="/storage/'+response.data.logo+'"height="150" alt="Preview Gambar">');
+                        $('#preview-icon').eq(0).html('<img src="/storage/'+response.data.favicon+'"height="150" alt="Preview Gambar">');
                     }
                 },
                 error: function(response){
+                    $('#modal-add-company').modal('hide');
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',

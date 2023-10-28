@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Throwable;
-use App\Models\Service;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-class ServiceController extends Controller
+class CompanyController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,13 +19,13 @@ class ServiceController extends Controller
     public function index()
     {
         if (request()->type == 'datatable') {
-            $data = Service::query()->orderBy('name', 'asc')->get();
+            $data = Company::query()->orderBy('name', 'asc')->get();
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
-                    $editRoute       = 'admin.services.edit';
-                    $deleteRoute     = 'admin.services.destroy';
-                    $viewRoute       = 'admin.services.show';
+                    $editRoute       = 'admin.companies.edit';
+                    $deleteRoute     = 'admin.companies.destroy';
+                    $viewRoute       = 'admin.companies.show';
                     $dataId          = Crypt::encryptString($data->id);
                     $dataDeleteLabel = $data->name;
 
@@ -47,16 +47,16 @@ class ServiceController extends Controller
                     </div>';
                     return $group;
                 })
-                ->addColumn('service_name', function ($data) {
-                    return $data->picture ? '<img class="avatar-img rounded-circle mr-3" src="' . $data->takePicture . '" alt="Gambar" width="50">' . $data->name : '';
+                ->addColumn('company_name', function ($data) {
+                    return $data->logo ? '<img class="mr-3" src="' . $data->takeLogo . '" alt="Gambar" width="50">' . $data->name : '';
                 })
-                ->rawColumns(['action', 'service_name'])
+                ->rawColumns(['action', 'company_name'])
                 ->make(true);
         }
 
-        return view('admin.modules.service.index', [
-            'pageTitle'     => 'List of Service',
-            'breadcrumb'    => 'Services',
+        return view('admin.modules.company.index', [
+            'pageTitle'     => 'Company',
+            'breadcrumb'    => 'Company',
         ]);
     }
 
@@ -75,12 +75,22 @@ class ServiceController extends Controller
     {
         $validator = Validator::make([
             'name'                  => $request->name,
-            'description'           => $request->description,
-            'picture'               => $request->picture
+            'address'               => $request->address,
+            'phone'                 => $request->phone,
+            'whatsapp'              => $request->whatsapp,
+            'email'                 => $request->email,
+            'instagram'             => $request->instagram,
+            'facebook'              => $request->facebook,
+            'logo'                  => $request->logo,
+            'icon'                  => $request->icon
         ], [
-            'name'                  => 'required|min:5|unique:services,name,NULL,id',
-            'description'           => 'required|min:5',
-            'picture'               => 'required|mimes:jpg,jpeg,png|max:1000',
+            'name'                  => 'required|max:100|min:5|unique:companies,name,NULL,id',
+            'address'               => 'required|min:5',
+            'phone'                 => 'required|min:7',
+            'whatsapp'              => 'required|min:11',
+            'email'                 => 'required|email|unique:companies,email',
+            'logo'                  => 'required|mimes:png|max:1000',
+            'icon'                  => 'required|mimes:png|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -91,15 +101,21 @@ class ServiceController extends Controller
         } else {
             DB::beginTransaction();
             try {
-                Service::create([
+                Company::create([
                     'name'                  => $request->name,
-                    'description'           => $request->description,
-                    'picture'               => request('picture') ? $request->file('picture')->store('images/services') : null
+                    'address'               => $request->address,
+                    'phone'                 => $request->phone,
+                    'whatsapp'              => $request->whatsapp,
+                    'email'                 => $request->email,
+                    'instagram'             => $request->instagram,
+                    'facebook'              => $request->facebook,
+                    'logo'                  => request('logo') ? $request->file('logo')->store('images/company/logo') : null,
+                    'favicon'               => request('icon') ? $request->file('icon')->store('images/company/favicon') : null,
                 ]);
                 DB::commit();
                 return response()->json([
                     'status'  => 200,
-                    'message' => 'Service has been created',
+                    'message' => 'Company has been created',
                 ], 200);
             } catch (Throwable $th) {
                 DB::rollBack();
@@ -114,7 +130,7 @@ class ServiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Service $service)
+    public function show(Company $company)
     {
         //
     }
@@ -126,7 +142,7 @@ class ServiceController extends Controller
     {
         try {
             $id = Crypt::decryptString($id);
-            $data = Service::find($id);
+            $data = Company::find($id);
 
             if ($data) {
                 return response()->json([
@@ -136,7 +152,7 @@ class ServiceController extends Controller
             } else {
                 return response()->json([
                     'status'    => 404,
-                    'message'   => 'Service Not Found',
+                    'message'   => 'Company Not Found',
                 ]);
             }
         } catch (\Throwable $e) {
@@ -152,16 +168,26 @@ class ServiceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = Service::find($id);
+        $data = Company::find($id);
 
         $validator = Validator::make([
             'name'                  => $request->name,
-            'description'           => $request->description,
-            'picture'               => $request->picture
+            'address'               => $request->address,
+            'phone'                 => $request->phone,
+            'whatsapp'              => $request->whatsapp,
+            'email'                 => $request->email,
+            'instagram'             => $request->instagram,
+            'facebook'              => $request->facebook,
+            'logo'                  => $request->logo,
+            'icon'                  => $request->icon
         ], [
-            'name'                  => 'required|min:5|unique:services,name,' . $data->id,
-            'description'           => 'required|min:5',
-            'picture'               => request('picture') ? 'mimes:jpg,jpeg,png|max:1000' : '',
+            'name'                  => 'required|max:100|min:5|unique:companies,name,' . $data->id,
+            'address'               => 'required|min:5',
+            'phone'                 => 'required|min:7',
+            'whatsapp'              => 'required|min:11',
+            'email'                 => 'required|email|unique:companies,email,' . $data->id,
+            'logo'                  => request('logo') ? 'mimes:png|max:1000' : '',
+            'icon'                  => request('icon') ? 'mimes:png|max:500' : '',
         ]);
 
         if ($validator->fails()) {
@@ -174,30 +200,47 @@ class ServiceController extends Controller
                 DB::beginTransaction();
 
                 //--Membuat kondisi langsung mendelete gambar yang lama pada storage
-                if (request('picture')) {
-                    if ($data->picture) {
-                        Storage::delete($data->picture);
+                if (request('logo')) {
+                    if ($data->logo) {
+                        Storage::delete($data->logo);
                     }
-                    $picture = request()->file('picture')->store('images/services');
-                } elseif ($data->picture) {
-                    $picture = $data->picture;
+                    $logo = request()->file('logo')->store('images/company/logo');
+                } elseif ($data->logo) {
+                    $logo = $data->logo;
                 } else {
-                    $picture = null;
+                    $logo = null;
+                }
+
+                if (request('icon')) {
+                    if ($data->favicon) {
+                        Storage::delete($data->favicon);
+                    }
+                    $icon = request()->file('icon')->store('images/company/favicon');
+                } elseif ($data->favicon) {
+                    $icon = $data->favicon;
+                } else {
+                    $icon = null;
                 }
                 //--End
 
                 try {
                     $data->update([
                         'name'                  => $request->name,
-                        'description'           => $request->description,
-                        'picture'               => $picture,
+                        'address'               => $request->address,
+                        'phone'                 => $request->phone,
+                        'whatsapp'              => $request->whatsapp,
+                        'email'                 => $request->email,
+                        'instagram'             => $request->instagram,
+                        'facebook'              => $request->facebook,
+                        'logo'                  => $logo,
+                        'favicon'               => $icon
                     ]);
 
                     DB::commit();
 
                     return response()->json([
                         'status'  => 200,
-                        'message' => 'Service has been updated',
+                        'message' => 'Company has been updated',
                     ], 200);
                 } catch (\Throwable $th) {
                     DB::rollBack();
@@ -223,7 +266,7 @@ class ServiceController extends Controller
         DB::beginTransaction();
         try {
             $id = Crypt::decryptString($id);
-            $data = Service::find($id);
+            $data = Company::find($id);
 
             if (!$data) {
                 return response()->json([
@@ -233,8 +276,11 @@ class ServiceController extends Controller
             }
 
             //Kondisi apabila terdapat path gambar pada tabel
-            if ($data->picture != null) {
-                Storage::delete($data->picture);
+            if ($data->logo != null) {
+                Storage::delete($data->logo);
+                if ($data->favicon != null) {
+                    Storage::delete($data->favicon);
+                }
                 $data->delete();
             } else {
                 $data->delete();
@@ -245,7 +291,7 @@ class ServiceController extends Controller
 
             return response()->json([
                 'status'  => 200,
-                'message' => "Service has been deleted..!",
+                'message' => "Company has been deleted..!",
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
