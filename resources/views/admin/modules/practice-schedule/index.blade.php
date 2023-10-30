@@ -1,4 +1,4 @@
-@extends('master.admin.layout.app', ['title' => 'Doctors'])
+@extends('master.admin.layout.app', ['title' => 'Doctor Practice Schedules'])
 
 @push('plugin-style')
     <!-- Datatables CSS -->
@@ -14,7 +14,6 @@
                 <h3 class="page-title">{{ $pageTitle }}</h3>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item">Doctors</li>
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
@@ -33,14 +32,15 @@
                             <table id="datatable" class="datatable table table-stripped" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20px">#</th>
-                                        <th>Doctor Name</th>
-                                        <th>Specialization</th>
-                                        <th>Speciality</th>
+                                        <th style="width: 10px">#</th>
                                         <th style="width: 100px">ACTION</th>
+                                        <th>Date</th>
+                                        <th>Doctor Name</th>
+                                        <th>Time</th>
+                                        <th>Booking Status</th>
                                     </tr>
                                 </thead>
-                                <tbody class="align-middle">
+                                <tbody>
                                 </tbody>
                             </table>
                         </div>
@@ -51,7 +51,7 @@
     </div>
 
     {{-- Modal Action --}}
-    @include('admin.modules.doctor.modal.action')
+    @include('admin.modules.practice-schedule.modal.action')
     {{-- End Modal Action --}}
 
 @endsection
@@ -66,53 +66,14 @@
 
 @push('custom-scripts')
 <script type="text/javascript">
-    //Preview Image
-    function previewImages() {
-        var preview = document.querySelector('#preview');
-        preview.innerHTML = '';
-        var files = document.querySelector('input[type=file]').files;
-    
-        function readAndPreview(file) {
-            // Make sure `file.name` matches our extensions criteria
-            if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
-                var reader = new FileReader();
-                reader.addEventListener('load', function() {
-                    var image = new Image();
-                    image.height = 150;
-                    image.title = file.name;
-                    image.src = this.result;
-                    preview.appendChild(image);
-                }, false);
-    
-                reader.readAsDataURL(file);
-            }
-        }
-    
-        if (files) {
-            [].forEach.call(files, readAndPreview);
-        }
-    };
-
     $(document).ready(function() {
 
         //datatable initialization
-        var tableOptions = {
-            "aLengthMenu": [
-                [10, 30, 50, -1],
-                [10, 30, 50, "All"]
-            ],
-            "iDisplayLength": 10,
-            "language": {
-                search: ""
-            }
-        };
-
         let dataTable = $("#datatable").DataTable({
-            ...tableOptions,
-            ajax: "{{ route('admin.doctor.index') }}?type=datatable",
+            ajax: "{{ route('admin.practice-schedules.index') }}?type=datatable",
             processing: true,
             serverSide : true,
-            responsive: false,
+            responsive: true,
             destroy: true,
             columns: [
                 {
@@ -123,45 +84,45 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
-                { data: "doctor", name: "doctor", orderable: true  },
-                { data: "specialization", name: "specialization", orderable: false, searchable: false },
-                { data: "speciality", name: "speciality", orderable: true },  
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                { data: "date", name: "date", orderable: true  },
+                { data: "doctor_name", name: "doctor_name", orderable: false, searchable: false },
+                { data: "time", name: "time", orderable: false, searchable: false, className: "text-center" },  
+                { data: "booking_status", name: "booking_status", orderable: true, searchable: false, className: "text-center" },  
             ],
         });
         //-----End datatable inizialitation
 
         //----form environtment
-        let ajaxUrl = "{{ route('admin.doctor.store') }}";
+        let ajaxUrl = "{{ route('admin.practice-schedules.store') }}";
         let ajaxType = "POST";
 
         function clearForm() {
-            $("#doctor-form").find('input').val("");
-            $('#doctor-form').find('.error').text("");
-            $("#specialities").val("").trigger('change');
-            $("#about-me").val("");
-            var preview = document.querySelector('#preview');
-            preview.innerHTML = '';
-            ajaxUrl = "{{ route('admin.doctor.store') }}";
+            $("#practice-schedule-form").find('input').val("");
+            $('#practice-schedule-form').find('.error').text("");
+
+            $("#doctor").val("").trigger('change');
+
+            ajaxUrl = "{{ route('admin.practice-schedules.store') }}";
             ajaxType = "POST";
         }
         //---End Form environment
 
         //----Modal
         $(document).on('click', '#btn-add', function() {
-            $('#modal-add-doctor').modal('show');
-            $('#title').text('Add Doctor');
+            $('#modal-add-practice-schedule').modal('show');
+            $('#title').text('Add Doctor Practice Schedule');
             $("#btn-submit-text").text("Save");
         });
 
         $(".btn-cancel").click(function() {
-            $('#modal-add-doctor').modal('hide');
+            $('#modal-add-practice-schedule').modal('hide');
             clearForm();
         });
         //----End Modal
 
         //------ Submit Data
-        $('#doctor-form').on('submit', function(e) {
+        $('#practice-schedule-form').on('submit', function(e) {
             e.preventDefault();
 
             var submitButton = $(this).find("button[type='submit']");
@@ -169,10 +130,12 @@
             submitButton.prop('disabled',true);
             submitButtonLoading.toggle();
 
+            $('.btn-cancel').toggle();
+
             var formData = new FormData(this);
             formData.append("_method", ajaxType)
 
-            $('#doctor-form').find('.error').text("");
+            $('#practice-schedule-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -201,7 +164,8 @@
 
                     if (response.status == 200) {
                         clearForm();
-                        $('#modal-add-doctor').modal('hide');
+                        $('.btn-cancel').toggle();
+                        $('#modal-add-practice-schedule').modal('hide');
                         $('#datatable').DataTable().ajax.reload();
 
                         Toast.fire({
@@ -209,21 +173,26 @@
                             title: response.message,
                         });
                     } else if (response.status == 400) {
-                        $.each(response.errors.name, function(key, error) {
-                            $('#error-name').append(error);
+                        $('.btn-cancel').toggle();
+
+                        $.each(response.errors.date, function(key, error) {
+                            $('#error-date').append(error);
                         });
-                        $.each(response.errors.specialization, function(key, error) {
-                            $('#error-specialization').append(error);
+                        $.each(response.errors.doctor, function(key, error) {
+                            $('#error-doctor').append(error);
                         });
-                        $.each(response.errors.specialities, function(key, error) {
-                            $('#error-specialities').append(error);
+                        $.each(response.errors.start_time, function(key, error) {
+                            $('#error-start-time').append(error);
                         });
-                        $.each(response.errors.about_me, function(key, error) {
-                            $('#error-about').append(error);
+                        $.each(response.errors.end_time, function(key, error) {
+                            $('#error-end-time').append(error);
                         });
-                        $.each(response.errors.picture, function(key, error) {
-                            $('#error-picture').append(error);
-                        });
+                    } else if (response.status == 404) {
+                        $('.btn-cancel').toggle();
+
+                        $('#error-date').append(response.errorDate);
+                        $('#error-start-time').append(response.errorStartTime);
+                        $('#error-end-time').append(response.errorEndTime);
                     } else {
                         Toast.fire({
                             icon: 'warning',
@@ -234,6 +203,8 @@
                 error: function(response){
                     submitButton.prop('disabled',false);
                     submitButtonLoading.toggle();
+
+                    $('.btn-cancel').toggle();
 
                     Toast.fire({
                         icon: 'error',
@@ -247,13 +218,13 @@
         //------ Load data to edit
         $(document).on('click', '#btn-edit', function(e) {
             e.preventDefault();
-            $('#modal-add-doctor').modal('show');
-            $('#title').text('Edit Doctor');
+            $('#modal-add-practice-schedule').modal('show');
+            $('#title').text('Edit Doctor Practice Schedule');
 
             var id = $(this).data('id');
             var url = $(this).data('url');
 
-            $('#doctor-form').find('.error').text("");
+            $('#practice-schedule-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -275,24 +246,23 @@
                 success: function(response) {
                     if (response.status == 404) {
                         clearForm();
-                        $('#modal-add-doctor').modal('hide');
+                        $('#modal-add-practice-schedule').modal('hide');
                         Toast.fire({
                             icon: 'warning',
                             title: response.message,
                         });
                     } else {
-                        ajaxUrl = "{{ route('admin.doctor.index') }}/"+response.data.id;
+                        ajaxUrl = "{{ route('admin.practice-schedules.index') }}/"+response.data.id;
                         ajaxType = "PUT";
 
-                        $('#name').val(response.data.name);
-                        $('#specialization').val(response.data.specialization);
-                        $('#specialities').val(response.data.speciality_id).trigger('change');
-                        $('#about-me').val(response.data.about_me);
-                        $('#preview').eq(0).html('<img src="/storage/'+response.data.picture+'"height="150" alt="Preview Gambar">');
+                        $('#date').val(response.data.date);
+                        $('#doctor').val(response.data.doctor_id).trigger('change');
+                        $('#start-time').val(response.data.start_time);
+                        $('#end-time').val(response.data.end_time);
                     }
                 },
                 error: function(response){
-                    $('#modal-add-doctor').modal('hide');
+                    $('#modal-add-practice-schedule').modal('hide');
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',

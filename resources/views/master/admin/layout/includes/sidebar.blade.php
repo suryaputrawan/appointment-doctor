@@ -8,6 +8,9 @@
                 <li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"> 
                     <a href="{{ route('admin.dashboard') }}"><i class="fe fe-home"></i> <span>Dashboard</span></a>
                 </li>
+                <li class="{{ request()->routeIs('admin.practice-schedules.index') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.practice-schedules.index') }}"><i class="fe fe-calendar"></i> <span>Doctor Schedules</span></a>
+                </li>
 
                 <li class="menu-title"> 
                     <span>Master</span>

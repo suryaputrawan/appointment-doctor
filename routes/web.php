@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\DoctorEducationController;
+use App\Http\Controllers\Admin\PracticeScheduleController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SpecialityController;
 
@@ -29,4 +30,5 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::resource('services', ServiceController::class);
     Route::resource('companies', CompanyController::class);
+    Route::resource('practice-schedules', PracticeScheduleController::class);
 });
