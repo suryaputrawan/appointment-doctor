@@ -1,14 +1,15 @@
 <?php
 
-use App\Http\Controllers\Admin\CompanyController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DoctorController;
+use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\SpecialityController;
+use App\Http\Controllers\Admin\DoctorLocationController;
 use App\Http\Controllers\Admin\DoctorEducationController;
 use App\Http\Controllers\Admin\PracticeScheduleController;
-use App\Http\Controllers\Admin\ServiceController;
-use App\Http\Controllers\Admin\SpecialityController;
 
 Route::name('client.')->group(function () {
     include 'client.php';
@@ -31,4 +32,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('services', ServiceController::class);
     Route::resource('companies', CompanyController::class);
     Route::resource('practice-schedules', PracticeScheduleController::class);
+
+    Route::get('doctor-location/list/{id}', [DoctorLocationController::class, 'list'])->name('doctor-location.list');
+    Route::resource('doctor-location', DoctorLocationController::class);
 });

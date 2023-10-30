@@ -8,9 +8,6 @@
                 <li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"> 
                     <a href="{{ route('admin.dashboard') }}"><i class="fe fe-home"></i> <span>Dashboard</span></a>
                 </li>
-                <li class="{{ request()->routeIs('admin.practice-schedules.index') ? 'active' : '' }}"> 
-                    <a href="{{ route('admin.practice-schedules.index') }}"><i class="fe fe-calendar"></i> <span>Doctor Schedules</span></a>
-                </li>
 
                 <li class="menu-title"> 
                     <span>Master</span>
@@ -28,9 +25,15 @@
                             <a class="{{ request()->routeIs('admin.doctor.index') ? 'active' : '' }}" href="{{ route('admin.doctor.index') }}">Doctor List</a>
                         </li>
                         <li>
-                            <a class="{{ request()->routeIs('admin.doctor-education.index') ? 'active' : '' }}" href="{{ route('admin.doctor-education.index') }}">Doctor Educations</a>
+                            <a class="{{ request()->routeIs('admin.doctor-education.index') ? 'active' : '' }}" href="{{ route('admin.doctor-education.index') }}">Educations</a>
+                        </li>
+                        <li>
+                            <a class="{{ request()->routeIs('admin.doctor-location.index') ? 'active' : '' }}" href="{{ route('admin.doctor-location.index') }}">Practice Locations</a>
                         </li>
                     </ul>
+                </li>
+                <li class="{{ request()->routeIs('admin.practice-schedules.index') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.practice-schedules.index') }}"><i class="fe fe-calendar"></i> <span>Doctor Schedules</span></a>
                 </li>
                 <li class="{{ request()->routeIs('admin.companies.index') ? 'active' : '' }}"> 
                     <a href="{{ route('admin.companies.index') }}"><i class="fa fa-building-o" aria-hidden="true"></i> <span>Company</span></a>

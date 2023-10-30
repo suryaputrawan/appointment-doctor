@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\DoctorEducation;
+use App\Models\DoctorLocation;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -252,6 +253,7 @@ class DoctorController extends Controller
             $id = Crypt::decryptString($id);
             $data = Doctor::find($id);
             $doctorEducations = DoctorEducation::where('doctor_id', $id)->get();
+            $doctorLocations = DoctorLocation::where('doctor_id', $id)->get();
 
             if (!$data) {
                 return response()->json([
@@ -273,6 +275,14 @@ class DoctorController extends Controller
             if ($doctorEducations != null) {
                 foreach ($doctorEducations as $doctorEducation) {
                     $doctorEducation->delete();
+                }
+            }
+            //---End check
+
+            //---Check apakah terdapat data pada tabel doctor location
+            if ($doctorLocations != null) {
+                foreach ($doctorLocations as $doctorLocation) {
+                    $doctorLocation->delete();
                 }
             }
             //---End check

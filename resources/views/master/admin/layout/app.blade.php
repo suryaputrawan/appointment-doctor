@@ -116,6 +116,7 @@
                                 swalWithBootstrapButtons.fire('Berhasil!', message, 'success');
                                 $('#datatable').DataTable().ajax.reload();
                                 $('#datatable-education').DataTable().ajax.reload();
+                                $('#datatable-location').DataTable().ajax.reload();
                             }, (data) => {
                                 let message = '';
                                 if (data.responseJSON.message) {

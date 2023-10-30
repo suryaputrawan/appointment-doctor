@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use Throwable;
 use App\Models\Doctor;
+use App\Models\Company;
 use Illuminate\Http\Request;
-use App\Models\DoctorEducation;
+use App\Models\DoctorLocation;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 
-class DoctorEducationController extends Controller
+class DoctorLocationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,7 +24,7 @@ class DoctorEducationController extends Controller
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
-                    $addRoute        = 'admin.doctor-education.list';
+                    $addRoute        = 'admin.doctor-location.list';
                     $dataId          = Crypt::encryptString($data->id);
                     $dataLabel       = $data->name;
 
@@ -32,7 +33,7 @@ class DoctorEducationController extends Controller
                     $action .= '
                         <a class="btn btn-primary" id="btn-add" type="button" data-url="' . route($addRoute, $dataId) . '"
                          data-name="' . $dataLabel . '" data-id="' . $data->id . '">
-                            <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                            <i class="fa fa-hospital-o" aria-hidden="true"></i>
                         </a> ';
 
                     $group = '<div class="btn-group btn-group-sm mb-1 mb-md-0" role="group">
@@ -40,22 +41,24 @@ class DoctorEducationController extends Controller
                     </div>';
                     return $group;
                 })
-                ->addColumn('educations', function ($data) {
-                    $education = DoctorEducation::where('doctor_id', $data->id)->get();
+                ->addColumn('locations_count', function ($data) {
+                    $location = DoctorLocation::with('company')->where('doctor_id', $data->id)
+                        ->get();
 
-                    if ($education != null) {
-                        return $data->doctorEducation()->implode('university_name', ', ');
+                    if ($location != null) {
+                        return $location->count();
                     } else {
                         return '';
                     }
                 })
-                ->rawColumns(['action', 'educations'])
+                ->rawColumns(['action', 'locations_count'])
                 ->make(true);
         }
 
-        return view('admin.modules.doctor-education.index', [
-            'pageTitle'     => 'List of Doctor Education',
-            'breadcrumb'    => 'Doctor Educations',
+        return view('admin.modules.doctor-location.index', [
+            'pageTitle'     => 'List of Doctor Practice Location',
+            'breadcrumb'    => 'Doctor locations',
+            'companies'     => Company::orderBy('name', 'asc')->get(['id', 'name'])
         ]);
     }
 
@@ -66,26 +69,34 @@ class DoctorEducationController extends Controller
     {
         if (request()->type == 'datatable') {
             $id = Crypt::decryptString($id);
-            $data = DoctorEducation::with('doctor')->where('doctor_id', $id)->get();
+            $data = DoctorLocation::with([
+                'doctor'    => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'company'   => function ($query) {
+                    $query->select('id', 'name');
+                }
+            ])
+                ->where('doctor_id', $id)->get();
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
-                    $editRoute       = 'admin.doctor-education.edit';
-                    $deleteRoute     = 'admin.doctor-education.destroy';
+                    $editRoute       = 'admin.doctor-location.edit';
+                    $deleteRoute     = 'admin.doctor-location.destroy';
                     $dataId          = Crypt::encryptString($data->id);
                     $dataName        = $data->doctor->name;
-                    $dataDeleteLabel = $data->university_name;
+                    $dataDeleteLabel = $data->company->name;
 
                     $action = "";
 
                     $action .= '
-                        <a class="btn btn-warning" id="btn-edit-education" type="button" data-url="' . route($editRoute, $dataId) . '"
+                        <a class="btn btn-sm btn-warning" id="btn-edit-location" type="button" data-url="' . route($editRoute, $dataId) . '"
                         data-name="' . $dataName . '" data-doctor-id="' . $data->doctor_id . '">
                             <i class="fe fe-pencil"></i>
                         </a> ';
 
                     $action .= '
-                        <button class="btn btn-danger delete-item" 
+                        <button class="btn btn-sm btn-danger delete-item" 
                             data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
                             <i class="fe fe-trash"></i>
                         </button> ';
@@ -95,10 +106,10 @@ class DoctorEducationController extends Controller
                     </div>';
                     return $group;
                 })
-                ->addColumn('year', function ($data) {
-                    return $data->start_year . ' - ' . $data->end_year;
+                ->addColumn('company', function ($data) {
+                    return $data->company->name;
                 })
-                ->rawColumns(['action', 'year'])
+                ->rawColumns(['action', 'company'])
                 ->make(true);
         }
     }
@@ -117,15 +128,13 @@ class DoctorEducationController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make([
-            'university'            => $request->university,
-            'specialization'        => $request->specialization,
-            'start_year'            => $request->start_year,
-            'end_year'              => $request->end_year,
+            'location'      => $request->location,
+            'day'           => $request->day,
+            'time'          => $request->time,
         ], [
-            'university'            => 'required|min:5',
-            'specialization'        => 'required|min:3',
-            'start_year'            => 'required|min:4',
-            'end_year'              => 'required|min:4',
+            'location'      => 'required',
+            'day'           => 'required|min:3',
+            'time'          => 'required|min:5',
         ]);
 
         if ($validator->fails()) {
@@ -136,17 +145,16 @@ class DoctorEducationController extends Controller
         } else {
             DB::beginTransaction();
             try {
-                DoctorEducation::create([
+                DoctorLocation::create([
                     'doctor_id'             => $request->doctor_id,
-                    'university_name'       => $request->university,
-                    'specialization'        => $request->specialization,
-                    'start_year'            => $request->start_year,
-                    'end_year'              => $request->end_year,
+                    'company_id'            => $request->location,
+                    'day'                   => $request->day,
+                    'time'                  => $request->time,
                 ]);
                 DB::commit();
                 return response()->json([
                     'status'  => 200,
-                    'message' => 'Education has been created',
+                    'message' => 'Doctor Location has been created',
                 ], 200);
             } catch (Throwable $th) {
                 DB::rollBack();
@@ -161,7 +169,7 @@ class DoctorEducationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(DoctorEducation $doctorEducation)
+    public function show(DoctorLocation $doctorLocation)
     {
         //
     }
@@ -173,7 +181,7 @@ class DoctorEducationController extends Controller
     {
         try {
             $id = Crypt::decryptString($id);
-            $data = DoctorEducation::find($id);
+            $data = DoctorLocation::find($id);
 
             if ($data) {
                 return response()->json([
@@ -183,7 +191,7 @@ class DoctorEducationController extends Controller
             } else {
                 return response()->json([
                     'status'    => 404,
-                    'message'   => 'Education Not Found',
+                    'message'   => 'Location Not Found',
                 ]);
             }
         } catch (\Throwable $e) {
@@ -199,18 +207,16 @@ class DoctorEducationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = DoctorEducation::find($id);
+        $data = DoctorLocation::find($id);
 
         $validator = Validator::make([
-            'university'            => $request->university,
-            'specialization'        => $request->specialization,
-            'start_year'            => $request->start_year,
-            'end_year'              => $request->end_year,
+            'location'      => $request->location,
+            'day'           => $request->day,
+            'time'          => $request->time,
         ], [
-            'university'            => 'required|min:5',
-            'specialization'        => 'required|min:3',
-            'start_year'            => 'required|min:4',
-            'end_year'              => 'required|min:4',
+            'location'      => 'required',
+            'day'           => 'required|min:3',
+            'time'          => 'required|min:5',
         ]);
 
         if ($validator->fails()) {
@@ -223,17 +229,16 @@ class DoctorEducationController extends Controller
                 DB::beginTransaction();
                 try {
                     $data->update([
-                        'university_name'       => $request->university,
-                        'specialization'        => $request->specialization,
-                        'start_year'            => $request->start_year,
-                        'end_year'              => $request->end_year,
+                        'company_id'            => $request->location,
+                        'day'                   => $request->day,
+                        'time'                  => $request->time,
                     ]);
 
                     DB::commit();
 
                     return response()->json([
                         'status'  => 200,
-                        'message' => 'Education has been updated',
+                        'message' => 'Doctor location has been updated',
                     ], 200);
                 } catch (\Throwable $th) {
                     DB::rollBack();
@@ -259,7 +264,7 @@ class DoctorEducationController extends Controller
         DB::beginTransaction();
         try {
             $id = Crypt::decryptString($id);
-            $data = DoctorEducation::find($id);
+            $data = DoctorLocation::find($id);
 
             if (!$data) {
                 return response()->json([
@@ -274,7 +279,7 @@ class DoctorEducationController extends Controller
 
             return response()->json([
                 'status'  => 200,
-                'message' => "Education has been deleted..!",
+                'message' => "Location has been deleted..!",
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
