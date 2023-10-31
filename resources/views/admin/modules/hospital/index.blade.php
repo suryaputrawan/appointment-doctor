@@ -34,7 +34,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th style="width: 100px">ACTION</th>
-                                        <th>Company Name</th>
+                                        <th>Hospital Name</th>
                                         <th>Address</th>
                                         <th>Email</th>
                                     </tr>
@@ -50,7 +50,7 @@
     </div>
 
     {{-- Modal Action --}}
-    @include('admin.modules.company.modal.action')
+    @include('admin.modules.hospital.modal.action')
     {{-- End Modal Action --}}
 
 @endsection
@@ -91,32 +91,6 @@
             [].forEach.call(files, readAndPreview);
         }
     };
-
-    function previewImagesIcon() {
-        var previewIcon = document.querySelector('#preview-icon');
-        previewIcon.innerHTML = '';
-        var files = document.querySelector('#icon').files;
-    
-        function readAndPreview(file) {
-            // Make sure `file.name` matches our extensions criteria
-            if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
-                var reader = new FileReader();
-                reader.addEventListener('load', function() {
-                    var image = new Image();
-                    image.height = 150;
-                    image.title = file.name;
-                    image.src = this.result;
-                    previewIcon.appendChild(image);
-                }, false);
-    
-                reader.readAsDataURL(file);
-            }
-        }
-    
-        if (files) {
-            [].forEach.call(files, readAndPreview);
-        }
-    };
     //---End preview image
 
     $(document).ready(function() {
@@ -135,7 +109,7 @@
 
         let dataTable = $("#datatable").DataTable({
             ...tableOptions,
-            ajax: "{{ route('admin.companies.index') }}?type=datatable",
+            ajax: "{{ route('admin.hospitals.index') }}?type=datatable",
             processing: true,
             serverSide : true,
             responsive: true,
@@ -150,7 +124,7 @@
                     className: "text-center",
                 },
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
-                { data: "company_name", name: "company_name", orderable: true  },
+                { data: "hospital_name", name: "hospital_name", orderable: true  },
                 { data: "address", name: "address", orderable: false, searchable: false },
                 { data: "email", name: "email", orderable: true, searchable: false },  
             ],
@@ -158,38 +132,36 @@
         //-----End datatable inizialitation
 
         //----form environtment
-        let ajaxUrl = "{{ route('admin.companies.store') }}";
+        let ajaxUrl = "{{ route('admin.hospitals.store') }}";
         let ajaxType = "POST";
 
         function clearForm() {
-            $("#company-form").find('input').val("");
-            $('#company-form').find('.error').text("");
+            $("#hospital-form").find('input').val("");
+            $('#hospital-form').find('.error').text("");
 
             var preview = document.querySelector('#preview');
-            var previewIcon = document.querySelector('#preview-icon');
             preview.innerHTML = '';
-            previewIcon.innerHTML = '';
 
-            ajaxUrl = "{{ route('admin.companies.store') }}";
+            ajaxUrl = "{{ route('admin.hospitals.store') }}";
             ajaxType = "POST";
         }
         //---End Form environment
 
         //----Modal
         $(document).on('click', '#btn-add', function() {
-            $('#modal-add-company').modal('show');
-            $('#title').text('Add Company');
+            $('#modal-add-hospital').modal('show');
+            $('#title').text('Add Hospital');
             $("#btn-submit-text").text("Save");
         });
 
         $(".btn-cancel").click(function() {
-            $('#modal-add-company').modal('hide');
+            $('#modal-add-hospital').modal('hide');
             clearForm();
         });
         //----End Modal
 
         //------ Submit Data
-        $('#company-form').on('submit', function(e) {
+        $('#hospital-form').on('submit', function(e) {
             e.preventDefault();
 
             var submitButton = $(this).find("button[type='submit']");
@@ -202,7 +174,7 @@
             var formData = new FormData(this);
             formData.append("_method", ajaxType)
 
-            $('#company-form').find('.error').text("");
+            $('#hospital-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -232,7 +204,7 @@
                     if (response.status == 200) {
                         clearForm();
                         $('.btn-cancel').toggle();
-                        $('#modal-add-company').modal('hide');
+                        $('#modal-add-hospital').modal('hide');
                         $('#datatable').DataTable().ajax.reload();
 
                         Toast.fire({
@@ -266,9 +238,6 @@
                         $.each(response.errors.logo, function(key, error) {
                             $('#error-logo').append(error);
                         });
-                        $.each(response.errors.icon, function(key, error) {
-                            $('#error-icon').append(error);
-                        });
                     } else {
                         Toast.fire({
                             icon: 'warning',
@@ -294,13 +263,13 @@
         //------ Load data to edit
         $(document).on('click', '#btn-edit', function(e) {
             e.preventDefault();
-            $('#modal-add-company').modal('show');
+            $('#modal-add-hospital').modal('show');
             $('#title').text('Edit Company');
 
             var id = $(this).data('id');
             var url = $(this).data('url');
 
-            $('#company-form').find('.error').text("");
+            $('#hospital-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -322,13 +291,13 @@
                 success: function(response) {
                     if (response.status == 404) {
                         clearForm();
-                        $('#modal-add-company').modal('hide');
+                        $('#modal-add-hospital').modal('hide');
                         Toast.fire({
                             icon: 'warning',
                             title: response.message,
                         });
                     } else {
-                        ajaxUrl = "{{ route('admin.companies.index') }}/"+response.data.id;
+                        ajaxUrl = "{{ route('admin.hospitals.index') }}/"+response.data.id;
                         ajaxType = "PUT";
 
                         $('#name').val(response.data.name);
@@ -340,11 +309,10 @@
                         $('#facebook').val(response.data.facebook);
 
                         $('#preview').eq(0).html('<img src="/storage/'+response.data.logo+'"height="150" alt="Preview Gambar">');
-                        $('#preview-icon').eq(0).html('<img src="/storage/'+response.data.favicon+'"height="150" alt="Preview Gambar">');
                     }
                 },
                 error: function(response){
-                    $('#modal-add-company').modal('hide');
+                    $('#modal-add-hospital').modal('hide');
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',

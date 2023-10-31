@@ -1,12 +1,12 @@
 <!-- Modal -->
-<div class="modal fade" id="modal-add-company" data-backdrop="static" aria-hidden="true" role="dialog">
+<div class="modal fade" id="modal-add-hospital" data-backdrop="static" aria-hidden="true" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="title"></h5>
             </div>
             <div class="modal-body">
-                <form id="company-form">
+                <form id="hospital-form">
                     @csrf
                     <div class="row form-row">
                         <div class="col-12 col-sm-12">
@@ -73,14 +73,6 @@
                                 <p id="error-logo" style="color: red" class="error"></p>
                             </div>
                             <div id="preview"></div>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="form-group">
-                                <label>Icon <span class="text-danger">(Max: 500Kb, Format: png) *</span></label>
-                                <input name="icon" id="icon" type="file" class="form-control" accept=".png" onchange="previewImagesIcon()">
-                                <p id="error-icon" style="color: red" class="error"></p>
-                            </div>
-                            <div id="preview-icon"></div>
                         </div>
                     </div>
                     <div class="float-right">

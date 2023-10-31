@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Throwable;
-use App\Models\Company;
+use App\Models\Hospital;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-class CompanyController extends Controller
+class HospitalController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,13 +19,13 @@ class CompanyController extends Controller
     public function index()
     {
         if (request()->type == 'datatable') {
-            $data = Company::query()->orderBy('name', 'asc')->get();
+            $data = Hospital::query()->orderBy('name', 'asc')->get();
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
-                    $editRoute       = 'admin.companies.edit';
-                    $deleteRoute     = 'admin.companies.destroy';
-                    $viewRoute       = 'admin.companies.show';
+                    $editRoute       = 'admin.hospitals.edit';
+                    $deleteRoute     = 'admin.hospitals.destroy';
+                    $viewRoute       = 'admin.hospitals.show';
                     $dataId          = Crypt::encryptString($data->id);
                     $dataDeleteLabel = $data->name;
 
@@ -47,16 +47,16 @@ class CompanyController extends Controller
                     </div>';
                     return $group;
                 })
-                ->addColumn('company_name', function ($data) {
+                ->addColumn('hospital_name', function ($data) {
                     return $data->logo ? '<img class="mr-3" src="' . $data->takeLogo . '" alt="Gambar" width="50">' . $data->name : '';
                 })
-                ->rawColumns(['action', 'company_name'])
+                ->rawColumns(['action', 'hospital_name'])
                 ->make(true);
         }
 
-        return view('admin.modules.company.index', [
-            'pageTitle'     => 'Company',
-            'breadcrumb'    => 'Company',
+        return view('admin.modules.hospital.index', [
+            'pageTitle'     => 'List Of Hospital',
+            'breadcrumb'    => 'Hospitals',
         ]);
     }
 
@@ -81,16 +81,14 @@ class CompanyController extends Controller
             'email'                 => $request->email,
             'instagram'             => $request->instagram,
             'facebook'              => $request->facebook,
-            'logo'                  => $request->logo,
-            'icon'                  => $request->icon
+            'logo'                  => $request->logo
         ], [
-            'name'                  => 'required|max:100|min:5|unique:companies,name,NULL,id',
+            'name'                  => 'required|max:100|min:5|unique:hospitals,name,NULL,id',
             'address'               => 'required|min:5',
             'phone'                 => 'required|min:7',
             'whatsapp'              => 'required|min:11',
-            'email'                 => 'required|email|unique:companies,email',
+            'email'                 => 'required|email|unique:hospitals,email',
             'logo'                  => 'required|mimes:png|max:1000',
-            'icon'                  => 'required|mimes:png|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -101,7 +99,7 @@ class CompanyController extends Controller
         } else {
             DB::beginTransaction();
             try {
-                Company::create([
+                Hospital::create([
                     'name'                  => $request->name,
                     'address'               => $request->address,
                     'phone'                 => $request->phone,
@@ -109,13 +107,12 @@ class CompanyController extends Controller
                     'email'                 => $request->email,
                     'instagram'             => $request->instagram,
                     'facebook'              => $request->facebook,
-                    'logo'                  => request('logo') ? $request->file('logo')->store('images/company/logo') : null,
-                    'favicon'               => request('icon') ? $request->file('icon')->store('images/company/favicon') : null,
+                    'logo'                  => request('logo') ? $request->file('logo')->store('images/hospital/logo') : null,
                 ]);
                 DB::commit();
                 return response()->json([
                     'status'  => 200,
-                    'message' => 'Company has been created',
+                    'message' => 'Hospital has been created',
                 ], 200);
             } catch (Throwable $th) {
                 DB::rollBack();
@@ -130,7 +127,7 @@ class CompanyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Company $company)
+    public function show(Hospital $hospital)
     {
         //
     }
@@ -142,7 +139,7 @@ class CompanyController extends Controller
     {
         try {
             $id = Crypt::decryptString($id);
-            $data = Company::find($id);
+            $data = Hospital::find($id);
 
             if ($data) {
                 return response()->json([
@@ -152,7 +149,7 @@ class CompanyController extends Controller
             } else {
                 return response()->json([
                     'status'    => 404,
-                    'message'   => 'Company Not Found',
+                    'message'   => 'Hospital Not Found',
                 ]);
             }
         } catch (\Throwable $e) {
@@ -168,7 +165,7 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = Company::find($id);
+        $data = Hospital::find($id);
 
         $validator = Validator::make([
             'name'                  => $request->name,
@@ -179,15 +176,13 @@ class CompanyController extends Controller
             'instagram'             => $request->instagram,
             'facebook'              => $request->facebook,
             'logo'                  => $request->logo,
-            'icon'                  => $request->icon
         ], [
-            'name'                  => 'required|max:100|min:5|unique:companies,name,' . $data->id,
+            'name'                  => 'required|max:100|min:5|unique:hospitals,name,' . $data->id,
             'address'               => 'required|min:5',
             'phone'                 => 'required|min:7',
             'whatsapp'              => 'required|min:11',
-            'email'                 => 'required|email|unique:companies,email,' . $data->id,
+            'email'                 => 'required|email|unique:hospitals,email,' . $data->id,
             'logo'                  => request('logo') ? 'mimes:png|max:1000' : '',
-            'icon'                  => request('icon') ? 'mimes:png|max:500' : '',
         ]);
 
         if ($validator->fails()) {
@@ -204,22 +199,11 @@ class CompanyController extends Controller
                     if ($data->logo) {
                         Storage::delete($data->logo);
                     }
-                    $logo = request()->file('logo')->store('images/company/logo');
+                    $logo = request()->file('logo')->store('images/hospital/logo');
                 } elseif ($data->logo) {
                     $logo = $data->logo;
                 } else {
                     $logo = null;
-                }
-
-                if (request('icon')) {
-                    if ($data->favicon) {
-                        Storage::delete($data->favicon);
-                    }
-                    $icon = request()->file('icon')->store('images/company/favicon');
-                } elseif ($data->favicon) {
-                    $icon = $data->favicon;
-                } else {
-                    $icon = null;
                 }
                 //--End
 
@@ -232,15 +216,14 @@ class CompanyController extends Controller
                         'email'                 => $request->email,
                         'instagram'             => $request->instagram,
                         'facebook'              => $request->facebook,
-                        'logo'                  => $logo,
-                        'favicon'               => $icon
+                        'logo'                  => $logo
                     ]);
 
                     DB::commit();
 
                     return response()->json([
                         'status'  => 200,
-                        'message' => 'Company has been updated',
+                        'message' => 'Hospital has been updated',
                     ], 200);
                 } catch (\Throwable $th) {
                     DB::rollBack();
@@ -266,7 +249,7 @@ class CompanyController extends Controller
         DB::beginTransaction();
         try {
             $id = Crypt::decryptString($id);
-            $data = Company::find($id);
+            $data = Hospital::find($id);
 
             if (!$data) {
                 return response()->json([
@@ -278,9 +261,6 @@ class CompanyController extends Controller
             //Kondisi apabila terdapat path gambar pada tabel
             if ($data->logo != null) {
                 Storage::delete($data->logo);
-                if ($data->favicon != null) {
-                    Storage::delete($data->favicon);
-                }
                 $data->delete();
             } else {
                 $data->delete();
@@ -291,7 +271,7 @@ class CompanyController extends Controller
 
             return response()->json([
                 'status'  => 200,
-                'message' => "Company has been deleted..!",
+                'message' => "Hospital has been deleted..!",
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([

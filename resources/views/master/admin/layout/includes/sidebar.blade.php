@@ -35,8 +35,8 @@
                 <li class="{{ request()->routeIs('admin.practice-schedules.index') ? 'active' : '' }}"> 
                     <a href="{{ route('admin.practice-schedules.index') }}"><i class="fe fe-calendar"></i> <span>Doctor Schedules</span></a>
                 </li>
-                <li class="{{ request()->routeIs('admin.companies.index') ? 'active' : '' }}"> 
-                    <a href="{{ route('admin.companies.index') }}"><i class="fa fa-building-o" aria-hidden="true"></i> <span>Company</span></a>
+                <li class="{{ request()->routeIs('admin.hospitals.index') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.hospitals.index') }}"><i class="fa fa-hospital-o" aria-hidden="true"></i> <span>Hospitals</span></a>
                 </li>
                 {{-- <li> 
                     <a href="appointment-list.html"><i class="fe fe-layout"></i> <span>Appointments</span></a>

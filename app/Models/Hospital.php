@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Company extends Model
+class Hospital extends Model
 {
     use HasFactory;
 
-    protected $table = 'companies';
+    protected $table = 'hospitals';
 
     protected $fillable = [
         'name',
@@ -21,17 +21,11 @@ class Company extends Model
         'instagram',
         'facebook',
         'logo',
-        'favicon'
     ];
 
     public function getTakeLogoAttribute()
     {
         return "/storage/" . $this->logo;
-    }
-
-    public function getTakeFaviconAttribute()
-    {
-        return "/storage/" . $this->favicon;
     }
 
     public function doctorLocation(): HasMany
