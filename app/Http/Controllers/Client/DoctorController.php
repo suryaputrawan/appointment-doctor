@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Doctor;
 use App\Models\DoctorEducation;
+use App\Models\DoctorLocation;
 use Illuminate\Support\Facades\Crypt;
 
 class DoctorController extends Controller
@@ -15,6 +16,7 @@ class DoctorController extends Controller
     {
         $doctor = null;
         $doctorEducations = null;
+        $doctorLocations = null;
 
         try {
             $id = Crypt::decryptString($id);
@@ -27,11 +29,17 @@ class DoctorController extends Controller
 
         if ($doctor) {
             $doctorEducations = DoctorEducation::where('doctor_id', $doctor->id)->get();
+            $doctorLocations = DoctorLocation::with('company')
+                ->where('doctor_id', $doctor->id)
+                ->orderBy('company_id')
+                ->get()
+                ->groupBy('company');
         }
 
         return view('client.modules.doctor.detail', [
             'doctor'            => $doctor,
-            'doctorEducations'  => $doctorEducations
+            'doctorEducations'  => $doctorEducations,
+            'doctorLocations'   => $doctorLocations
         ]);
     }
 }

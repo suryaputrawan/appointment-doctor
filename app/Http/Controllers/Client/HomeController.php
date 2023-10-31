@@ -15,8 +15,13 @@ class HomeController extends Controller
         $doctors = Doctor::with([
             'speciality'    => function ($query) {
                 $query->select('id', 'name');
+            },
+            'doctorLocation'    => function ($query) {
+                $query->with('company');
             }
         ])->get();
+
+        // dd($doctors);
 
         $specialities = Speciality::get(['id', 'name', 'picture']);
 

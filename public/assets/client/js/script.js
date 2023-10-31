@@ -224,7 +224,7 @@ Version      : 1.0
 	if($('.specialities-slider').length > 0) {
 		$('.specialities-slider').slick({
 			dots: true,
-			autoplay:false,
+			autoplay:true,
 			infinite: true,
 			variableWidth: true,
 			prevArrow: false,
@@ -243,13 +243,13 @@ Version      : 1.0
 	if($('.features-slider').length > 0) {
 		$('.features-slider').slick({
 			dots: true,
-			infinite: true,
+			infinite: false,
 			centerMode: true,
-			slidesToShow: 3,
+			slidesToShow: 2,
 			speed: 500,
 			variableWidth: true,
 			arrows: false,
-			autoplay:false,
+			autoplay:true,
 			responsive: [{
 				  breakpoint: 992,
 				  settings: {

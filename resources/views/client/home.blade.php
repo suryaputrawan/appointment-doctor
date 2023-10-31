@@ -1,4 +1,4 @@
-@extends('master.client.layout.app');
+@extends('master.client.layout.app')
 
 @section('banner')
 <section class="section section-search">
@@ -97,18 +97,21 @@
                                         <a href=#">{{ $doctor->name }}</a> 
                                     </h6>
                                     <p class="speciality">{{ $doctor->specialization }} - {{ $doctor->speciality->name }}</p>
-                                    {{-- <ul class="available-info">
-                                        <li>
-                                            <i class="fas fa-map-marker-alt"></i> Florida, USA
-                                        </li>
-                                        <li>
+                                    <ul class="available-info">
+                                        @foreach ($doctor->doctorLocation as $location)
+                                            <li>
+                                                <i class="fas fa-map-marker-alt"></i> {{ $location->company->name }}
+                                            </li>
+                                        @endforeach
+                                        
+                                        {{-- <li>
                                             <i class="far fa-clock"></i> Available on Fri, 22 Mar
                                         </li>
                                         <li>
                                             <i class="far fa-money-bill-alt"></i> $300 - $1000 
                                             <i class="fas fa-info-circle" data-toggle="tooltip" title="Lorem Ipsum"></i>
-                                        </li>
-                                    </ul> --}}
+                                        </li> --}}
+                                    </ul>
                                     <div class="row row-sm">
                                         <div class="col-6">
                                             <a href="{{ route('client.doctor.show', Crypt::encryptString($doctor->id)) }}" class="btn view-btn">View Profile</a>
@@ -537,4 +540,45 @@
         </div>
     </div>
 </section>
+{{-- 
+<section class="section section-features">
+    <div class="container-fluid">
+       <div class="row">
+            <div class="col-12">
+                <div class="section-header">	
+                    <h2 class="mt-2">Availabe Features in Our Clinic</h2>
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. </p>
+                </div>	
+                <div class="features-slider slider">
+                    <!-- Slider Item -->
+                    <div class="feature-item text-center">
+                        <img src="assets/img/features/feature-01.jpg" class="img-fluid" alt="Feature">
+                        <p>Patient Ward</p>
+                    </div>
+                    <!-- /Slider Item -->
+                    
+                    <!-- Slider Item -->
+                    <div class="feature-item text-center">
+                        <img src="assets/img/features/feature-02.jpg" class="img-fluid" alt="Feature">
+                        <p>Test Room</p>
+                    </div>
+                    <!-- /Slider Item -->
+                    
+                    <!-- Slider Item -->
+                    <div class="feature-item text-center">
+                        <img src="assets/img/features/feature-03.jpg" class="img-fluid" alt="Feature">
+                        <p>ICU</p>
+                    </div>
+                    <!-- /Slider Item -->
+                    
+
+                    
+                    
+                    
+                    
+                </div>
+            </div>
+       </div>
+    </div>
+</section>	 --}}
 @endsection

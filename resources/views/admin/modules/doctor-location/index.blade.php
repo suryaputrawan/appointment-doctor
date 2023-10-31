@@ -287,7 +287,7 @@
                         ajaxUrl = "{{ route('admin.doctor-location.index') }}/"+response.data.id;
                         ajaxType = "PUT";
 
-                        $('#doctor').val(response.data.company_id).trigger('change');
+                        $('#location').val(response.data.company_id).trigger('change');
                         $('#day').val(response.data.day);
                         $('#time').val(response.data.time);
                     }
