@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Admin;
 use Throwable;
 use App\Models\Doctor;
 use App\Models\Speciality;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\DoctorLocation;
+use App\Models\DoctorEducation;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Models\DoctorEducation;
-use App\Models\DoctorLocation;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -112,6 +113,7 @@ class DoctorController extends Controller
             DB::beginTransaction();
             try {
                 Doctor::create([
+                    'slug'                  => Str::slug($request->name),
                     'name'                  => $request->name,
                     'specialization'        => $request->specialization,
                     'speciality_id'         => $request->specialities,
@@ -214,6 +216,7 @@ class DoctorController extends Controller
 
                 try {
                     $data->update([
+                        'slug'                  => Str::slug($request->name),
                         'name'                  => $request->name,
                         'specialization'        => $request->specialization,
                         'speciality_id'         => $request->specialities,

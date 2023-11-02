@@ -21,12 +21,10 @@
 		<!-- Feathericon CSS -->
         <link rel="stylesheet" href="{{ asset('assets/admin/css/feathericon.min.css') }}">
 		
-		{{-- <link rel="stylesheet" href="{{ asset('assets/admin/plugins/morris/morris.css') }}"> --}}
-		
+		@stack('plugin-style')
+
 		<!-- Main CSS -->
         <link rel="stylesheet" href="{{ asset('assets/admin/css/style.css') }}">
-
-        @stack('plugin-style')
 		
 		<!--[if lt IE 9]>
 			<script src="assets/js/html5shiv.min.js"></script>

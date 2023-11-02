@@ -10,12 +10,12 @@
                     @csrf
                     <input name="doctor_id" type="text" id="doctor-id" style="display: none">
                     <div class="row form-row">
-                        <div class="col-12 col-sm-6">
+                        <div class="col-12 col-sm-10">
                             <div class="form-group">
-                                <label> RS/ Clinic Name <span class="text-danger">*</span></label>
+                                <label> Hospital / Clinic Name <span class="text-danger">*</span></label>
                                 <select name="location" id="location" class="select">
                                     <option value="">-- Please Selected --</option>
-                                    @foreach ($companies as $data)
+                                    @foreach ($hospital as $data)
                                     <option value="{{ $data->id }}"
                                         {{ old('location') == $data->id ? 'selected' : null }}>{{ $data->name }}
                                     </option>
@@ -25,11 +25,47 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row form-row">
+                    
+                    <div class="row form-row" id="item-form">
+                        <div class="form-group col-12 col-md-11">
+                            <div class="table-responsive">
+                                <table id="tb-item" class="table table-stripped" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Day</th>
+                                            <th>Time</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input name="day[]" id="day" type="text" class="form-control" value="{{ old('day') }}" placeholder="Example : MON - FRI" style="text-transform:uppercase">
+                                                <p id="error-day" style="color: red" class="error"></p>
+                                            </td>
+                                            <td>
+                                                <input name="time[]" id="time" type="text" class="form-control" value="{{ old('time') }}" placeholder="Example : 10:00 AM - 2:00 PM" style="text-transform:uppercase">
+                                                <p id="error-time" style="color: red" class="error"></p>
+                                            </td>
+                                            {{-- <td>
+                                                <button id="btn-item-delete" type="button" class="btn btn-sm btn-danger"><i class='fe fe-trash'></i></button>
+                                            </td> --}}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                         <div class="form-group col-12 col-md-1">
+                            <button id="btn-item-add" type="button" class="btn btn-sm btn-primary"><i class='fe fe-plus'></i></button>
+                         </div>
+                    </div>
+
+                    {{-- <div class="row form-row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label>Day <span class="text-danger">*</span></label>
-                                <input name="day" id="day" type="text" class="form-control" value="{{ old('day') }}" placeholder="Example : Mon - Fri">
+                                <input name="day" id="day" type="text" class="form-control" value="{{ old('day') }}" placeholder="Example : MON - FRI" style="text-transform:uppercase">
                                 <p id="error-day" style="color: red" class="error"></p>
                             </div>
                         </div>
@@ -37,11 +73,11 @@
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label>Time <span class="text-danger">*</span></label>
-                                <input name="time" id="time" type="text" class="form-control" value="{{ old('time') }}" placeholder="Example : 10:00 AM - 2:00 PM">
+                                <input name="time" id="time" type="text" class="form-control" value="{{ old('time') }}" placeholder="Example : 10:00 AM - 2:00 PM" style="text-transform:uppercase">
                                 <p id="error-time" style="color: red" class="error"></p>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="text-right">
                         <button class="btn btn-primary" type="submit">
                             <span id="submit-loading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" style="display: none;"></span>

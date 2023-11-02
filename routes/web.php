@@ -33,6 +33,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('hospitals', HospitalController::class);
     Route::resource('practice-schedules', PracticeScheduleController::class);
 
-    Route::get('doctor-location/list/{id}', [DoctorLocationController::class, 'list'])->name('doctor-location.list');
+    // Route::get('doctor-location/list/{id}', [DoctorLocationController::class, 'list'])->name('doctor-location.list');
     Route::resource('doctor-location', DoctorLocationController::class);
 });

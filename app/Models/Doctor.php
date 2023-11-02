@@ -13,6 +13,7 @@ class Doctor extends Model
 
     protected $table = 'doctors';
     protected $fillable = [
+        'slug',
         'name',
         'specialization',
         'speciality_id',

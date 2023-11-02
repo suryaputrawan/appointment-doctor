@@ -18,6 +18,12 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
+
+            <div class="col-sm-5 col">
+                <a href="{{ route('admin.doctor-location.create') }}" class="btn btn-primary float-right mt-2" type="button">
+                    Add
+                </a>
+            </div>
         </div>
         
         <div class="row">
@@ -31,7 +37,7 @@
                                         <th style="width: 10px">#</th>
                                         <th style="width: 100px">ACTION</th>
                                         <th>Doctor Name</th>
-                                        <th>Locations</th>
+                                        <th>Location</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -43,11 +49,6 @@
             </div>			
         </div>
     </div>
-
-    {{-- Modal Action --}}
-    @include('admin.modules.doctor-location.modal.action')
-    {{-- End Modal Action --}}
-
 @endsection
 
 @push('plugin-script')
@@ -61,7 +62,6 @@
 @push('custom-scripts')
 <script type="text/javascript">
     $(document).ready(function() {
-
         //datatable initialization
         var tableOptions = {
             "aLengthMenu": [
@@ -91,216 +91,32 @@
                     className: "text-center",
                 },
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
-                { data: "name", name: "name", orderable: true  },
-                { data: "locations_count", name: "locations_count", orderable: false, searchable: false },
+                { data: "doctor_name", name: "doctor_name", orderable: true  },
+                { data: "hospital", name: "hospital", orderable: false, searchable: false },
             ],
         });
         //-----End datatable inizialitation
 
-        //----form environtment
-        let ajaxUrl = "{{ route('admin.doctor-location.store') }}";
-        let ajaxType = "POST";
+        //Toast for session success
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
 
-        function clearForm() {
-            $("#location").val("").trigger('change');
-            $("#day").val("");
-            $("#time").val("");
-            $('#doctor-location-form').find('.error').text("");
-
-            ajaxUrl = "{{ route('admin.doctor-location.store') }}";
-            ajaxType = "POST";
-
-            $("#btn-submit-text").text("Save");
+        @if (session('success')) {
+            Toast.fire({
+                icon: 'success',
+                title: "{{ session('success') }}",
+            });
         }
-        //---End Form environment
-
-        //----Modal
-        $(document).on('click', '#btn-add', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            var nama = $(this).data('name');
-            var url = $(this).data('url');
-
-            $('#modal-add-doctor-location').modal('show');
-            $('#title').text('Add Doctor Practice Location');
-            $('#title-span').text(nama);
-            $('#doctor-id').val(id);
-            $("#btn-submit-text").text("Save");
-
-            $("#datatable-location").DataTable({
-                ...tableOptions,
-                ajax: `${url}?type=datatable`,
-                processing: true,
-                serverSide : true,
-                responsive: true,
-                destroy: true,
-                columns: [
-                    {
-                        data: "id",
-                        render: function (data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        },
-                        orderable: false, searchable: false,
-                        className: "text-center",
-                    },
-                    { data: "company", name: "company", orderable: true  },
-                    { data: "day", name: "day", orderable: false, searchable: false  },
-                    { data: "time", name: "time", orderable: false, searchable: false  },
-                    { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
-                ],
-            });
-        });
-
-        $(".btn-cancel").click(function() {
-            $('#modal-add-doctor-location').modal('hide');
-            clearForm();
-            $('#datatable').DataTable().ajax.reload();
-        });
-
-        $(".btn-clear").click(function() {
-            clearForm();
-            $('#title').text('Add Doctor Location');
-        });
-        //----End Modal
-
-        //------ Submit Data
-        $('#doctor-location-form').on('submit', function(e) {
-            e.preventDefault();
-
-            var submitButton = $(this).find("button[type='submit']");
-            var submitButtonLoading = $(this).find("button[type='submit'] #submit-loading");
-            submitButton.prop('disabled',true);
-            submitButtonLoading.toggle();
-
-            var formData = new FormData(this);
-            formData.append("_method", ajaxType)
-
-            $('#doctor-location-form').find('.error').text("");
-
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
-
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type   : "POST",
-                url    : ajaxUrl,
-                data   : formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {                   
-                    submitButton.prop('disabled',false);
-                    submitButtonLoading.toggle();
-
-                    if (response.status == 200) {
-                        clearForm();
-                        $('#title').text('Add Doctor Location');
-                        $('#datatable-location').DataTable().ajax.reload();
-
-                        Toast.fire({
-                            icon: 'success',
-                            title: response.message,
-                        });
-                    } else if (response.status == 400) {
-                        $.each(response.errors.location, function(key, error) {
-                            $('#error-location').append(error);
-                        });
-                        $.each(response.errors.day, function(key, error) {
-                            $('#error-day').append(error);
-                        });
-                        $.each(response.errors.time, function(key, error) {
-                            $('#error-time').append(error);
-                        });
-                    } else {
-                        Toast.fire({
-                            icon: 'warning',
-                            title: response.message,
-                        });
-                    }
-                },
-                error: function(response){
-                    submitButton.prop('disabled',false);
-                    submitButtonLoading.toggle();
-
-                    Toast.fire({
-                        icon: 'error',
-                        title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
-                    });
-                }
-            });
-        });
-        //------ End Submit Data
-
-        //------ Load data to edit
-        $(document).on('click', '#btn-edit-location', function(e) {
-            e.preventDefault();
-
-            var id = $(this).data('id');
-            var url = $(this).data('url');
-            var nama = $(this).data('name');
-            var doctorId = $(this).data('doctor-id');
-
-            $('#title').text('Edit Doctor Location');
-            $('#title-span').text(nama);
-            $('#doctor-id').val(doctorId);
-
-            $('#doctor-location-form').find('.error').text("");
-
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
-
-            $("#item-loading").show(500);
-            $("#btn-submit-text").text("Save Change");
-
-            $.ajax({
-                type   : "GET",
-                url    : url,
-                success: function(response) {
-                    $("#item-loading").hide(500);
-                    if (response.status == 404) {
-                        clearForm();
-
-                        Toast.fire({
-                            icon: 'warning',
-                            title: response.message,
-                        });
-                    } else {
-                        ajaxUrl = "{{ route('admin.doctor-location.index') }}/"+response.data.id;
-                        ajaxType = "PUT";
-
-                        $('#location').val(response.data.company_id).trigger('change');
-                        $('#day').val(response.data.day);
-                        $('#time').val(response.data.time);
-                    }
-                },
-                error: function(response){
-                    Toast.fire({
-                        icon: 'error',
-                        title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
-                    });
-                }
-            });
-        });
-        //------ End Load data to edit
+        @endif
     });
 </script>
 @endpush
