@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('doctors', function (Blueprint $table) {
             $table->id();
+            $table->string('slug');
             $table->string('name');
+            $table->char('gender');
             $table->string('specialization');
             $table->foreignId('speciality_id')->constrained('specialities')->cascadeOnDelete();
             $table->text('about_me');
             $table->string('picture')->nullable();
+            $table->tinyInteger('isAktif')->default(1);
             $table->timestamps();
         });
     }

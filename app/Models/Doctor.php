@@ -15,10 +15,12 @@ class Doctor extends Model
     protected $fillable = [
         'slug',
         'name',
+        'gender',
         'specialization',
         'speciality_id',
         'about_me',
-        'picture'
+        'picture',
+        'isAktif',
     ];
 
     public function getTakePictureAttribute()

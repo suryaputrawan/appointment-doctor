@@ -40,11 +40,11 @@ class DoctorController extends Controller
                             <i class="fe fe-pencil"></i>
                         </a> ';
 
-                    $action .= '
-                        <button class="btn btn-danger delete-item" 
-                            data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
-                            <i class="fe fe-trash"></i>
-                        </button> ';
+                    // $action .= '
+                    //     <button class="btn btn-danger delete-item" 
+                    //         data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
+                    //         <i class="fe fe-trash"></i>
+                    //     </button> ';
 
                     $group = '<div class="btn-group btn-group-sm mb-1 mb-md-0" role="group">
                         ' . $action . '
@@ -66,7 +66,14 @@ class DoctorController extends Controller
                         return '';
                     }
                 })
-                ->rawColumns(['action', 'doctor', 'speciality', 'educations'])
+                ->addColumn('status', function ($data) {
+                    if ($data->isAktif == 0) {
+                        return '<a class="btn btn-sm btn-danger" style="color:white">Non Aktif</a>';
+                    } else {
+                        return '<a class="btn btn-sm btn-success" style="color:white">Aktif</a>';
+                    }
+                })
+                ->rawColumns(['action', 'doctor', 'speciality', 'educations', 'status'])
                 ->make(true);
         }
 
@@ -92,12 +99,14 @@ class DoctorController extends Controller
     {
         $validator = Validator::make([
             'name'                  => $request->name,
+            'gender'                => $request->gender,
             'specialization'        => $request->specialization,
             'specialities'          => $request->specialities,
             'about_me'              => $request->about_me,
             'picture'               => $request->picture
         ], [
             'name'                  => 'required|max:100|min:5|unique:doctors,name,NULL,id',
+            'gender'                => 'required',
             'specialization'        => 'required|min:3',
             'specialities'          => 'required',
             'about_me'              => 'required|min:5',
@@ -115,10 +124,12 @@ class DoctorController extends Controller
                 Doctor::create([
                     'slug'                  => Str::slug($request->name),
                     'name'                  => $request->name,
+                    'gender'                => $request->gender,
                     'specialization'        => $request->specialization,
                     'speciality_id'         => $request->specialities,
                     'about_me'              => $request->about_me,
-                    'picture'               => request('picture') ? $request->file('picture')->store('images/doctors') : null
+                    'picture'               => request('picture') ? $request->file('picture')->store('images/doctors') : null,
+                    'isAktif'               => $request->status
                 ]);
                 DB::commit();
                 return response()->json([
@@ -180,12 +191,14 @@ class DoctorController extends Controller
 
         $validator = Validator::make([
             'name'                  => $request->name,
+            'gender'                => $request->gender,
             'specialization'        => $request->specialization,
             'specialities'          => $request->specialities,
             'about_me'              => $request->about_me,
             'picture'               => $request->picture
         ], [
             'name'                  => 'required|max:100|min:5|unique:doctors,name,' . $data->id,
+            'gender'                => 'required',
             'specialization'        => 'required|min:3',
             'specialities'          => 'required',
             'about_me'              => 'required|min:5',
@@ -218,10 +231,12 @@ class DoctorController extends Controller
                     $data->update([
                         'slug'                  => Str::slug($request->name),
                         'name'                  => $request->name,
+                        'gender'                => $request->gender,
                         'specialization'        => $request->specialization,
                         'speciality_id'         => $request->specialities,
                         'about_me'              => $request->about_me,
                         'picture'               => $picture,
+                        'isAktif'               => $request->status
                     ]);
 
                     DB::commit();

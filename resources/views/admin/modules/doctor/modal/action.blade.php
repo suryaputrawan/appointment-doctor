@@ -18,11 +18,22 @@
                         </div>
                     </div>
                     <div class="row form-row">
-                        <div class="col-12 col-sm-12">
+                        <div class="col-12 col-sm-9">
                             <div class="form-group">
                                 <label>Specialization <span class="text-danger">*</span></label>
                                 <input name="specialization" id="specialization" type="text" class="form-control" value="{{ old('specialization') }}">
                                 <p id="error-specialization" style="color: red" class="error"></p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-3">
+                            <div class="form-group">
+                                <label>Gender <span class="text-danger">*</span></label>
+                                <select name="gender" id="gender" class="form-control select">
+                                    <option value="">-- Please Selected --</option>
+                                    <option value="M" {{ old('gender') == "M" ? 'selected' : null }}>MALE</option>
+                                    <option value="F" {{ old('gender') == "F" ? 'selected' : null }}>FEMALE</option>
+                                </select>
+                                <p id="error-gender" style="color: red" class="error"></p>
                             </div>
                         </div>
                     </div>
@@ -30,7 +41,7 @@
                         <div class="col-12 col-sm-12">
                             <div class="form-group">
                                 <label>Specialities <span class="text-danger">*</span></label>
-                                <select name="specialities" id="specialities" class="select">
+                                <select name="specialities" id="specialities" class="form-control select">
                                     <option value="">-- Please Selected --</option>
                                     @foreach ($specialities as $data)
                                     <option value="{{ $data->id }}"
@@ -52,11 +63,21 @@
                         </div>
                     </div>
                     <div class="row form-row">
-                        <div class="col-12 col-sm-12">
+                        <div class="col-12 col-sm-9">
                             <div class="form-group">
                                 <label>Foto <span class="text-danger">(Max: 1Mb, Format: jpg, jpeg, png) *</span></label>
                                 <input name="picture" id="picture-upload" type="file" class="form-control" accept="image/*" onchange="previewImages()">
                                 <p id="error-picture" style="color: red" class="error"></p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-3">
+                            <div class="form-group">
+                                <label>Status <span class="text-danger">*</span></label>
+                                <select name="status" id="status" class="form-control select">
+                                    <option value="1" {{ old('status') == "1" ? 'selected' : null }}>AKTIF</option>
+                                    <option value="0" {{ old('status') == "0" ? 'selected' : null }}>NON AKTIF</option>
+                                </select>
+                                <p id="error-status" style="color: red" class="error"></p>
                             </div>
                         </div>
                         <div id="preview"></div>

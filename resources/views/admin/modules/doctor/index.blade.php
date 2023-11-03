@@ -33,11 +33,12 @@
                             <table id="datatable" class="datatable table table-stripped" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20px">#</th>
+                                        <th style="width: 10px">#</th>
+                                        <th style="width: 100px">Action</th>
                                         <th>Doctor Name</th>
                                         <th>Specialization</th>
                                         <th>Speciality</th>
-                                        <th style="width: 100px">ACTION</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody class="align-middle">
@@ -123,10 +124,11 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
+                { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
                 { data: "doctor", name: "doctor", orderable: true  },
                 { data: "specialization", name: "specialization", orderable: false, searchable: false },
                 { data: "speciality", name: "speciality", orderable: true },  
-                { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                { data: "status", name: "status", orderable: false, searchable: false },
             ],
         });
         //-----End datatable inizialitation
@@ -139,6 +141,7 @@
             $("#doctor-form").find('input').val("");
             $('#doctor-form').find('.error').text("");
             $("#specialities").val("").trigger('change');
+            $("#gender").val("").trigger('change');
             $("#about-me").val("");
             var preview = document.querySelector('#preview');
             preview.innerHTML = '';
@@ -211,6 +214,9 @@
                     } else if (response.status == 400) {
                         $.each(response.errors.name, function(key, error) {
                             $('#error-name').append(error);
+                        });
+                        $.each(response.errors.gender, function(key, error) {
+                            $('#error-gender').append(error);
                         });
                         $.each(response.errors.specialization, function(key, error) {
                             $('#error-specialization').append(error);
@@ -285,6 +291,7 @@
                         ajaxType = "PUT";
 
                         $('#name').val(response.data.name);
+                        $('#gender').val(response.data.gender).trigger('change');
                         $('#specialization').val(response.data.specialization);
                         $('#specialities').val(response.data.speciality_id).trigger('change');
                         $('#about-me').val(response.data.about_me);
