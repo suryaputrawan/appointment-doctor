@@ -28,7 +28,11 @@
                             <a class="{{ request()->routeIs('admin.doctor-education.index') ? 'active' : '' }}" href="{{ route('admin.doctor-education.index') }}">Educations</a>
                         </li>
                         <li>
-                            <a class="{{ request()->routeIs('admin.doctor-location.index') ? 'active' : '' }}" href="{{ route('admin.doctor-location.index') }}">Practice Locations</a>
+                            <a class="{{ request()->routeIs('admin.doctor-location.index') || 
+                            request()->routeIs('admin.doctor-location.create') || 
+                            request()->routeIs('admin.doctor-location.edit') || 
+                            request()->routeIs('admin.doctor-location.show') ? 'active' : '' }}" 
+                            href="{{ route('admin.doctor-location.index') }}">Practice Locations</a>
                         </li>
                     </ul>
                 </li>

@@ -18,7 +18,7 @@
                 </ul>
             </div>
             <div class="col-sm-5 col">
-                <a href="{{ route('admin.practice-schedules.create') }}" class="btn btn-primary float-right mt-2" type="button">
+                <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
                     Add
                 </a>
             </div>
@@ -37,7 +37,6 @@
                                         <th>Date</th>
                                         <th>Doctor Name</th>
                                         <th>Time</th>
-                                        <th>Hospital / Clinic</th>
                                         <th>Booking Status</th>
                                     </tr>
                                 </thead>
@@ -88,8 +87,7 @@
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
                 { data: "date", name: "date", orderable: true  },
                 { data: "doctor_name", name: "doctor_name", orderable: false, searchable: false },
-                { data: "time", name: "time", orderable: false, searchable: false, className: "text-center" },
-                { data: "hospital", name: "hospital", orderable: false, searchable: false, className: "text-center" },  
+                { data: "time", name: "time", orderable: false, searchable: false, className: "text-center" },  
                 { data: "booking_status", name: "booking_status", orderable: true, searchable: false, className: "text-center" },  
             ],
         });
@@ -104,7 +102,6 @@
             $('#practice-schedule-form').find('.error').text("");
 
             $("#doctor").val("").trigger('change');
-            $("#hospital").val("").trigger('change');
 
             ajaxUrl = "{{ route('admin.practice-schedules.store') }}";
             ajaxType = "POST";
@@ -177,10 +174,6 @@
                         });
                     } else if (response.status == 400) {
                         $('.btn-cancel').toggle();
-
-                        $.each(response.errors.hospital, function(key, error) {
-                            $('#error-hospital').append(error);
-                        });
 
                         $.each(response.errors.date, function(key, error) {
                             $('#error-date').append(error);
@@ -263,7 +256,6 @@
                         ajaxType = "PUT";
 
                         $('#date').val(response.data.date);
-                        $('#hospital').val(response.data.hospital_id).trigger('change');
                         $('#doctor').val(response.data.doctor_id).trigger('change');
                         $('#start-time').val(response.data.start_time);
                         $('#end-time').val(response.data.end_time);

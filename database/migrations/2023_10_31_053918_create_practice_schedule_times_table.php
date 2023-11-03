@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('practice_schedules', function (Blueprint $table) {
+        Schema::create('practice_schedule_times', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('doctor_id')->constrained('doctors')->cascadeOnDelete();
-            $table->foreignId('hospital_id')->constrained('hospitals')->cascadeOnDelete();
-            $table->date('date');
+            $table->foreignId('practice_schedule_id')->constrained('practice_schedules')
+                ->cascadeOnDelete();
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->tinyInteger('booking_status')->default(0);
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('practice_schedules');
+        Schema::dropIfExists('practice_schedule_times');
     }
 };

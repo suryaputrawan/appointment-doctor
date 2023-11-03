@@ -1,6 +1,6 @@
 <!-- Modal -->
 <div class="modal fade" id="modal-add-practice-schedule" data-backdrop="static" aria-hidden="true" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="title"></h5>
@@ -9,15 +9,22 @@
                 <form id="practice-schedule-form">
                     @csrf
                     <div class="row form-row">
-                        <div class="col-12 col-sm-4">
+                        <div class="col-12 col-sm-6">
                             <div class="form-group">
-                                <label>Date <span class="text-danger">*</span></label>
-                                <input name="date" id="date" type="date" class="form-control" value="{{ old('date') }}">
-                                <p id="error-date" style="color: red" class="error"></p>
+                                <label>Hospital / Clinic <span class="text-danger">*</span></label>
+                                <select name="hospital" id="hospital" class="select">
+                                    <option value="">-- Please Selected --</option>
+                                    @foreach ($hospital as $data)
+                                    <option value="{{ $data->id }}"
+                                        {{ old('hospital') == $data->id ? 'selected' : null }}>{{ $data->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                <p id="error-hospital" style="color: red" class="error"></p>
                             </div>
                         </div>
 
-                        <div class="col-12 col-sm-8">
+                        <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label>Doctor Name <span class="text-danger">*</span></label>
                                 <select name="doctor" id="doctor" class="select">
@@ -34,6 +41,14 @@
                     </div>
 
                     <div class="row form-row">
+                        <div class="col-12 col-sm-4">
+                            <div class="form-group">
+                                <label>Date <span class="text-danger">*</span></label>
+                                <input name="date" id="date" type="date" class="form-control" value="{{ old('date') }}">
+                                <p id="error-date" style="color: red" class="error"></p>
+                            </div>
+                        </div>
+
                         <div class="col-12 col-sm-4">
                             <div class="form-group">
                                 <label>Start Time <span class="text-danger">*</span></label>
