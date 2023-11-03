@@ -14,7 +14,8 @@ class DoctorLocationDay extends Model
     protected $fillable = [
         'doctor_location_id',
         'day',
-        'time'
+        'start_time',
+        'end_time'
     ];
 
     public function doctorLocation()

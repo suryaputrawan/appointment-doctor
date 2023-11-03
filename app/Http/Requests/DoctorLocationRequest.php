@@ -22,12 +22,14 @@ class DoctorLocationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'doctor'        => ['required'],
-            'hospital'      => ['required'],
-            'day'           => ['array'],
-            'day.*'         => ['required', 'min:3'],
-            'time'          => ['array'],
-            'time.*'        => ['required', 'min:5']
+            'doctor'            => ['required'],
+            'hospital'          => ['required'],
+            'day'               => ['array'],
+            'day.*'             => ['required', 'min:3'],
+            'start_time'        => ['array'],
+            'start_time.*'      => ['required'],
+            'end_time'          => ['array'],
+            'end_time.*'        => ['required']
         ];
     }
 
@@ -42,10 +44,15 @@ class DoctorLocationRequest extends FormRequest
             }
         }
 
-        if ($this->get('time')) {
-            foreach ($this->get('time') as $key => $val) {
-                $messages["time.$key.required"] = "The time field is required";
-                $messages["time.$key.min"] = "The time field must be at least :min characters.";
+        if ($this->get('start_time')) {
+            foreach ($this->get('start_time') as $key => $val) {
+                $messages["start_time.$key.required"] = "The time field is required";
+            }
+        }
+
+        if ($this->get('end_time')) {
+            foreach ($this->get('end_time') as $key => $val) {
+                $messages["end_time.$key.required"] = "The time field is required";
             }
         }
         return $messages;

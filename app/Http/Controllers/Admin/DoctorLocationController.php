@@ -24,7 +24,7 @@ class DoctorLocationController extends Controller
         if (request()->type == 'datatable') {
             $data = DoctorLocation::with([
                 'doctorLocationDay' => function ($query) {
-                    $query->select('id', 'doctor_location_id', 'day', 'time');
+                    $query->select('id', 'doctor_location_id', 'day', 'start_time', 'end_time');
                 },
                 'doctor' => function ($query) {
                     $query->select('id', 'name');
@@ -108,13 +108,14 @@ class DoctorLocationController extends Controller
             ]);
 
             //Store multiple data to doctor_location_day
-            if ($request->day && $request->time) {
+            if ($request->day && $request->start_time && $request->end_time) {
                 for ($i = 0; $i < count($request->day); $i++) {
                     if ($request->day[$i]) {
                         DoctorLocationDay::create([
                             'doctor_location_id'    => $location->id,
                             'day'                   => strtoupper($request->day[$i]),
-                            'time'                  => strtoupper($request->time[$i]),
+                            'start_time'            => $request->start_time[$i],
+                            'end_time'              => $request->end_time[$i],
                         ]);
                     }
                 }
@@ -147,9 +148,32 @@ class DoctorLocationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(DoctorLocation $doctorLocation)
+    public function show($id)
     {
-        //
+        try {
+            $id = Crypt::decryptString($id);
+            $data = DoctorLocation::find($id);
+            $days = DoctorLocationDay::where('doctor_location_id', $data->id)->get();
+
+            if (!$data) {
+                return redirect()
+                    ->back()
+                    ->with('error', "Data not found..");
+            }
+
+            return view('admin.modules.doctor-location.view', [
+                'pageTitle'     => 'View Doctor Location',
+                'breadcrumb'    => 'View Doctor location',
+                'data'          => $data,
+                'days'          => $days,
+                'hospitals'      => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
+                'doctors'        => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
+            ]);
+        } catch (\Throwable $e) {
+            return redirect()
+                ->back()
+                ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+        }
     }
 
     /**
@@ -213,13 +237,14 @@ class DoctorLocationController extends Controller
             }
 
             //Store multiple data to doctor_location_day
-            if ($request->day && $request->time) {
+            if ($request->day && $request->start_time && $request->end_time) {
                 for ($i = 0; $i < count($request->day); $i++) {
                     if ($request->day[$i]) {
                         DoctorLocationDay::create([
                             'doctor_location_id'    => $data->id,
                             'day'                   => strtoupper($request->day[$i]),
-                            'time'                  => strtoupper($request->time[$i]),
+                            'start_time'            => $request->start_time[$i],
+                            'end_time'              => $request->end_time[$i],
                         ]);
                     }
                 }

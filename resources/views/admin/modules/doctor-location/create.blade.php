@@ -84,12 +84,13 @@
                                             <thead>
                                                 <tr>
                                                     <th>Day</th>
-                                                    <th>Time</th>
+                                                    <th>Start Time</th>
+                                                    <th>End Time</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @if (old('day') || old('time'))
+                                                @if (old('day') || old('start_time') || old('end_time'))
                                                     @for ($i = 0; $i < count(old('day')); $i++)
                                                         <tr>
                                                             <td>
@@ -99,8 +100,14 @@
                                                                 @enderror
                                                             </td>
                                                             <td>
-                                                                <input type="text" class="form-control @error('time.'.$i) is-invalid @enderror" name="time[]" id="time" placeholder="Example : 10:00 AM - 2:00 PM" value="{{ old('time.'.$i) }}" style='text-transform:uppercase' autocomplete="off">
-                                                                @error('time.'.$i)
+                                                                <input type="time" class="form-control @error('start_time.'.$i) is-invalid @enderror" name="start_time[]" id="time" value="{{ old('start_time.'.$i) }}" autocomplete="off">
+                                                                @error('start_time.'.$i)
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
+                                                            </td>
+                                                            <td>
+                                                                <input type="time" class="form-control @error('end_time.'.$i) is-invalid @enderror" name="end_time[]" id="time" value="{{ old('end_time.'.$i) }}" autocomplete="off">
+                                                                @error('end_time.'.$i)
                                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                                 @enderror
                                                             </td>
@@ -118,8 +125,14 @@
                                                             @enderror
                                                         </td>
                                                         <td>
-                                                            <input type="text" class="form-control @error('time') is-invalid @enderror" name="time[]" id="time" placeholder="Example : 10:00 AM - 2:00 PM" value="{{ old('time') }}" style='text-transform:uppercase' autocomplete="off">
-                                                            @error('time')
+                                                            <input type="time" class="form-control @error('start_time') is-invalid @enderror" name="start_time[]" id="time" value="{{ old('start_time') }}" autocomplete="off">
+                                                            @error('start_time')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </td>
+                                                        <td>
+                                                            <input type="time" class="form-control @error('end_time') is-invalid @enderror" name="end_time[]" id="time" value="{{ old('end_time') }}" autocomplete="off">
+                                                            @error('end_time')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
                                                         </td>
@@ -172,8 +185,12 @@
                         "<p id='error-day' style='color: red' class='error'></p>"+
                     "</td>"+
                     "<td>"+
-                        "<input type='text' class='form-control' name='time[]' placeholder='Example : 10:00 AM - 2:00 PM' style='text-transform:uppercase' value='{{ old('time.*') }}' autocomplete='off'>"+
-                        "<p id='error-time' style='color: red' class='error'></p>"+
+                        "<input type='time' class='form-control' name='start_time[]' value='{{ old('start_time.*') }}' autocomplete='off'>"+
+                        "<p id='error-start_time' style='color: red' class='error'></p>"+
+                    "</td>"+
+                    "<td>"+
+                        "<input type='time' class='form-control' name='end_time[]' value='{{ old('end_time.*') }}' autocomplete='off'>"+
+                        "<p id='error-end_time' style='color: red' class='error'></p>"+
                     "</td>"+
                     "<td>"+
                         "<button id='btn-item-delete' type='button' class='btn btn-sm btn-danger'><i class='fe fe-trash'></i></button>"+

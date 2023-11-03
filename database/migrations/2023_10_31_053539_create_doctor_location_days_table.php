@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('doctor_location_id')->constrained('doctor_locations')
                 ->cascadeOnDelete();
             $table->string('day');
-            $table->string('time');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->timestamps();
         });
     }
