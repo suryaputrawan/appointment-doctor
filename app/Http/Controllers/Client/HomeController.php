@@ -17,11 +17,9 @@ class HomeController extends Controller
                 $query->select('id', 'name');
             },
             'doctorLocation'    => function ($query) {
-                $query->with('company');
+                $query->with('hospital');
             }
         ])->get();
-
-        // dd($doctors);
 
         $specialities = Speciality::get(['id', 'name', 'picture']);
 

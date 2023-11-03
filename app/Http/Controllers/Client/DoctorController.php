@@ -29,11 +29,10 @@ class DoctorController extends Controller
 
         if ($doctor) {
             $doctorEducations = DoctorEducation::where('doctor_id', $doctor->id)->get();
-            $doctorLocations = DoctorLocation::with('company')
+            $doctorLocations = DoctorLocation::with('hospital', 'doctorLocationDay')
                 ->where('doctor_id', $doctor->id)
-                ->orderBy('company_id')
-                ->get()
-                ->groupBy('company');
+                ->orderBy('hospital_id')
+                ->get();
         }
 
         return view('client.modules.doctor.detail', [

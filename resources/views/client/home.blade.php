@@ -93,14 +93,12 @@
                                     </a>
                                 </div>
                                 <div class="pro-content">
-                                    <h6>
-                                        <a href=#">{{ $doctor->name }}</a> 
-                                    </h6>
+                                    <h6><a href=#">{{ $doctor->name }}</a></h6>
                                     <p class="speciality">{{ $doctor->specialization }} - {{ $doctor->speciality->name }}</p>
                                     <ul class="available-info">
                                         @foreach ($doctor->doctorLocation as $location)
                                             <li>
-                                                <i class="fas fa-map-marker-alt"></i> {{ $location->company->name }}
+                                                <i class="fas fa-map-marker-alt"></i> {{ $location->hospital->name }}
                                             </li>
                                         @endforeach
                                         
