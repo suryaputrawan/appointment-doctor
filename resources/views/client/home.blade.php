@@ -104,8 +104,8 @@
                                         
                                         {{-- <li>
                                             <i class="far fa-clock"></i> Available on Fri, 22 Mar
-                                        </li>
-                                        <li>
+                                        </li> --}}
+                                        {{-- <li>
                                             <i class="far fa-money-bill-alt"></i> $300 - $1000 
                                             <i class="fas fa-info-circle" data-toggle="tooltip" title="Lorem Ipsum"></i>
                                         </li> --}}
@@ -115,7 +115,7 @@
                                             <a href="{{ route('client.doctor.show', Crypt::encryptString($doctor->id)) }}" class="btn view-btn">View Profile</a>
                                         </div>
                                         <div class="col-6">
-                                            <a href="#" class="btn book-btn">Book Now</a>
+                                            <a href="{{ route('client.patient.booking', Crypt::encryptString($doctor->id)) }}" class="btn book-btn">Book Now</a>
                                         </div>
                                     </div>
                                 </div>
