@@ -8,7 +8,7 @@
             </span>
         </a>
         <a href="{{ route('client.home') }}" class="navbar-brand logo">
-            <img src="{{ asset('assets/client/img/SiloamCanggu-Logo.png') }}" class="img-fluid" alt="Logo">
+            <img src="{{ asset('assets/client/img/logo.png') }}" class="img-fluid" alt="Logo">
         </a>
     </div>
     <div class="main-menu-wrapper">

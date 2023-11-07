@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AppointmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\DoctorController;
@@ -14,7 +15,6 @@ use App\Http\Controllers\Admin\PracticeScheduleController;
 Route::name('client.')->group(function () {
     include 'client.php';
 });
-
 
 Route::get('/admin', [AuthController::class, 'showloginform'])->name('login');
 Route::post('/admin/postlogin', [AuthController::class, 'postlogin'])->name('postlogin');
@@ -35,4 +35,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     // Route::get('doctor-location/list/{id}', [DoctorLocationController::class, 'list'])->name('doctor-location.list');
     Route::resource('doctor-location', DoctorLocationController::class);
+
+    Route::put('appointment/arrived/{id}', [AppointmentController::class, 'arrived'])->name('appointment.arrived');
+    Route::put('appointment/cancel/{id}', [AppointmentController::class, 'cancel'])->name('appointment.cancel');
+    Route::resource('appointment', AppointmentController::class);
 });

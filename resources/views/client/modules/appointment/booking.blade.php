@@ -289,8 +289,6 @@
 
                 success: function (response) {
 
-                    console.log(response);
-
                     if (response.status == 404) {
                         Toast.fire({
                             icon: 'warning',
@@ -325,6 +323,8 @@
             let id_hospital = $('#hospital').val();
             let id_doctor   = $('#doctor').val();
             let id_date     = $('#booking-date').val();
+            $('#info-time').text('');
+
             loadTimeData(id_hospital, id_doctor, id_date, null, true);
         });
 

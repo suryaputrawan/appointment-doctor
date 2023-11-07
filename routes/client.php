@@ -7,6 +7,7 @@ use App\Http\Controllers\Client\HomeController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+Route::get('getBookingHospital', [AppointmentController::class, 'getBookingHospital'])->name('getBookingHospital');
 Route::get('getBookingDate', [AppointmentController::class, 'getBookingDate'])->name('getBookingDate');
 Route::get('getBookingTime', [AppointmentController::class, 'getBookingTime'])->name('getBookingTime');
 

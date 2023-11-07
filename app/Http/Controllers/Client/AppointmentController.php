@@ -65,7 +65,7 @@ class AppointmentController extends Controller
             $bookingNumber = Appointment::whereDate('created_at', $dateNow)->get();
 
             $appointment = Appointment::create([
-                'booking_number'    => Carbon::now()->format('Ymd') . '-' . $bookingNumber->count() + 1,
+                'booking_number'    => Carbon::now()->format('Ymd') . $bookingNumber->count() + 1,
                 'date'              => $time->date,
                 'start_time'        => $time->start_time,
                 'end_time'          => $time->end_time,
@@ -98,6 +98,51 @@ class AppointmentController extends Controller
                 ->back()
                 ->withInput()
                 ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+        }
+    }
+
+    public function getBookingHospital(Request $request)
+    {
+        try {
+            $id_doctor = $request->id_doctor;
+
+            $data = DoctorLocation::with([
+                'hospital'  => function ($query) {
+                    $query->select('id', 'name');
+                }
+            ])
+                ->where('doctor_id', $id_doctor)
+                ->get();
+
+            $option = "<option>-- Select Hospital --</option>";
+
+            foreach ($data as $item) {
+                $selectedState = '';
+                if ($request->selected) {
+                    $selectedState = $item->hospital_id == $request->selected ? 'selected' : '';
+                }
+
+                $hospital = json_decode($item->hospital);
+
+                $option .=  "<option value='$item->hospital_id'$selectedState>$hospital->name</option>";
+            }
+
+            if ($data) {
+                return response()->json([
+                    'status' => 200,
+                    'data' => $option,
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Hospital Not Found',
+                ]);
+            }
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status'  => 500,
+                'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
+            ], 500);
         }
     }
 

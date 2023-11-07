@@ -9,6 +9,12 @@
                     <a href="{{ route('admin.dashboard') }}"><i class="fe fe-home"></i> <span>Dashboard</span></a>
                 </li>
 
+                <li class="{{ request()->routeIs('admin.appointment.index') || 
+                    request()->routeIs('admin.appointment.create') || 
+                    request()->routeIs('admin.appointment.edit') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.appointment.index') }}"><i class="fe fe-calendar"></i> <span>Appointment</span></a>
+                </li>
+
                 <li class="menu-title"> 
                     <span>Master</span>
                 </li>
