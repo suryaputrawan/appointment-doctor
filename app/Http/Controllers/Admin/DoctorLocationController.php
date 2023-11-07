@@ -32,7 +32,7 @@ class DoctorLocationController extends Controller
                 'hospital'  => function ($query) {
                     $query->select('id', 'name');
                 }
-            ])->get();
+            ])->orderBy('doctor_id')->get();
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {

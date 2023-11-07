@@ -45,6 +45,6 @@ class Doctor extends Model
 
     public function doctorLocation(): HasMany
     {
-        return $this->hasMany(DoctorLocation::class);
+        return $this->hasMany(DoctorLocation::class, 'doctor_id', 'id');
     }
 }

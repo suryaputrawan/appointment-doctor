@@ -68,19 +68,13 @@
 @section('doctor')
 <section class="section section-doctor">
     <div class="container-fluid">
+
+        <div class="section-header text-center">
+            <h2>Book Our Doctor</h2>
+            {{-- <p class="sub-title">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p> --}}
+        </div>
         <div class="row">
-            <div class="col-lg-4">
-                <div class="section-header ">
-                    <h2>Book Our Doctor</h2>
-                    <p>Lorem Ipsum is simply dummy text </p>
-                </div>
-                <div class="about-content">
-                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum.</p>
-                    <p>web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes</p>					
-                    <a href="javascript:;">Read More..</a>
-                </div>
-            </div>
-            <div class="col-lg-8">
+            <div class="col-lg-12">
                 <div class="doctor-slider slider">
                 
                     <!-- Doctor Widget -->

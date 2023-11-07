@@ -24,8 +24,8 @@
             <li class="{{ request()->routeIs('client.home') ? 'active' : '' }}">
                 <a href="{{ route('client.home') }}">Home</a>
             </li>
-            <li>
-                <a href="{{ route('login') }}" target="_blank">Admin</a>
+            <li class="{{ request()->routeIs('client.doctor.search') ? 'active' : '' }}">
+                <a href="{{ route('client.doctor.search') }}">Search Doctor</a>
             </li>
 
             {{-- <li class="has-submenu">

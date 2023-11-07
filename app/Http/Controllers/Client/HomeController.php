@@ -19,7 +19,9 @@ class HomeController extends Controller
             'doctorLocation'    => function ($query) {
                 $query->with('hospital');
             }
-        ])->get();
+        ])
+            ->where('isAktif', 1)
+            ->get();
 
         $specialities = Speciality::get(['id', 'name', 'picture']);
 

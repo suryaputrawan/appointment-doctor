@@ -13,6 +13,8 @@ Route::get('getBookingTime', [AppointmentController::class, 'getBookingTime'])->
 
 Route::get('/profile-doctor/{id}', [DoctorController::class, 'show'])->name('doctor.show');
 
+Route::get('/search-doctor', [DoctorController::class, 'searchDoctor'])->name('doctor.search');
+
 Route::post('/booking/store', [AppointmentController::class, 'store'])->name('appointment.store');
 Route::get('/booking/{id}', [AppointmentController::class, 'booking'])->name('patient.booking');
 Route::get('/booking/{id}/success', [AppointmentController::class, 'bookingSuccess'])->name('appointment.success');
