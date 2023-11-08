@@ -4,25 +4,27 @@ namespace App\Http\Controllers\Permissions;
 
 use Exception;
 use Throwable;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
-use Spatie\Permission\Models\Permission;
 
-class AssignController extends Controller
+class UserController extends Controller
 {
     public function index()
     {
         if (request()->type == 'datatable') {
-            $data = Role::get();
+            $data = User::has('roles')->get();
+
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
-                    $editRoute       = 'admin.assign.edit';
-                    $dataId          = Crypt::encryptString($data->id);
+                    $editRoute      = 'admin.assign.user.edit';
+                    $dataId         = Crypt::encryptString($data->id);
 
                     $action = "";
+
                     $action .= '
                     <a class="btn btn-warning btn-icon" type="button" href="' . route($editRoute, $dataId) . '">
                         <i class="fa fa-pencil"></i>
@@ -31,50 +33,48 @@ class AssignController extends Controller
                     $group = '<div class="btn-group btn-group-sm mb-1 mb-md-0" role="group">
                         ' . $action . '
                     </div>';
+
                     return $group;
                 })
-                ->addColumn('permissions', function ($data) {
-                    return implode(', ', $data->getPermissionNames()->toArray());
+                ->addColumn('role', function ($data) {
+                    return implode(', ', $data->getRoleNames()->toArray());
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        return view('admin.modules.permission.assign.index', [
-            'pageTitle'     => 'Assign Permissions',
-            'breadcrumb'    => 'Assign Permissions'
+        return view('admin.modules.permission.assign.user.index', [
+            'pageTitle'     => 'Permission To User',
+            'breadcrumb'    => 'Permission To User'
         ]);
     }
     public function create()
     {
-        return view('admin.modules.permission.assign.create', [
-            'pageTitle'     => 'Create assign permissions',
-            'breadcrumb'    => 'Create assign permissions',
+        return view('admin.modules.permission.assign.user.create', [
+            'pageTitle'     => 'Create Permission To User',
+            'breadcrumb'    => 'Create Permission To User',
             'btnSubmit'     => 'Save',
             'roles'         => Role::get(),
-            'permissions'   => Permission::get()
+            'users'         => User::get(['id', 'name', 'username'])
         ]);
     }
     public function store(Request $request)
     {
         $request->validate([
-            'role'          => 'required',
-            'permissions'   => 'array|required'
+            'user'    => 'required',
+            'roles'   => 'array|required'
         ]);
 
         try {
             DB::beginTransaction();
 
-            $role = Role::find(request('role'));
-            $role->givePermissionTo(request('permissions'));
+            $user = User::find($request->user);
+
+            $user->assignRole(request('roles'));
 
             DB::commit();
-            if (isset($_POST['btnSimpan'])) {
-                return redirect()->route('admin.assign.index')
-                    ->with('success', "Permission has been assigned to the role {$role->name}");
-            } else {
-                return redirect()->route('admin.assign.create')
-                    ->with('success', "Permission has been assigned to the role {$role->name}");
-            }
+
+            return redirect()->route('admin.assign.user.index')
+                ->with('success', "{$user->name} has been assigned to the role");
         } catch (Exception $e) {
             DB::rollBack();
             return redirect()
@@ -93,7 +93,7 @@ class AssignController extends Controller
     {
         try {
             $id = Crypt::decryptString($id);
-            $data = Role::find($id);
+            $data = User::find($id);
 
             if (!$data) {
                 return redirect()
@@ -101,13 +101,13 @@ class AssignController extends Controller
                     ->with('error', "Data not found..");
             }
 
-            return view('admin.modules.permission.assign.edit', [
-                'pageTitle'     => 'Sync assign permissions',
-                'breadcrumb'    => 'Sync assign permissions',
+            return view('admin.modules.permission.assign.user.edit', [
+                'pageTitle'     => 'Edit Permission To User',
+                'breadcrumb'    => 'Edit Permission To User',
                 'btnSubmit'     => 'Sync',
                 'data'          => $data,
                 'roles'         => Role::get(),
-                'permissions'   => Permission::get()
+                'users'         => User::get(['id', 'name', 'username'])
             ]);
         } catch (\Throwable $e) {
             return redirect()
@@ -118,12 +118,12 @@ class AssignController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'role'          => 'required',
-            'permissions'   => 'array|required'
+            'user'      => 'required',
+            'roles'     => 'array'
         ]);
 
         $id = Crypt::decryptString($id);
-        $data = Role::find($id);
+        $data = User::find($id);
 
         if (!$data) {
             return redirect()
@@ -133,17 +133,12 @@ class AssignController extends Controller
 
         DB::beginTransaction();
         try {
-            $request->validate([
-                'role'          => 'required',
-                'permissions'   => 'array|required'
-            ]);
-
-            $data->syncPermissions(request('permissions'));
+            $data->syncRoles(request('roles'));
 
             DB::commit();
 
-            return redirect()->route('admin.assign.index')
-                ->with('success', 'The Permission has been synced');
+            return redirect()->route('admin.assign.user.index')
+                ->with('success', "{$data->name} has been updated the role");
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()

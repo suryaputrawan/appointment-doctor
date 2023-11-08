@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\HospitalController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SpecialityController;
 use App\Http\Controllers\Permissions\RoleController;
+use App\Http\Controllers\Permissions\UserController;
 use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Permissions\AssignController;
 use App\Http\Controllers\Admin\DoctorLocationController;
@@ -64,6 +65,13 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::post('assignable/store', [AssignController::class, 'store'])->name('assign.store');
         Route::get('assignable/{id}/edit', [AssignController::class, 'edit'])->name('assign.edit');
         Route::put('assignable/{id}/update', [AssignController::class, 'update'])->name('assign.update');
+
+        // Route assign to user
+        Route::get('assign', [UserController::class, 'index'])->name('assign.user.index');
+        Route::get('assign/user', [UserController::class, 'create'])->name('assign.user.create');
+        Route::post('assign/user', [UserController::class, 'store'])->name('assign.user.store');
+        Route::get('assign/{id}/user', [UserController::class, 'edit'])->name('assign.user.edit');
+        Route::put('assign/{id}/user', [UserController::class, 'update'])->name('assign.user.update');
     });
     // end route
 });

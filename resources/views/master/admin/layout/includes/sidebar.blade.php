@@ -63,7 +63,10 @@
                             <a class="{{ request()->routeIs('admin.permissions.index') ? 'active' : '' }}" href="{{ route('admin.permissions.index') }}">Permissions</a>
                         </li>
                         <li>
-                            <a class="{{ request()->routeIs('admin.assign.index') ? 'active' : '' }}" href="{{ route('admin.assign.index') }}">Assign Permissions</a>
+                            <a class="{{ request()->routeIs('admin.assign.index') || request()->routeIs('admin.assign.edit') ? 'active' : '' }}" href="{{ route('admin.assign.index') }}">Assign Permissions</a>
+                        </li>
+                        <li>
+                            <a class="{{ request()->routeIs('admin.assign.user.index') ? 'active' : '' }}" href="{{ route('admin.assign.user.index') }}">Permission To User</a>
                         </li>
                     </ul>
                 </li>

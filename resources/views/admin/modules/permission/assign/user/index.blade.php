@@ -1,4 +1,4 @@
-@extends('master.admin.layout.app', ['title' => 'Assign Permissions'])
+@extends('master.admin.layout.app', ['title' => 'Permission To User'])
 
 @push('plugin-style')
     <!-- Datatables CSS -->
@@ -18,11 +18,11 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-            {{-- <div class="col-sm-5 col">
-                <a href="{{ route('admin.assign.create') }}" class="btn btn-primary float-right mt-2" type="button">
+            <div class="col-sm-5 col">
+                <a href="{{ route('admin.assign.user.create') }}" class="btn btn-primary float-right mt-2" type="button">
                     Add
                 </a>
-            </div> --}}
+            </div>
         </div>
         
         <div class="row">
@@ -34,9 +34,9 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">#</th>
-                                        <th style="width: 100px">ACTION</th>
+                                        <th style="width: 100px">Action</th>
+                                        <th>Name</th>
                                         <th>Role</th>
-                                        <th>Permissions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -63,11 +63,23 @@
     $(document).ready(function() {
 
         //datatable initialization
+        var tableOptions = {
+            "aLengthMenu": [
+                [10, 30, 50, -1],
+                [10, 30, 50, "All"]
+            ],
+            "iDisplayLength": 10,
+            "language": {
+                search: ""
+            }
+        };
+
         let dataTable = $("#datatable").DataTable({
-            ajax: "{{ route('admin.assign.index') }}?type=datatable",
+            ...tableOptions,
+            ajax: "{{ route('admin.assign.user.index') }}?type=datatable",
             processing: true,
             serverSide : true,
-            responsive: true,
+            responsive: false,
             destroy: true,
             columns: [
                 {
@@ -80,7 +92,7 @@
                 },
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
                 { data: "name", name: "name", orderable: true  },
-                { data: "permissions", name: "permissions", orderable: false, searchable: false },
+                { data: "role", name: "role", orderable: true  },
             ],
         });
         //-----End datatable inizialitation

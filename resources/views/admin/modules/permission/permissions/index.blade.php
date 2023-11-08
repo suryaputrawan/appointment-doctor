@@ -14,6 +14,7 @@
                 <h3 class="page-title">{{ $pageTitle }}</h3>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item">Roles & Permissions</li>
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
