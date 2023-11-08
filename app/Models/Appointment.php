@@ -25,7 +25,8 @@ class Appointment extends Model
         'patient_address',
         'patient_email',
         'patient_telp',
-        'status'
+        'status',
+        'user_id'
     ];
 
     public function hospital(): BelongsTo
@@ -36,5 +37,10 @@ class Appointment extends Model
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(Doctor::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

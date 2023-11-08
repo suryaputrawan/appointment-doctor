@@ -1,4 +1,4 @@
-@extends('master.admin.layout.app', ['title' => 'Company'])
+@extends('master.admin.layout.app', ['title' => 'Hospital/Clinic'])
 
 @push('plugin-style')
     <!-- Datatables CSS -->

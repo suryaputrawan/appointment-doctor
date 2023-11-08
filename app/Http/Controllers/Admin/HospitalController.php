@@ -86,7 +86,7 @@ class HospitalController extends Controller
             'name'                  => 'required|max:100|min:5|unique:hospitals,name,NULL,id',
             'address'               => 'required|min:5',
             'phone'                 => 'required|min:7',
-            'whatsapp'              => 'required|min:11',
+            'whatsapp'              => 'required|min:9',
             'email'                 => 'required|email|unique:hospitals,email',
             'logo'                  => 'required|mimes:png|max:1000',
         ]);
@@ -180,7 +180,7 @@ class HospitalController extends Controller
             'name'                  => 'required|max:100|min:5|unique:hospitals,name,' . $data->id,
             'address'               => 'required|min:5',
             'phone'                 => 'required|min:7',
-            'whatsapp'              => 'required|min:11',
+            'whatsapp'              => 'required|min:9',
             'email'                 => 'required|email|unique:hospitals,email,' . $data->id,
             'logo'                  => request('logo') ? 'mimes:png|max:1000' : '',
         ]);

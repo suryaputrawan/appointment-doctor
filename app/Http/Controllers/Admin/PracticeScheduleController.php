@@ -25,7 +25,7 @@ class PracticeScheduleController extends Controller
         if (request()->type == 'datatable') {
             $data = PracticeSchedule::with([
                 'doctor'    => function ($query) {
-                    $query->select('id', 'name');
+                    $query->select('id', 'name', 'isAktif')->where('isAktif', 1);
                 },
                 'hospital'  => function ($query) {
                     $query->select('id', 'name');
@@ -93,7 +93,7 @@ class PracticeScheduleController extends Controller
         return view('admin.modules.practice-schedule.index', [
             'pageTitle'     => 'List Of Doctor Practice Schedule',
             'breadcrumb'    => 'Practice Schedules',
-            'doctor'        => Doctor::orderBy('name', 'asc')->get(['id', 'name']),
+            'doctor'        => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
             'hospital'      => Hospital::orderBy('name', 'asc')->get(['id', 'name'])
         ]);
     }
@@ -107,7 +107,7 @@ class PracticeScheduleController extends Controller
             'pageTitle'     => 'Create Practice Schedule',
             'breadcrumb'    => 'Create Practice Schedule',
             'btnSubmit'     => 'Save',
-            'doctor'        => Doctor::orderBy('name', 'asc')->get(['id', 'name']),
+            'doctor'        => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
             'hospital'      => Hospital::orderBy('name', 'asc')->get(['id', 'name'])
         ]);
     }

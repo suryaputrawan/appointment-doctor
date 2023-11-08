@@ -51,7 +51,7 @@ class AppointmentController extends Controller
             'dob'           => 'required',
             'sex'           => 'required',
             'email'         => 'required|email',
-            'phone'         => 'required|min:7',
+            'phone'         => 'required|min:6',
             'address'       => 'required|min:5',
             'hospital'      => 'required',
         ]);
@@ -114,7 +114,7 @@ class AppointmentController extends Controller
                 ->where('doctor_id', $id_doctor)
                 ->get();
 
-            $option = "<option>-- Select Hospital --</option>";
+            $option = "<option>Select Hospital</option>";
 
             foreach ($data as $item) {
                 $selectedState = '';
@@ -159,7 +159,7 @@ class AppointmentController extends Controller
                 ->where('date', '>=', $dateNow)
                 ->get()->groupBy('date');
 
-            $option = "<option>-- Select Date --</option>";
+            $option = "<option>Select Date</option>";
 
             foreach ($data as $index => $item) {
                 $selectedState = '';
@@ -205,7 +205,7 @@ class AppointmentController extends Controller
                 ->orderBy('start_time', 'asc')
                 ->get();
 
-            $option = "<option>-- Select Time --</option>";
+            $option = "<option>Select Time</option>";
 
             foreach ($data as $item) {
                 $selectedState = '';

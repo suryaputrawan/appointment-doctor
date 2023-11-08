@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\PracticeSchedule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 class AppointmentController extends Controller
@@ -113,7 +114,7 @@ class AppointmentController extends Controller
             'pageTitle'     => 'Create Appointment',
             'breadcrumb'    => 'Create Appointment',
             'btnSubmit'     => 'Save',
-            'doctor'        => Doctor::orderBy('name', 'asc')->get(['id', 'name']),
+            'doctor'        => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
         ]);
     }
 
@@ -247,7 +248,7 @@ class AppointmentController extends Controller
                 'breadcrumb'    => 'Edit Appointment',
                 'btnSubmit'     => 'Save Change',
                 'data'          => $data,
-                'doctors'       => Doctor::orderBy('name', 'asc')->get(['id', 'name']),
+                'doctors'       => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
                 'schedule'      => $schedule
             ]);
         } catch (\Throwable $e) {
@@ -344,7 +345,8 @@ class AppointmentController extends Controller
             }
 
             $data->update([
-                'status'     => 'Arrived'
+                'status'     => 'Arrived',
+                'user_id'    => Auth::user()->id
             ]);
 
             DB::commit();
@@ -369,6 +371,12 @@ class AppointmentController extends Controller
             $decrypt = Crypt::decryptString($id);
             $data = Appointment::find($decrypt);
 
+            $schedule = PracticeSchedule::where('doctor_id', $data->doctor_id)
+                ->where('hospital_id', $data->hospital_id)
+                ->where('start_time', $data->start_time)
+                ->where('end_time', $data->end_time)
+                ->first();
+
             if (!$data) {
                 return response()->json([
                     'status'  => 404,
@@ -377,7 +385,12 @@ class AppointmentController extends Controller
             }
 
             $data->update([
-                'status'     => 'Cancel'
+                'status'     => 'Cancel',
+                'user_id'    => Auth::user()->id
+            ]);
+
+            $schedule->update([
+                'booking_status'    => 0
             ]);
 
             DB::commit();

@@ -43,9 +43,15 @@
                                         <a href="{{ route('client.doctor.show', Crypt::encryptString($data->id)) }}" class="mb-0">{{ $data->name }}</a>
                                         <p class="speciality" style="font-size: 12px;">{{ $data->specialization }} - {{ $data->speciality->name }}</p>
                                     </h4>
-                                    @foreach ($data->doctorLocation as $location)
-                                        <p class="text-muted mb-0" style="font-size: 12px;"><i class="fas fa-map-marker-alt"></i> {{ $location->hospital->name }}</p>
+                                    <p class="text-muted mb-0" style="font-size: 12px;"><i class="fas fa-map-marker-alt"></i>
+                                    @foreach ($data->doctorLocation as $index => $location)
+                                        @if ($index == 0)
+                                            {{ $location->hospital->name }}
+                                        @else
+                                            , {{ $location->hospital->name }}
+                                        @endif
                                     @endforeach
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +94,7 @@
                                             <div class="form-group">
                                                 <label>Sex <span class="text-danger">*</span></label>
                                                 <select name="sex" id="sex" class="select @error('sex') is-invalid @enderror">
-                                                    <option selected disabled>-- Select Sex --</option>
+                                                    <option selected disabled>Select Sex</option>
                                                     <option value="M"
                                                         {{ old('sex') == "M" ? 'selected' : null }}>Male
                                                     </option>
@@ -145,7 +151,7 @@
                                             <div class="form-group card-label">
                                                 <label>Hospital <span class="text-danger">*</span></label>
                                                 <select name="hospital" id="hospital" class="select @error('hospital') is-invalid @enderror">
-                                                    <option selected disabled>-- Select Hospital --</option>
+                                                    <option selected disabled>Select Hospital</option>
                                                     @foreach ($hospitals as $item)
                                                     <option value="{{ $item->hospital_id }}"
                                                         {{ old('hospital') == $item->hospital_id ? 'selected' : null }}>{{ $item->hospital->name }}

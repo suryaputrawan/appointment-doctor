@@ -133,10 +133,15 @@
                                             <p class="doc-speciality">{{ $doctor->specialization }} - {{ $doctor->speciality->name }}</p>
                                             <h5 class="doc-department mb-3"><img src="{{ $doctor->speciality->takePicture }}" class="img-fluid" alt="Speciality">{{ $doctor->speciality->name }}</h5>
                                             <div class="clinic-details">
-                                                @foreach ($doctor->doctorLocation as $location)
-                                                    <span class="doc-location"><i class="fas fa-map-marker-alt"></i> {{ $location->hospital->name }}</span><br>
+                                                <span class="doc-location"><i class="fas fa-map-marker-alt"></i>
+                                                @foreach ($doctor->doctorLocation as $index => $location)
+                                                   @if ($index == 0)
+                                                    {{ $location->hospital->name }}
+                                                   @else
+                                                    , {{ $location->hospital->name }}
+                                                   @endif
                                                 @endforeach
-                                                
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
