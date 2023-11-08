@@ -16,6 +16,9 @@ return new class extends Migration
             $table->foreignId('doctor_id')->constrained('doctors')->cascadeOnDelete();
             $table->foreignId('hospital_id')->constrained('hospitals')->cascadeOnDelete();
             $table->date('date');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->tinyInteger('booking_status')->default(0);
             $table->timestamps();
         });
     }

@@ -7,11 +7,12 @@
                 <!-- Footer Widget -->
                 <div class="footer-widget footer-about">
                     <div class="footer-logo">
-                        <img src="{{ asset('assets/client/img/footer-logo.png') }}" alt="logo">
+                        <img src="{{ asset('assets/client/img/logo.png') }}" alt="logo" width="150px" height="65px">
+                        <p style="color: white">Appointment Doctor Specialist</p>
                     </div>
                     <div class="footer-about-content">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
-                        <div class="social-icon">
+                        <p style="color: white">Copyright @2023</p>
+                        {{-- <div class="social-icon">
                             <ul>
                                 <li>
                                     <a href="#" target="_blank"><i class="fab fa-facebook-f"></i> </a>
@@ -29,14 +30,14 @@
                                     <a href="#" target="_blank"><i class="fab fa-dribbble"></i> </a>
                                 </li>
                             </ul>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <!-- /Footer Widget -->
                 
             </div>
             
-            <div class="col-lg-3 col-md-6">
+            {{-- <div class="col-lg-3 col-md-6">
             
                 <!-- Footer Widget -->
                 <div class="footer-widget footer-menu">
@@ -92,7 +93,7 @@
                 </div>
                 <!-- /Footer Widget -->
                 
-            </div>
+            </div> --}}
             
         </div>
     </div>
@@ -100,7 +101,7 @@
 <!-- /Footer Top -->
 
 <!-- Footer Bottom -->
-<div class="footer-bottom">
+{{-- <div class="footer-bottom">
     <div class="container-fluid">
     
         <!-- Copyright -->
@@ -128,5 +129,5 @@
         <!-- /Copyright -->
         
     </div>
-</div>
+</div> --}}
 <!-- /Footer Bottom -->

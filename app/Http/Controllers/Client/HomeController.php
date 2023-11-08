@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Doctor;
+use App\Models\Hospital;
 use App\Models\Service;
 use App\Models\Speciality;
 use Illuminate\Http\Request;
@@ -30,7 +31,8 @@ class HomeController extends Controller
         return view('client.home', [
             'doctors'       => $doctors,
             'specialities'  => $specialities,
-            'services'      => $services
+            'services'      => $services,
+            'hospital'      => Hospital::get(['id', 'name'])
         ]);
     }
 }
