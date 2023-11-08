@@ -1,15 +1,16 @@
 <?php
 
-use App\Http\Controllers\Admin\AppointmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\HospitalController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SpecialityController;
+use App\Http\Controllers\Permissions\RoleController;
+use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\DoctorLocationController;
 use App\Http\Controllers\Admin\DoctorEducationController;
-use App\Http\Controllers\Admin\HospitalController;
 use App\Http\Controllers\Admin\PracticeScheduleController;
 
 Route::name('client.')->group(function () {
@@ -39,4 +40,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('appointment/arrived/{id}', [AppointmentController::class, 'arrived'])->name('appointment.arrived');
     Route::put('appointment/cancel/{id}', [AppointmentController::class, 'cancel'])->name('appointment.cancel');
     Route::resource('appointment', AppointmentController::class);
+
+    Route::prefix('roles')->group(function () {
+        Route::get('', [RoleController::class, 'index'])->name('roles.index');
+        Route::post('store', [RoleController::class, 'store'])->name('roles.store');
+        Route::get('{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+        Route::put('{role}', [RoleController::class, 'update'])->name('roles.update');
+    });
 });
