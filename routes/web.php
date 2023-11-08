@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\DoctorLocationController;
 use App\Http\Controllers\Admin\DoctorEducationController;
 use App\Http\Controllers\Admin\PracticeScheduleController;
+use App\Http\Controllers\Permissions\PermissionController;
 
 Route::name('client.')->group(function () {
     include 'client.php';
@@ -41,10 +42,19 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('appointment/cancel/{id}', [AppointmentController::class, 'cancel'])->name('appointment.cancel');
     Route::resource('appointment', AppointmentController::class);
 
+    // Route role and permission
     Route::prefix('roles')->group(function () {
         Route::get('', [RoleController::class, 'index'])->name('roles.index');
         Route::post('store', [RoleController::class, 'store'])->name('roles.store');
         Route::get('{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
         Route::put('{role}', [RoleController::class, 'update'])->name('roles.update');
     });
+
+    Route::prefix('permissions')->group(function () {
+        Route::get('', [PermissionController::class, 'index'])->name('permissions.index');
+        Route::post('store', [PermissionController::class, 'store'])->name('permissions.store');
+        Route::get('{permission}/edit', [PermissionController::class, 'edit'])->name('permissions.edit');
+        Route::put('{permission}', [PermissionController::class, 'update'])->name('permissions.update');
+    });
+    // end route
 });

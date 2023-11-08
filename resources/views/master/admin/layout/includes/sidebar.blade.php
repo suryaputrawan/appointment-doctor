@@ -56,6 +56,9 @@
                 <li class="{{ request()->routeIs('admin.roles.index') ? 'active' : '' }}"> 
                     <a href="{{ route('admin.roles.index') }}"><i class="fe fe-gear"></i> <span>Roles</span></a>
                 </li>
+                <li class="{{ request()->routeIs('admin.permissions.index') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.permissions.index') }}"><i class="fe fe-gear"></i> <span>Permissions</span></a>
+                </li>
             </ul>
         </div>
     </div>
