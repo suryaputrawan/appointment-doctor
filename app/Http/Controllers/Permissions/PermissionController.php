@@ -55,7 +55,7 @@ class PermissionController extends Controller
             DB::beginTransaction();
             try {
                 Permission::create([
-                    'name'          => request('name'),
+                    'name'          => strtolower(request('name')),
                     'guard_name'    => request('guard_name') ?? 'web',
                 ]);
                 DB::commit();
@@ -113,7 +113,7 @@ class PermissionController extends Controller
                 DB::beginTransaction();
                 try {
                     $data->update([
-                        'name'          => $request->name
+                        'name'          => strtolower($request->name)
                     ]);
                     DB::commit();
                     return response()->json([

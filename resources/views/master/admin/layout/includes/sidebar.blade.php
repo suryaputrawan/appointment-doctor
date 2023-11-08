@@ -11,7 +11,7 @@
                 <li class="{{ request()->routeIs('admin.appointment.index') || 
                     request()->routeIs('admin.appointment.create') || 
                     request()->routeIs('admin.appointment.edit') ? 'active' : '' }}"> 
-                    <a href="{{ route('admin.appointment.index') }}"><i class="fe fe-calendar"></i> <span>Appointment</span></a>
+                    <a href="{{ route('admin.appointment.index') }}"><i class="fe fe-layout"></i> <span>Appointments</span></a>
                 </li>
 
                 {{-- Menu Master --}}
@@ -53,11 +53,19 @@
                 <li class="menu-title"> 
                     <span>Role & Permission</span>
                 </li>
-                <li class="{{ request()->routeIs('admin.roles.index') ? 'active' : '' }}"> 
-                    <a href="{{ route('admin.roles.index') }}"><i class="fe fe-gear"></i> <span>Roles</span></a>
-                </li>
-                <li class="{{ request()->routeIs('admin.permissions.index') ? 'active' : '' }}"> 
-                    <a href="{{ route('admin.permissions.index') }}"><i class="fe fe-gear"></i> <span>Permissions</span></a>
+                <li class="submenu">
+                    <a href="#"><i class="fe fe-gear"></i> <span> Roles & Permissions</span> <span class="menu-arrow"></span></a>
+                    <ul style="display: none;">
+                        <li>
+                            <a class="{{ request()->routeIs('admin.roles.index') ? 'active' : '' }}" href="{{ route('admin.roles.index') }}">Roles</a>
+                        </li>
+                        <li>
+                            <a class="{{ request()->routeIs('admin.permissions.index') ? 'active' : '' }}" href="{{ route('admin.permissions.index') }}">Permissions</a>
+                        </li>
+                        <li>
+                            <a class="{{ request()->routeIs('admin.assign.index') ? 'active' : '' }}" href="{{ route('admin.assign.index') }}">Assign Permissions</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>

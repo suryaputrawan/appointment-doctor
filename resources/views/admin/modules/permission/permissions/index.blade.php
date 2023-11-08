@@ -1,4 +1,4 @@
-@extends('master.admin.layout.app', ['title' => 'Roles'])
+@extends('master.admin.layout.app', ['title' => 'Permissions'])
 
 @push('plugin-style')
     <!-- Datatables CSS -->
