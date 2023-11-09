@@ -14,6 +14,7 @@ use App\Http\Controllers\Permissions\AssignController;
 use App\Http\Controllers\Admin\DoctorLocationController;
 use App\Http\Controllers\Admin\DoctorEducationController;
 use App\Http\Controllers\Admin\PracticeScheduleController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Permissions\PermissionController;
 
 Route::name('client.')->group(function () {
@@ -43,6 +44,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('appointment/arrived/{id}', [AppointmentController::class, 'arrived'])->name('appointment.arrived');
     Route::put('appointment/cancel/{id}', [AppointmentController::class, 'cancel'])->name('appointment.cancel');
     Route::resource('appointment', AppointmentController::class);
+
+    Route::resource('users', AdminUserController::class);
 
     // Route role and permission
     Route::prefix('roles-and-permission')->namespace('Permissions')->group(function () {

@@ -16,7 +16,7 @@ class UserController extends Controller
     public function index()
     {
         if (request()->type == 'datatable') {
-            $data = User::has('roles')->get();
+            $data = User::has('roles')->where('isAktif', 1)->get();
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
@@ -54,7 +54,7 @@ class UserController extends Controller
             'breadcrumb'    => 'Create Permission To User',
             'btnSubmit'     => 'Save',
             'roles'         => Role::get(),
-            'users'         => User::get(['id', 'name', 'username'])
+            'users'         => User::where('isAktif', 1)->get(['id', 'name', 'username'])
         ]);
     }
     public function store(Request $request)

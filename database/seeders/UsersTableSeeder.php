@@ -27,6 +27,6 @@ class UsersTableSeeder extends Seeder
             'updated_at'        => Carbon::now('Asia/Singapore'),
         ]);
 
-        $superUser->assignRole('Super Administrator');
+        $superUser->assignRole('Super Admin');
     }
 }

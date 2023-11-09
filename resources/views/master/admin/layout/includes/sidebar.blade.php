@@ -48,6 +48,9 @@
                 <li class="{{ request()->routeIs('admin.hospitals.index') ? 'active' : '' }}"> 
                     <a href="{{ route('admin.hospitals.index') }}"><i class="fa fa-hospital-o" aria-hidden="true"></i> <span>Hospitals</span></a>
                 </li>
+                <li class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}"> 
+                    <a href="{{ route('admin.users.index') }}"><i class="fe fe-user" aria-hidden="true"></i> <span>Users</span></a>
+                </li>
 
                 {{-- Role & Permission --}}
                 <li class="menu-title"> 

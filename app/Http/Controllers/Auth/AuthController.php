@@ -25,9 +25,9 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $request['isaktif'] = 1;
+        $request['isAktif'] = 1;
 
-        if (Auth::attempt($request->only('username', 'password'))) {
+        if (Auth::attempt($request->only('username', 'password', 'isAktif'))) {
 
             Auth::logoutOtherDevices(request('password'));
 

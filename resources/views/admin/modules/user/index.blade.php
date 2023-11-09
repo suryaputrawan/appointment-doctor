@@ -14,7 +14,6 @@
                 <h3 class="page-title">{{ $pageTitle }}</h3>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item">Doctors</li>
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
@@ -35,13 +34,14 @@
                                     <tr>
                                         <th style="width: 10px">#</th>
                                         <th style="width: 100px">Action</th>
-                                        <th>Doctor Name</th>
-                                        <th>Specialization</th>
-                                        <th>Speciality</th>
+                                        <th>Fullname</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Hospital</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
-                                <tbody class="align-middle">
+                                <tbody>
                                 </tbody>
                             </table>
                         </div>
@@ -52,7 +52,7 @@
     </div>
 
     {{-- Modal Action --}}
-    @include('admin.modules.doctor.modal.action')
+    @include('admin.modules.user.modal.action')
     {{-- End Modal Action --}}
 
 @endsection
@@ -67,33 +67,6 @@
 
 @push('custom-scripts')
 <script type="text/javascript">
-    //Preview Image
-    function previewImages() {
-        var preview = document.querySelector('#preview');
-        preview.innerHTML = '';
-        var files = document.querySelector('input[type=file]').files;
-    
-        function readAndPreview(file) {
-            // Make sure `file.name` matches our extensions criteria
-            if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
-                var reader = new FileReader();
-                reader.addEventListener('load', function() {
-                    var image = new Image();
-                    image.height = 150;
-                    image.title = file.name;
-                    image.src = this.result;
-                    preview.appendChild(image);
-                }, false);
-    
-                reader.readAsDataURL(file);
-            }
-        }
-    
-        if (files) {
-            [].forEach.call(files, readAndPreview);
-        }
-    };
-
     $(document).ready(function() {
 
         //datatable initialization
@@ -110,7 +83,7 @@
 
         let dataTable = $("#datatable").DataTable({
             ...tableOptions,
-            ajax: "{{ route('admin.doctor.index') }}?type=datatable",
+            ajax: "{{ route('admin.users.index') }}?type=datatable",
             processing: true,
             serverSide : true,
             responsive: false,
@@ -125,47 +98,45 @@
                     className: "text-center",
                 },
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
-                { data: "doctor", name: "doctor", orderable: true  },
-                { data: "specialization", name: "specialization", orderable: false, searchable: false },
-                { data: "speciality", name: "speciality", orderable: true },  
+                { data: "name", name: "name", orderable: true  },
+                { data: "username", name: "username", orderable: false, searchable: false },
+                { data: "email", name: "email", orderable: true },  
+                { data: "hospital", name: "hospital", orderable: false, searchable: false }, 
                 { data: "status", name: "status", orderable: false, searchable: false },
             ],
         });
         //-----End datatable inizialitation
 
         //----form environtment
-        let ajaxUrl = "{{ route('admin.doctor.store') }}";
+        let ajaxUrl = "{{ route('admin.users.store') }}";
         let ajaxType = "POST";
 
         function clearForm() {
-            $("#doctor-form").find('input').val("");
-            $('#doctor-form').find('.error').text("");
-            $("#specialities").val("").trigger('change');
-            $("#gender").val("").trigger('change');
-            $("#about-me").val("");
+            $("#user-form").find('input').val("");
+            $('#user-form').find('.error').text("");
+            $("#hospital").val("").trigger('change');
             $("#status").val("1").trigger('change');
-            var preview = document.querySelector('#preview');
-            preview.innerHTML = '';
-            ajaxUrl = "{{ route('admin.doctor.store') }}";
+
+            ajaxUrl = "{{ route('admin.users.store') }}";
             ajaxType = "POST";
         }
         //---End Form environment
 
         //----Modal
         $(document).on('click', '#btn-add', function() {
-            $('#modal-add-doctor').modal('show');
-            $('#title').text('Add Doctor');
+            $('#modal-add-user').modal('show');
+            $('#title').text('Add User');
             $("#btn-submit-text").text("Save");
         });
 
         $(".btn-cancel").click(function() {
-            $('#modal-add-doctor').modal('hide');
+            $('#modal-add-user').modal('hide');
             clearForm();
         });
         //----End Modal
 
         //------ Submit Data
-        $('#doctor-form').on('submit', function(e) {
+        $('#user-form').on('submit', function(e) {
             e.preventDefault();
 
             var submitButton = $(this).find("button[type='submit']");
@@ -176,7 +147,7 @@
             var formData = new FormData(this);
             formData.append("_method", ajaxType)
 
-            $('#doctor-form').find('.error').text("");
+            $('#user-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -205,7 +176,7 @@
 
                     if (response.status == 200) {
                         clearForm();
-                        $('#modal-add-doctor').modal('hide');
+                        $('#modal-add-user').modal('hide');
                         $('#datatable').DataTable().ajax.reload();
 
                         Toast.fire({
@@ -216,20 +187,14 @@
                         $.each(response.errors.name, function(key, error) {
                             $('#error-name').append(error);
                         });
-                        $.each(response.errors.gender, function(key, error) {
-                            $('#error-gender').append(error);
+                        $.each(response.errors.username, function(key, error) {
+                            $('#error-username').append(error);
                         });
-                        $.each(response.errors.specialization, function(key, error) {
-                            $('#error-specialization').append(error);
+                        $.each(response.errors.email, function(key, error) {
+                            $('#error-email').append(error);
                         });
-                        $.each(response.errors.specialities, function(key, error) {
-                            $('#error-specialities').append(error);
-                        });
-                        $.each(response.errors.about_me, function(key, error) {
-                            $('#error-about').append(error);
-                        });
-                        $.each(response.errors.picture, function(key, error) {
-                            $('#error-picture').append(error);
+                        $.each(response.errors.hospital, function(key, error) {
+                            $('#error-hospital').append(error);
                         });
                     } else {
                         Toast.fire({
@@ -254,13 +219,13 @@
         //------ Load data to edit
         $(document).on('click', '#btn-edit', function(e) {
             e.preventDefault();
-            $('#modal-add-doctor').modal('show');
-            $('#title').text('Edit Doctor');
+            $('#modal-add-user').modal('show');
+            $('#title').text('Edit User');
 
             var id = $(this).data('id');
             var url = $(this).data('url');
 
-            $('#doctor-form').find('.error').text("");
+            $('#user-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -282,26 +247,24 @@
                 success: function(response) {
                     if (response.status == 404) {
                         clearForm();
-                        $('#modal-add-doctor').modal('hide');
+                        $('#modal-add-user').modal('hide');
                         Toast.fire({
                             icon: 'warning',
                             title: response.message,
                         });
                     } else {
-                        ajaxUrl = "{{ route('admin.doctor.index') }}/"+response.data.id;
+                        ajaxUrl = "{{ route('admin.users.index') }}/"+response.data.id;
                         ajaxType = "PUT";
 
                         $('#name').val(response.data.name);
-                        $('#gender').val(response.data.gender).trigger('change');
-                        $('#specialization').val(response.data.specialization);
-                        $('#specialities').val(response.data.speciality_id).trigger('change');
-                        $('#about-me').val(response.data.about_me);
+                        $('#username').val(response.data.username);
+                        $('#email').val(response.data.email);
+                        $('#hospital').val(response.data.hospital_id).trigger('change');
                         $('#status').val(response.data.isAktif).trigger('change');
-                        $('#preview').eq(0).html('<img src="/storage/'+response.data.picture+'"height="150" alt="Preview Gambar">');
                     }
                 },
                 error: function(response){
-                    $('#modal-add-doctor').modal('hide');
+                    $('#modal-add-user').modal('hide');
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',

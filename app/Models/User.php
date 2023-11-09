@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -24,6 +25,8 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'hospital_id',
+        'isAktif'
     ];
 
     /**
@@ -49,5 +52,10 @@ class User extends Authenticatable
     public function appointment(): HasMany
     {
         return $this->hasMany(Appointment::class);
+    }
+
+    public function hospital(): BelongsTo
+    {
+        return $this->belongsTo(Hospital::class);
     }
 }
