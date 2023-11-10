@@ -15,11 +15,13 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-            <div class="col-sm-5 col">
-                <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
-                    Add
-                </a>
-            </div>
+            @can('create specialities')
+                <div class="col-sm-5 col">
+                    <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
+                        Add
+                    </a>
+                </div>
+            @endcan 
         </div>
         
         <div class="row">
@@ -32,7 +34,9 @@
                                     <tr>
                                         <th style="width: 20px">#</th>
                                         <th>Speciality</th>
-                                        <th style="width: 100px">ACTION</th>
+                                        @canany(['update specialities', 'delete specialities'])
+                                            <th style="width: 100px">ACTION</th> 
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody class="align-middle">
@@ -118,7 +122,9 @@
                     className: "text-center",
                 },
                 { data: "speciality", name: "speciality", orderable: true  },
+                @canany(['update specialities', 'delete specialities'])
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                @endcanany
             ],
         });
         //-----End datatable inizialitation

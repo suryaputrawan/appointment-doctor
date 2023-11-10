@@ -17,11 +17,13 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-            <div class="col-sm-5 col">
-                <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
-                    Add
-                </a>
-            </div>
+            @can('create services')
+                <div class="col-sm-5 col">
+                    <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
+                        Add
+                    </a>
+                </div>
+            @endcan
         </div>
         
         <div class="row">
@@ -33,12 +35,14 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 20px">#</th>
-                                        <th style="width: 100px">ACTION</th>
+                                        @canany(['update services', 'delete services'])
+                                            <th style="width: 100px">ACTION</th>   
+                                        @endcanany
                                         <th>Service Name</th>
                                         <th>Description</th>
                                     </tr>
                                 </thead>
-                                <tbody class="align-middle">
+                                <tbody>
                                 </tbody>
                             </table>
                         </div>
@@ -121,7 +125,9 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
+                @canany(['update services', 'delete services'])
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                @endcanany
                 { data: "service_name", name: "service_name", orderable: true  },
                 { data: "description", name: "description", orderable: false, searchable: false  },
             ],

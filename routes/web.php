@@ -42,41 +42,49 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         // Route::get('doctor-location/list/{id}', [DoctorLocationController::class, 'list'])->name('doctor-location.list');
         Route::resource('doctor-location', DoctorLocationController::class);
 
-        Route::put('appointment/arrived/{id}', [AppointmentController::class, 'arrived'])->name('appointment.arrived');
-        Route::put('appointment/cancel/{id}', [AppointmentController::class, 'cancel'])->name('appointment.cancel');
+        Route::group(['middleware' => [\Spatie\Permission\Middleware\PermissionMiddleware::using('arrived appointment')]], function () {
+            Route::put('appointment/arrived/{id}', [AppointmentController::class, 'arrived'])->name('appointment.arrived');
+        });
+
+        Route::group(['middleware' => [\Spatie\Permission\Middleware\PermissionMiddleware::using('cancel appointment')]], function () {
+            Route::put('appointment/cancel/{id}', [AppointmentController::class, 'cancel'])->name('appointment.cancel');
+        });
+
         Route::resource('appointment', AppointmentController::class);
 
         Route::resource('users', AdminUserController::class);
 
         // Route role and permission
-        Route::prefix('roles-and-permission')->namespace('Permissions')->group(function () {
-            Route::prefix('roles')->group(function () {
-                Route::get('', [RoleController::class, 'index'])->name('roles.index');
-                Route::post('store', [RoleController::class, 'store'])->name('roles.store');
-                Route::get('{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
-                Route::put('{role}', [RoleController::class, 'update'])->name('roles.update');
+        Route::group(['middleware' => [\Spatie\Permission\Middleware\RoleMiddleware::using('Super Admin')]], function () {
+            Route::prefix('roles-and-permission')->namespace('Permissions')->group(function () {
+                Route::prefix('roles')->group(function () {
+                    Route::get('', [RoleController::class, 'index'])->name('roles.index');
+                    Route::post('store', [RoleController::class, 'store'])->name('roles.store');
+                    Route::get('{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+                    Route::put('{role}', [RoleController::class, 'update'])->name('roles.update');
+                });
+
+                Route::prefix('permissions')->group(function () {
+                    Route::get('', [PermissionController::class, 'index'])->name('permissions.index');
+                    Route::post('store', [PermissionController::class, 'store'])->name('permissions.store');
+                    Route::get('{permission}/edit', [PermissionController::class, 'edit'])->name('permissions.edit');
+                    Route::put('{permission}', [PermissionController::class, 'update'])->name('permissions.update');
+                });
+
+                Route::get('assignable', [AssignController::class, 'index'])->name('assign.index');
+                Route::get('assignable/create', [AssignController::class, 'create'])->name('assign.create');
+                Route::post('assignable/store', [AssignController::class, 'store'])->name('assign.store');
+                Route::get('assignable/{id}/edit', [AssignController::class, 'edit'])->name('assign.edit');
+                Route::put('assignable/{id}/update', [AssignController::class, 'update'])->name('assign.update');
+
+                // Route assign to user
+                Route::get('assign', [UserController::class, 'index'])->name('assign.user.index');
+                Route::get('assign/user', [UserController::class, 'create'])->name('assign.user.create');
+                Route::post('assign/user', [UserController::class, 'store'])->name('assign.user.store');
+                Route::get('assign/{id}/user', [UserController::class, 'edit'])->name('assign.user.edit');
+                Route::put('assign/{id}/user', [UserController::class, 'update'])->name('assign.user.update');
             });
-
-            Route::prefix('permissions')->group(function () {
-                Route::get('', [PermissionController::class, 'index'])->name('permissions.index');
-                Route::post('store', [PermissionController::class, 'store'])->name('permissions.store');
-                Route::get('{permission}/edit', [PermissionController::class, 'edit'])->name('permissions.edit');
-                Route::put('{permission}', [PermissionController::class, 'update'])->name('permissions.update');
-            });
-
-            Route::get('assignable', [AssignController::class, 'index'])->name('assign.index');
-            Route::get('assignable/create', [AssignController::class, 'create'])->name('assign.create');
-            Route::post('assignable/store', [AssignController::class, 'store'])->name('assign.store');
-            Route::get('assignable/{id}/edit', [AssignController::class, 'edit'])->name('assign.edit');
-            Route::put('assignable/{id}/update', [AssignController::class, 'update'])->name('assign.update');
-
-            // Route assign to user
-            Route::get('assign', [UserController::class, 'index'])->name('assign.user.index');
-            Route::get('assign/user', [UserController::class, 'create'])->name('assign.user.create');
-            Route::post('assign/user', [UserController::class, 'store'])->name('assign.user.store');
-            Route::get('assign/{id}/user', [UserController::class, 'edit'])->name('assign.user.edit');
-            Route::put('assign/{id}/user', [UserController::class, 'update'])->name('assign.user.update');
         });
-        // end route
+        // end route role permission
     });
 });

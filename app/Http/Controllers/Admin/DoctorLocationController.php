@@ -32,10 +32,15 @@ class DoctorLocationController extends Controller
                 'hospital'  => function ($query) {
                     $query->select('id', 'name');
                 }
-            ])->orderBy('doctor_id')->get();
+            ])
+                ->whereHas('doctor', function ($query) {
+                    $query->where('isAktif', 1);
+                })
+                ->orderBy('doctor_id')->get();
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
+                    $user            = auth()->user();
                     $editRoute       = 'admin.doctor-location.edit';
                     $deleteRoute     = 'admin.doctor-location.destroy';
                     $viewRoute       = 'admin.doctor-location.show';
@@ -48,16 +53,20 @@ class DoctorLocationController extends Controller
                         <i class="fe fe-eye"></i>
                     </a> ';
 
-                    $action .= '
-                        <a class="btn btn-sm btn-warning" type="button" href="' . route($editRoute, $dataId) . '">
-                            <i class="fe fe-pencil"></i>
-                        </a> ';
+                    if ($user->can('update doctors')) {
+                        $action .= '
+                            <a class="btn btn-sm btn-warning" type="button" href="' . route($editRoute, $dataId) . '">
+                                <i class="fe fe-pencil"></i>
+                            </a> ';
+                    }
 
-                    $action .= '
+                    if ($user->can('delete doctors')) {
+                        $action .= '
                         <button class="btn btn-sm btn-danger delete-item" 
                             data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
                             <i class="fe fe-trash"></i>
                         </button> ';
+                    }
 
                     $group = '<div class="btn-group btn-group-sm mb-1 mb-md-0" role="group">
                         ' . $action . '
@@ -85,13 +94,19 @@ class DoctorLocationController extends Controller
      */
     public function create()
     {
-        return view('admin.modules.doctor-location.create', [
-            'pageTitle'     => 'Create Doctor Location',
-            'breadcrumb'    => 'Create Doctor locations',
-            'btnSubmit'     => 'Save',
-            'hospital'      => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
-            'doctor'        => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
-        ]);
+        $user = auth()->user();
+
+        if ($user->can('create doctors')) {
+            return view('admin.modules.doctor-location.create', [
+                'pageTitle'     => 'Create Doctor Location',
+                'breadcrumb'    => 'Create Doctor locations',
+                'btnSubmit'     => 'Save',
+                'hospital'      => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
+                'doctor'        => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
+            ]);
+        } else {
+            abort(403);
+        }
     }
 
     /**
@@ -99,49 +114,55 @@ class DoctorLocationController extends Controller
      */
     public function store(DoctorLocationRequest $request)
     {
-        try {
-            DB::beginTransaction();
+        $user = auth()->user();
 
-            $location = DoctorLocation::firstOrCreate([
-                'doctor_id'             => $request->doctor,
-                'hospital_id'           => $request->hospital,
-            ]);
+        if ($user->can('create doctors')) {
+            try {
+                DB::beginTransaction();
 
-            //Store multiple data to doctor_location_day
-            if ($request->day && $request->start_time && $request->end_time) {
-                for ($i = 0; $i < count($request->day); $i++) {
-                    if ($request->day[$i]) {
-                        DoctorLocationDay::create([
-                            'doctor_location_id'    => $location->id,
-                            'day'                   => strtoupper($request->day[$i]),
-                            'start_time'            => $request->start_time[$i],
-                            'end_time'              => $request->end_time[$i],
-                        ]);
+                $location = DoctorLocation::firstOrCreate([
+                    'doctor_id'             => $request->doctor,
+                    'hospital_id'           => $request->hospital,
+                ]);
+
+                //Store multiple data to doctor_location_day
+                if ($request->day && $request->start_time && $request->end_time) {
+                    for ($i = 0; $i < count($request->day); $i++) {
+                        if ($request->day[$i]) {
+                            DoctorLocationDay::create([
+                                'doctor_location_id'    => $location->id,
+                                'day'                   => strtoupper($request->day[$i]),
+                                'start_time'            => $request->start_time[$i],
+                                'end_time'              => $request->end_time[$i],
+                            ]);
+                        }
                     }
                 }
-            }
 
-            DB::commit();
+                DB::commit();
 
-            if (isset($_POST['btnSimpan'])) {
-                return redirect()->route('admin.doctor-location.index')
-                    ->with('success', 'Doctor Location has been created');
-            } else {
-                return redirect()->route('admin.doctor-location.create')
-                    ->with('success', 'Doctor Location has been created');
+                if (isset($_POST['btnSimpan'])) {
+                    return redirect()->route('admin.doctor-location.index')
+                        ->with('success', 'Doctor Location has been created');
+                } else {
+                    return redirect()->route('admin.doctor-location.create')
+                        ->with('success', 'Doctor Location has been created');
+                }
+            } catch (Exception $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+            } catch (Throwable $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
             }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
-        } catch (Throwable $e) {
-            DB::rollBack();
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+        } else {
+            abort(403);
         }
     }
 
@@ -181,30 +202,36 @@ class DoctorLocationController extends Controller
      */
     public function edit($id)
     {
-        try {
-            $id = Crypt::decryptString($id);
-            $data = DoctorLocation::find($id);
-            $days = DoctorLocationDay::where('doctor_location_id', $data->id)->get();
+        $user = auth()->user();
 
-            if (!$data) {
+        if ($user->can('update doctors')) {
+            try {
+                $id = Crypt::decryptString($id);
+                $data = DoctorLocation::find($id);
+                $days = DoctorLocationDay::where('doctor_location_id', $data->id)->get();
+
+                if (!$data) {
+                    return redirect()
+                        ->back()
+                        ->with('error', "Data not found..");
+                }
+
+                return view('admin.modules.doctor-location.edit', [
+                    'pageTitle'     => 'Edit Doctor Location',
+                    'breadcrumb'    => 'Edit Doctor location',
+                    'btnSubmit'     => 'Save Change',
+                    'data'          => $data,
+                    'days'          => $days,
+                    'hospitals'      => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
+                    'doctors'        => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
+                ]);
+            } catch (\Throwable $e) {
                 return redirect()
                     ->back()
-                    ->with('error', "Data not found..");
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
             }
-
-            return view('admin.modules.doctor-location.edit', [
-                'pageTitle'     => 'Edit Doctor Location',
-                'breadcrumb'    => 'Edit Doctor location',
-                'btnSubmit'     => 'Save Change',
-                'data'          => $data,
-                'days'          => $days,
-                'hospitals'      => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
-                'doctors'        => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
-            ]);
-        } catch (\Throwable $e) {
-            return redirect()
-                ->back()
-                ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+        } else {
+            abort(403);
         }
     }
 
@@ -213,59 +240,65 @@ class DoctorLocationController extends Controller
      */
     public function update(DoctorLocationRequest $request, $id)
     {
-        $id = Crypt::decryptString($id);
-        $data = DoctorLocation::find($id);
-        $days = DoctorLocationDay::where('doctor_location_id', $data->id)->get();
+        $user = auth()->user();
 
-        if (!$data) {
-            return redirect()
-                ->back()
-                ->with('error', "Data not found");
-        }
+        if ($user->can('update doctors')) {
+            $id = Crypt::decryptString($id);
+            $data = DoctorLocation::find($id);
+            $days = DoctorLocationDay::where('doctor_location_id', $data->id)->get();
 
-        DB::beginTransaction();
-
-        try {
-            $data->update([
-                'doctor_id'             => $request->doctor,
-                'hospital_id'           => $request->hospital,
-            ]);
-
-            //--Delete data collection
-            foreach ($days as $day) {
-                $day->delete();
+            if (!$data) {
+                return redirect()
+                    ->back()
+                    ->with('error', "Data not found");
             }
 
-            //Store multiple data to doctor_location_day
-            if ($request->day && $request->start_time && $request->end_time) {
-                for ($i = 0; $i < count($request->day); $i++) {
-                    if ($request->day[$i]) {
-                        DoctorLocationDay::create([
-                            'doctor_location_id'    => $data->id,
-                            'day'                   => strtoupper($request->day[$i]),
-                            'start_time'            => $request->start_time[$i],
-                            'end_time'              => $request->end_time[$i],
-                        ]);
+            DB::beginTransaction();
+
+            try {
+                $data->update([
+                    'doctor_id'             => $request->doctor,
+                    'hospital_id'           => $request->hospital,
+                ]);
+
+                //--Delete data collection
+                foreach ($days as $day) {
+                    $day->delete();
+                }
+
+                //Store multiple data to doctor_location_day
+                if ($request->day && $request->start_time && $request->end_time) {
+                    for ($i = 0; $i < count($request->day); $i++) {
+                        if ($request->day[$i]) {
+                            DoctorLocationDay::create([
+                                'doctor_location_id'    => $data->id,
+                                'day'                   => strtoupper($request->day[$i]),
+                                'start_time'            => $request->start_time[$i],
+                                'end_time'              => $request->end_time[$i],
+                            ]);
+                        }
                     }
                 }
+
+                DB::commit();
+
+                return redirect()->route('admin.doctor-location.index')
+                    ->with('success', 'Location success to updated');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
             }
-
-            DB::commit();
-
-            return redirect()->route('admin.doctor-location.index')
-                ->with('success', 'Location success to updated');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+        } else {
+            abort(403);
         }
     }
 
@@ -274,37 +307,43 @@ class DoctorLocationController extends Controller
      */
     public function destroy($id)
     {
-        DB::beginTransaction();
-        try {
-            $id = Crypt::decryptString($id);
-            $data = DoctorLocation::find($id);
-            $locationDay = DoctorLocationDay::where('doctor_location_id', $data->id)->get();
+        $user = auth()->user();
 
-            if (!$data) {
+        if ($user->can('delete doctors')) {
+            DB::beginTransaction();
+            try {
+                $id = Crypt::decryptString($id);
+                $data = DoctorLocation::find($id);
+                $locationDay = DoctorLocationDay::where('doctor_location_id', $data->id)->get();
+
+                if (!$data) {
+                    return response()->json([
+                        'status'  => 404,
+                        'message' => "Data not found!",
+                    ], 404);
+                }
+
+                $data->delete();
+
+                //--Delete data collection
+                foreach ($locationDay as $day) {
+                    $day->delete();
+                }
+
+                DB::commit();
+
                 return response()->json([
-                    'status'  => 404,
-                    'message' => "Data not found!",
-                ], 404);
+                    'status'  => 200,
+                    'message' => "Location has been deleted..!",
+                ], 200);
+            } catch (\Throwable $e) {
+                return response()->json([
+                    'status'  => 500,
+                    'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
+                ], 500);
             }
-
-            $data->delete();
-
-            //--Delete data collection
-            foreach ($locationDay as $day) {
-                $day->delete();
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'status'  => 200,
-                'message' => "Location has been deleted..!",
-            ], 200);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status'  => 500,
-                'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
-            ], 500);
+        } else {
+            abort(403);
         }
     }
 }

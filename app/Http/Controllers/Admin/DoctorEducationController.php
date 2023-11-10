@@ -19,7 +19,7 @@ class DoctorEducationController extends Controller
     public function index()
     {
         if (request()->type == 'datatable') {
-            $data = Doctor::query()->orderBy('name', 'asc')->get();
+            $data = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get();
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {

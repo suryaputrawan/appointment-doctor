@@ -25,7 +25,7 @@ class PracticeScheduleController extends Controller
         if (request()->type == 'datatable') {
             $data = PracticeSchedule::with([
                 'doctor'    => function ($query) {
-                    $query->select('id', 'name', 'isAktif')->where('isAktif', 1);
+                    $query->select('id', 'name', 'isAktif');
                 },
                 'hospital'  => function ($query) {
                     $query->select('id', 'name');
@@ -37,6 +37,7 @@ class PracticeScheduleController extends Controller
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
+                    $user            = auth()->user();
                     $editRoute       = 'admin.practice-schedules.edit';
                     $deleteRoute     = 'admin.practice-schedules.destroy';
                     $viewRoute       = 'admin.practice-schedules.show';
@@ -48,16 +49,20 @@ class PracticeScheduleController extends Controller
 
                     $action = "";
 
-                    $action .= '
-                        <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
-                            <i class="fe fe-pencil"></i>
-                        </a> ';
+                    if ($user->can('update doctor schedules')) {
+                        $action .= '
+                            <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
+                                <i class="fe fe-pencil"></i>
+                            </a> ';
+                    }
 
-                    $action .= '
-                        <button class="btn btn-danger delete-item" 
-                            data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
-                            <i class="fe fe-trash"></i>
-                        </button> ';
+                    if ($user->can('delete doctor schedules')) {
+                        $action .= '
+                            <button class="btn btn-danger delete-item" 
+                                data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
+                                <i class="fe fe-trash"></i>
+                            </button> ';
+                    }
 
                     $group = '<div class="btn-group btn-group-sm mb-1 mb-md-0" role="group">
                         ' . $action . '
@@ -103,13 +108,19 @@ class PracticeScheduleController extends Controller
      */
     public function create()
     {
-        return view('admin.modules.practice-schedule.create', [
-            'pageTitle'     => 'Create Practice Schedule',
-            'breadcrumb'    => 'Create Practice Schedule',
-            'btnSubmit'     => 'Save',
-            'doctor'        => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
-            'hospital'      => Hospital::orderBy('name', 'asc')->get(['id', 'name'])
-        ]);
+        $user = auth()->user();
+
+        if ($user->can('create doctor schedules')) {
+            return view('admin.modules.practice-schedule.create', [
+                'pageTitle'     => 'Create Practice Schedule',
+                'breadcrumb'    => 'Create Practice Schedule',
+                'btnSubmit'     => 'Save',
+                'doctor'        => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
+                'hospital'      => Hospital::orderBy('name', 'asc')->get(['id', 'name'])
+            ]);
+        } else {
+            abort(403);
+        }
     }
 
     /**
@@ -117,45 +128,51 @@ class PracticeScheduleController extends Controller
      */
     public function store(PracticeScheduleRequest $request)
     {
-        try {
-            DB::beginTransaction();
+        $user = auth()->user();
 
-            //Store multiple data
-            if ($request->date && $request->start_time && $request->end_time) {
-                for ($i = 0; $i < count($request->date); $i++) {
-                    if ($request->date[$i]) {
-                        PracticeSchedule::firstOrCreate([
-                            'doctor_id'             => $request->doctor,
-                            'hospital_id'           => $request->hospital,
-                            'date'                  => $request->date[$i],
-                            'start_time'            => $request->start_time[$i],
-                            'end_time'              => $request->end_time[$i],
-                        ]);
+        if ($user->can('create doctor schedules')) {
+            try {
+                DB::beginTransaction();
+
+                //Store multiple data
+                if ($request->date && $request->start_time && $request->end_time) {
+                    for ($i = 0; $i < count($request->date); $i++) {
+                        if ($request->date[$i]) {
+                            PracticeSchedule::firstOrCreate([
+                                'doctor_id'             => $request->doctor,
+                                'hospital_id'           => $request->hospital,
+                                'date'                  => $request->date[$i],
+                                'start_time'            => $request->start_time[$i],
+                                'end_time'              => $request->end_time[$i],
+                            ]);
+                        }
                     }
                 }
-            }
 
-            DB::commit();
+                DB::commit();
 
-            if (isset($_POST['btnSimpan'])) {
-                return redirect()->route('admin.practice-schedules.index')
-                    ->with('success', 'Practice Schedules has been created');
-            } else {
-                return redirect()->route('admin.practice-schedules.create')
-                    ->with('success', 'Practice Schedules has been created');
+                if (isset($_POST['btnSimpan'])) {
+                    return redirect()->route('admin.practice-schedules.index')
+                        ->with('success', 'Practice Schedules has been created');
+                } else {
+                    return redirect()->route('admin.practice-schedules.create')
+                        ->with('success', 'Practice Schedules has been created');
+                }
+            } catch (Exception $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+            } catch (Throwable $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
             }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
-        } catch (Throwable $e) {
-            DB::rollBack();
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+        } else {
+            abort(403);
         }
     }
 
@@ -172,26 +189,32 @@ class PracticeScheduleController extends Controller
      */
     public function edit($id)
     {
-        try {
-            $id = Crypt::decryptString($id);
-            $data = PracticeSchedule::find($id);
+        $user = auth()->user();
 
-            if ($data) {
+        if ($user->can('update doctor schedules')) {
+            try {
+                $id = Crypt::decryptString($id);
+                $data = PracticeSchedule::find($id);
+
+                if ($data) {
+                    return response()->json([
+                        'status'    => 200,
+                        'data'      => $data,
+                    ]);
+                } else {
+                    return response()->json([
+                        'status'    => 404,
+                        'message'   => 'Schedule Not Found',
+                    ]);
+                }
+            } catch (\Throwable $e) {
                 return response()->json([
-                    'status'    => 200,
-                    'data'      => $data,
-                ]);
-            } else {
-                return response()->json([
-                    'status'    => 404,
-                    'message'   => 'Schedule Not Found',
-                ]);
+                    'status'  => 500,
+                    'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
+                ], 500);
             }
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status'  => 500,
-                'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
-            ], 500);
+        } else {
+            abort(403);
         }
     }
 
@@ -200,67 +223,73 @@ class PracticeScheduleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = PracticeSchedule::find($id);
-        $dateNow = Carbon::now()->format('Y-m-d');
+        $user = auth()->user();
 
-        if ($request->date != null && $request->date < $dateNow) {
-            return response()->json([
-                'status' => 400,
-                'errors' => 'Date must be higher than current date...!',
-            ]);
-        }
+        if ($user->can('update doctor schedules')) {
+            $data = PracticeSchedule::find($id);
+            $dateNow = Carbon::now()->format('Y-m-d');
 
-        $validator = Validator::make([
-            'hospital'              => $request->hospital,
-            'date'                  => $request->date,
-            'doctor'                => $request->doctor,
-            'start_time'            => $request->start_time,
-            'end_time'              => $request->end_time,
-        ], [
-            'hospital'              => 'required',
-            'date'                  => 'required',
-            'doctor'                => 'required',
-            'start_time'            => 'required',
-            'end_time'              => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 400,
-                'errors' => $validator->messages(),
-            ]);
-        } else {
-            if ($data) {
-                DB::beginTransaction();
-
-                try {
-                    $data->update([
-                        'hospital_id'           => $request->hospital,
-                        'date'                  => $request->date,
-                        'doctor_id'             => $request->doctor,
-                        'start_time'            => $request->start_time,
-                        'end_time'              => $request->end_time,
-                    ]);
-
-                    DB::commit();
-
-                    return response()->json([
-                        'status'  => 200,
-                        'message' => 'Schedule has been updated',
-                    ], 200);
-                } catch (\Throwable $th) {
-                    DB::rollBack();
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => $th->getMessage(),
-                    ], 500);
-                }
-            } else {
+            if ($request->date != null && $request->date < $dateNow) {
                 return response()->json([
-                    'status' => 404,
-                    'message' => 'Data not found..!',
+                    'status' => 400,
+                    'errors' => 'Date must be higher than current date...!',
                 ]);
             }
+
+            $validator = Validator::make([
+                'hospital'              => $request->hospital,
+                'date'                  => $request->date,
+                'doctor'                => $request->doctor,
+                'start_time'            => $request->start_time,
+                'end_time'              => $request->end_time,
+            ], [
+                'hospital'              => 'required',
+                'date'                  => 'required',
+                'doctor'                => 'required',
+                'start_time'            => 'required',
+                'end_time'              => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'errors' => $validator->messages(),
+                ]);
+            } else {
+                if ($data) {
+                    DB::beginTransaction();
+
+                    try {
+                        $data->update([
+                            'hospital_id'           => $request->hospital,
+                            'date'                  => $request->date,
+                            'doctor_id'             => $request->doctor,
+                            'start_time'            => $request->start_time,
+                            'end_time'              => $request->end_time,
+                        ]);
+
+                        DB::commit();
+
+                        return response()->json([
+                            'status'  => 200,
+                            'message' => 'Schedule has been updated',
+                        ], 200);
+                    } catch (\Throwable $th) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => $th->getMessage(),
+                        ], 500);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => 404,
+                        'message' => 'Data not found..!',
+                    ]);
+                }
+            }
+        } else {
+            abort(403);
         }
     }
 
@@ -269,31 +298,37 @@ class PracticeScheduleController extends Controller
      */
     public function destroy($id)
     {
-        DB::beginTransaction();
-        try {
-            $id = Crypt::decryptString($id);
-            $data = PracticeSchedule::find($id);
+        $user = auth()->user();
 
-            if (!$data) {
+        if ($user->can('delete doctor schedules')) {
+            DB::beginTransaction();
+            try {
+                $id = Crypt::decryptString($id);
+                $data = PracticeSchedule::find($id);
+
+                if (!$data) {
+                    return response()->json([
+                        'status'  => 404,
+                        'message' => "Data not found!",
+                    ], 404);
+                }
+
+                $data->delete();
+
+                DB::commit();
+
                 return response()->json([
-                    'status'  => 404,
-                    'message' => "Data not found!",
-                ], 404);
+                    'status'  => 200,
+                    'message' => "Schedule has been deleted..!",
+                ], 200);
+            } catch (\Throwable $e) {
+                return response()->json([
+                    'status'  => 500,
+                    'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
+                ], 500);
             }
-
-            $data->delete();
-
-            DB::commit();
-
-            return response()->json([
-                'status'  => 200,
-                'message' => "Schedule has been deleted..!",
-            ], 200);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status'  => 500,
-                'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
-            ], 500);
+        } else {
+            abort(403);
         }
     }
 }

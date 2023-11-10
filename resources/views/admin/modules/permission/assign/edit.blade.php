@@ -5,6 +5,17 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/plugins/datatables/datatables.min.css') }}">
     <!-- Select2 CSS -->
     <link rel="stylesheet" href="{{ asset('assets/admin/css/select2.min.css') }}">
+
+    <style>
+        .group {
+            display: flex;
+            align-items: center;
+        }
+    
+        .group label {
+            margin-left: 10px;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -61,7 +72,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12 col-md-12 col-sm-12">
+                                {{-- <div class="col-12 col-md-12 col-sm-12">
                                     <div class="form-group">
                                         <label> Permissions <span class="text-danger">*</span></label>
                                         <div class="checkbox">
@@ -76,16 +87,44 @@
                                             <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
 
-                            <div class="text-right">
-                                <button name="btnSimpan" class="btn btn-primary" type="submit" id="btnSave">{{ $btnSubmit }}</button>
-                                <button class="btn btn-primary" type="submit" id="btnSave-loading" style="display: none">
-                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                    <span>{{ $btnSubmit }}</span>
-                                </button>
-                                <a href="{{ route('admin.assign.index') }}" class="btn btn-danger">Cancel</a>
+                            <div class="row form-row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label> Permissions <span class="text-danger">*</span></label>
+                                        <?php $lastGroup = ''; ?>
+                                        @foreach ($permissions as $permission)
+                                            <?php $words = explode(" ", $permission->name); ?>
+                                            <?php $group = implode(' ', array_slice($words, 1));; ?>
+                                            @if ($lastGroup !== $group)
+                                                @if ($lastGroup !== '')
+                                                    </div>
+                                                @endif
+                                                <div>
+                                                    <h4>{{ $group }}</h4>
+                                                <?php $lastGroup = $group; ?>
+                                            @endif
+                                            <input type="checkbox" name="permissions[]" value="{{ $permission->name }}" {{ $data->permissions()->find($permission->id) ? "checked" : "" }}>
+                                            <label for="{{ $permission->name }}">{{ array_shift($words) }}</label><br>
+                                        @endforeach
+
+                                        
+                                        @error('permissions')
+                                            <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="text-right">
+                                    <button name="btnSimpan" class="btn btn-primary" type="submit" id="btnSave">{{ $btnSubmit }}</button>
+                                    <button class="btn btn-primary" type="submit" id="btnSave-loading" style="display: none">
+                                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                        <span>{{ $btnSubmit }}</span>
+                                    </button>
+                                    <a href="{{ route('admin.assign.index') }}" class="btn btn-danger">Cancel</a>
+                                </div>
                             </div>
                         </form>
                     </div>

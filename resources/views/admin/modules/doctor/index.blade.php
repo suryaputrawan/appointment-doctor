@@ -18,11 +18,13 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-            <div class="col-sm-5 col">
-                <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
-                    Add
-                </a>
-            </div>
+            @can('create doctors')
+                <div class="col-sm-5 col">
+                    <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
+                        Add
+                    </a>
+                </div>
+            @endcan
         </div>
         
         <div class="row">
@@ -34,14 +36,16 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">#</th>
-                                        <th style="width: 100px">Action</th>
+                                        @canany(['update doctors', 'delete doctors'])
+                                            <th style="width: 100px">Action</th>
+                                        @endcanany
                                         <th>Doctor Name</th>
                                         <th>Specialization</th>
                                         <th>Speciality</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
-                                <tbody class="align-middle">
+                                <tbody>
                                 </tbody>
                             </table>
                         </div>
@@ -124,7 +128,9 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
+                @canany(['update doctors', 'delete doctors'])
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                @endcanany
                 { data: "doctor", name: "doctor", orderable: true  },
                 { data: "specialization", name: "specialization", orderable: false, searchable: false },
                 { data: "speciality", name: "speciality", orderable: true },  

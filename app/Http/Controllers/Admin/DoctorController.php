@@ -27,6 +27,7 @@ class DoctorController extends Controller
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
+                    $user            = auth()->user();
                     $editRoute       = 'admin.doctor.edit';
                     $deleteRoute     = 'admin.doctor.destroy';
                     $viewRoute       = 'admin.doctor.show';
@@ -35,16 +36,20 @@ class DoctorController extends Controller
 
                     $action = "";
 
-                    $action .= '
-                        <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
-                            <i class="fe fe-pencil"></i>
-                        </a> ';
+                    if ($user->can('create doctors')) {
+                        $action .= '
+                            <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
+                                <i class="fe fe-pencil"></i>
+                            </a> ';
+                    }
 
-                    // $action .= '
-                    //     <button class="btn btn-danger delete-item" 
-                    //         data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
-                    //         <i class="fe fe-trash"></i>
-                    //     </button> ';
+                    if ($user->can('delete doctors')) {
+                        // $action .= '
+                        //     <button class="btn btn-danger delete-item" 
+                        //         data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
+                        //         <i class="fe fe-trash"></i>
+                        //     </button> ';
+                    }
 
                     $group = '<div class="btn-group btn-group-sm mb-1 mb-md-0" role="group">
                         ' . $action . '
@@ -89,7 +94,11 @@ class DoctorController extends Controller
      */
     public function create()
     {
-        //
+        $user = auth()->user();
+
+        if (!$user->can('create doctors')) {
+            abort(403);
+        }
     }
 
     /**
@@ -97,52 +106,58 @@ class DoctorController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make([
-            'name'                  => $request->name,
-            'gender'                => $request->gender,
-            'specialization'        => $request->specialization,
-            'specialities'          => $request->specialities,
-            'about_me'              => $request->about_me,
-            'picture'               => $request->picture
-        ], [
-            'name'                  => 'required|max:100|min:5|unique:doctors,name,NULL,id',
-            'gender'                => 'required',
-            'specialization'        => 'required|min:3',
-            'specialities'          => 'required',
-            'about_me'              => 'required|min:5',
-            'picture'               => 'required|mimes:jpg,jpeg,png|max:1000',
-        ]);
+        $user = auth()->user();
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 400,
-                'errors' => $validator->messages(),
+        if ($user->can('create doctors')) {
+            $validator = Validator::make([
+                'name'                  => $request->name,
+                'gender'                => $request->gender,
+                'specialization'        => $request->specialization,
+                'specialities'          => $request->specialities,
+                'about_me'              => $request->about_me,
+                'picture'               => $request->picture
+            ], [
+                'name'                  => 'required|max:100|min:5|unique:doctors,name,NULL,id',
+                'gender'                => 'required',
+                'specialization'        => 'required|min:3',
+                'specialities'          => 'required',
+                'about_me'              => 'required|min:5',
+                'picture'               => 'required|mimes:jpg,jpeg,png|max:1000',
             ]);
-        } else {
-            DB::beginTransaction();
-            try {
-                Doctor::create([
-                    'slug'                  => Str::slug($request->name),
-                    'name'                  => $request->name,
-                    'gender'                => $request->gender,
-                    'specialization'        => $request->specialization,
-                    'speciality_id'         => $request->specialities,
-                    'about_me'              => $request->about_me,
-                    'picture'               => request('picture') ? $request->file('picture')->store('images/doctors') : null,
-                    'isAktif'               => $request->status
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'errors' => $validator->messages(),
                 ]);
-                DB::commit();
-                return response()->json([
-                    'status'  => 200,
-                    'message' => 'Doctor has been created',
-                ], 200);
-            } catch (Throwable $th) {
-                DB::rollBack();
-                return response()->json([
-                    'status'  => 500,
-                    'message' => $th->getMessage(),
-                ], 500);
+            } else {
+                DB::beginTransaction();
+                try {
+                    Doctor::create([
+                        'slug'                  => Str::slug($request->name),
+                        'name'                  => $request->name,
+                        'gender'                => $request->gender,
+                        'specialization'        => $request->specialization,
+                        'speciality_id'         => $request->specialities,
+                        'about_me'              => $request->about_me,
+                        'picture'               => request('picture') ? $request->file('picture')->store('images/doctors') : null,
+                        'isAktif'               => $request->status
+                    ]);
+                    DB::commit();
+                    return response()->json([
+                        'status'  => 200,
+                        'message' => 'Doctor has been created',
+                    ], 200);
+                } catch (Throwable $th) {
+                    DB::rollBack();
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => $th->getMessage(),
+                    ], 500);
+                }
             }
+        } else {
+            abort(403);
         }
     }
 
@@ -159,26 +174,32 @@ class DoctorController extends Controller
      */
     public function edit($id)
     {
-        try {
-            $id = Crypt::decryptString($id);
-            $data = Doctor::find($id);
+        $user = auth()->user();
 
-            if ($data) {
+        if ($user->can('update doctors')) {
+            try {
+                $id = Crypt::decryptString($id);
+                $data = Doctor::find($id);
+
+                if ($data) {
+                    return response()->json([
+                        'status'    => 200,
+                        'data'      => $data,
+                    ]);
+                } else {
+                    return response()->json([
+                        'status'    => 404,
+                        'message'   => 'Doctor Not Found',
+                    ]);
+                }
+            } catch (\Throwable $e) {
                 return response()->json([
-                    'status'    => 200,
-                    'data'      => $data,
-                ]);
-            } else {
-                return response()->json([
-                    'status'    => 404,
-                    'message'   => 'Doctor Not Found',
-                ]);
+                    'status'  => 500,
+                    'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
+                ], 500);
             }
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status'  => 500,
-                'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
-            ], 500);
+        } else {
+            abort(403);
         }
     }
 
@@ -187,77 +208,83 @@ class DoctorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = Doctor::find($id);
+        $user = auth()->user();
 
-        $validator = Validator::make([
-            'name'                  => $request->name,
-            'gender'                => $request->gender,
-            'specialization'        => $request->specialization,
-            'specialities'          => $request->specialities,
-            'about_me'              => $request->about_me,
-            'picture'               => $request->picture
-        ], [
-            'name'                  => 'required|max:100|min:5|unique:doctors,name,' . $data->id,
-            'gender'                => 'required',
-            'specialization'        => 'required|min:3',
-            'specialities'          => 'required',
-            'about_me'              => 'required|min:5',
-            'picture'               => request('picture') ? 'mimes:jpg,jpeg,png|max:1000' : '',
-        ]);
+        if ($user->can('update doctors')) {
+            $data = Doctor::find($id);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 400,
-                'errors' => $validator->messages(),
+            $validator = Validator::make([
+                'name'                  => $request->name,
+                'gender'                => $request->gender,
+                'specialization'        => $request->specialization,
+                'specialities'          => $request->specialities,
+                'about_me'              => $request->about_me,
+                'picture'               => $request->picture
+            ], [
+                'name'                  => 'required|max:100|min:5|unique:doctors,name,' . $data->id,
+                'gender'                => 'required',
+                'specialization'        => 'required|min:3',
+                'specialities'          => 'required',
+                'about_me'              => 'required|min:5',
+                'picture'               => request('picture') ? 'mimes:jpg,jpeg,png|max:1000' : '',
             ]);
-        } else {
-            if ($data) {
-                DB::beginTransaction();
 
-                //--Membuat kondisi langsung mendelete gambar yang lama pada storage
-                if (request('picture')) {
-                    if ($data->picture) {
-                        Storage::delete($data->picture);
-                    }
-                    $picture = request()->file('picture')->store('images/doctors');
-                } elseif ($data->picture) {
-                    $picture = $data->picture;
-                } else {
-                    $picture = null;
-                }
-                //--End
-
-                try {
-                    $data->update([
-                        'slug'                  => Str::slug($request->name),
-                        'name'                  => $request->name,
-                        'gender'                => $request->gender,
-                        'specialization'        => $request->specialization,
-                        'speciality_id'         => $request->specialities,
-                        'about_me'              => $request->about_me,
-                        'picture'               => $picture,
-                        'isAktif'               => $request->status
-                    ]);
-
-                    DB::commit();
-
-                    return response()->json([
-                        'status'  => 200,
-                        'message' => 'Doctor has been updated',
-                    ], 200);
-                } catch (\Throwable $th) {
-                    DB::rollBack();
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => $th->getMessage(),
-                    ], 500);
-                }
-            } else {
+            if ($validator->fails()) {
                 return response()->json([
-                    'status' => 404,
-                    'message' => 'Data not found..!',
+                    'status' => 400,
+                    'errors' => $validator->messages(),
                 ]);
+            } else {
+                if ($data) {
+                    DB::beginTransaction();
+
+                    //--Membuat kondisi langsung mendelete gambar yang lama pada storage
+                    if (request('picture')) {
+                        if ($data->picture) {
+                            Storage::delete($data->picture);
+                        }
+                        $picture = request()->file('picture')->store('images/doctors');
+                    } elseif ($data->picture) {
+                        $picture = $data->picture;
+                    } else {
+                        $picture = null;
+                    }
+                    //--End
+
+                    try {
+                        $data->update([
+                            'slug'                  => Str::slug($request->name),
+                            'name'                  => $request->name,
+                            'gender'                => $request->gender,
+                            'specialization'        => $request->specialization,
+                            'speciality_id'         => $request->specialities,
+                            'about_me'              => $request->about_me,
+                            'picture'               => $picture,
+                            'isAktif'               => $request->status
+                        ]);
+
+                        DB::commit();
+
+                        return response()->json([
+                            'status'  => 200,
+                            'message' => 'Doctor has been updated',
+                        ], 200);
+                    } catch (\Throwable $th) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => $th->getMessage(),
+                        ], 500);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => 404,
+                        'message' => 'Data not found..!',
+                    ]);
+                }
             }
+        } else {
+            abort(403);
         }
     }
 
@@ -266,56 +293,62 @@ class DoctorController extends Controller
      */
     public function destroy($id)
     {
-        DB::beginTransaction();
-        try {
-            $id = Crypt::decryptString($id);
-            $data = Doctor::find($id);
-            $doctorEducations = DoctorEducation::where('doctor_id', $id)->get();
-            $doctorLocations = DoctorLocation::where('doctor_id', $id)->get();
+        $user = auth()->user();
 
-            if (!$data) {
+        if ($user->can('delete doctors')) {
+            DB::beginTransaction();
+            try {
+                $id = Crypt::decryptString($id);
+                $data = Doctor::find($id);
+                $doctorEducations = DoctorEducation::where('doctor_id', $id)->get();
+                $doctorLocations = DoctorLocation::where('doctor_id', $id)->get();
+
+                if (!$data) {
+                    return response()->json([
+                        'status'  => 404,
+                        'message' => "Data not found!",
+                    ], 404);
+                }
+
+                //Kondisi apabila terdapat path gambar pada tabel
+                if ($data->picture != null) {
+                    Storage::delete($data->picture);
+                    $data->delete();
+                } else {
+                    $data->delete();
+                }
+                //End kondisi
+
+                //---Check apakah terdapat data pada tabel education
+                if ($doctorEducations != null) {
+                    foreach ($doctorEducations as $doctorEducation) {
+                        $doctorEducation->delete();
+                    }
+                }
+                //---End check
+
+                //---Check apakah terdapat data pada tabel doctor location
+                if ($doctorLocations != null) {
+                    foreach ($doctorLocations as $doctorLocation) {
+                        $doctorLocation->delete();
+                    }
+                }
+                //---End check
+
+                DB::commit();
+
                 return response()->json([
-                    'status'  => 404,
-                    'message' => "Data not found!",
-                ], 404);
+                    'status'  => 200,
+                    'message' => "Doctor has been deleted..!",
+                ], 200);
+            } catch (\Throwable $e) {
+                return response()->json([
+                    'status'  => 500,
+                    'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
+                ], 500);
             }
-
-            //Kondisi apabila terdapat path gambar pada tabel
-            if ($data->picture != null) {
-                Storage::delete($data->picture);
-                $data->delete();
-            } else {
-                $data->delete();
-            }
-            //End kondisi
-
-            //---Check apakah terdapat data pada tabel education
-            if ($doctorEducations != null) {
-                foreach ($doctorEducations as $doctorEducation) {
-                    $doctorEducation->delete();
-                }
-            }
-            //---End check
-
-            //---Check apakah terdapat data pada tabel doctor location
-            if ($doctorLocations != null) {
-                foreach ($doctorLocations as $doctorLocation) {
-                    $doctorLocation->delete();
-                }
-            }
-            //---End check
-
-            DB::commit();
-
-            return response()->json([
-                'status'  => 200,
-                'message' => "Doctor has been deleted..!",
-            ], 200);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status'  => 500,
-                'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
-            ], 500);
+        } else {
+            abort(403);
         }
     }
 }

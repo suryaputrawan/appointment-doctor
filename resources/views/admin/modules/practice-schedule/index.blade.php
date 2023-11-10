@@ -17,11 +17,13 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-            <div class="col-sm-5 col">
-                <a href="{{ route('admin.practice-schedules.create') }}" class="btn btn-primary float-right mt-2" type="button">
-                    Add
-                </a>
-            </div>
+            @can('create doctor schedules')
+                <div class="col-sm-5 col">
+                    <a href="{{ route('admin.practice-schedules.create') }}" class="btn btn-primary float-right mt-2" type="button">
+                        Add
+                    </a>
+                </div>
+            @endcan  
         </div>
         
         <div class="row">
@@ -33,7 +35,9 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">#</th>
-                                        <th style="width: 100px">ACTION</th>
+                                        @canany(['update doctor schedules', 'delete doctor schedules'])
+                                            <th style="width: 100px">ACTION</th> 
+                                        @endcanany
                                         <th>Date</th>
                                         <th>Doctor Name</th>
                                         <th>Time</th>
@@ -85,7 +89,9 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
+                @canany(['update doctor schedules', 'delete doctor schedules'])
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                @endcanany
                 { data: "date", name: "date", orderable: true  },
                 { data: "doctor_name", name: "doctor_name", orderable: false, searchable: false },
                 { data: "time", name: "time", orderable: false, searchable: false, className: "text-center" },

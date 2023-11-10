@@ -18,12 +18,13 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-
-            <div class="col-sm-5 col">
-                <a href="{{ route('admin.doctor-location.create') }}" class="btn btn-primary float-right mt-2" type="button">
-                    Add
-                </a>
-            </div>
+            @can('create doctors')
+                <div class="col-sm-5 col">
+                    <a href="{{ route('admin.doctor-location.create') }}" class="btn btn-primary float-right mt-2" type="button">
+                        Add
+                    </a>
+                </div>
+            @endcan  
         </div>
         
         <div class="row">

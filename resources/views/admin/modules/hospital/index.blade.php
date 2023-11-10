@@ -17,11 +17,13 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-            <div class="col-sm-5 col">
-                <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
-                    Add
-                </a>
-            </div>
+            @can('create hospitals')
+                <div class="col-sm-5 col">
+                    <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
+                        Add
+                    </a>
+                </div>
+            @endcan
         </div>
         
         <div class="row">
@@ -33,7 +35,9 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th style="width: 100px">ACTION</th>
+                                        @canany(['update hospitals', 'delete hospitals'])
+                                            <th style="width: 100px">ACTION</th>
+                                        @endcanany
                                         <th>Hospital Name</th>
                                         <th>Address</th>
                                         <th>Email</th>
@@ -123,7 +127,9 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
+                @canany(['update hospitals', 'delete hospitals'])
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                @endcanany
                 { data: "hospital_name", name: "hospital_name", orderable: true  },
                 { data: "address", name: "address", orderable: false, searchable: false },
                 { data: "email", name: "email", orderable: true, searchable: false },  

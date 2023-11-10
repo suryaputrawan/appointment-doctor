@@ -17,11 +17,13 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-            <div class="col-sm-5 col">
-                <a href="{{ route('admin.appointment.create') }}" class="btn btn-primary float-right mt-2" type="button">
-                    Add
-                </a>
-            </div>
+            @can('create appointment')
+                <div class="col-sm-5 col">
+                    <a href="{{ route('admin.appointment.create') }}" class="btn btn-primary float-right mt-2" type="button">
+                        Add
+                    </a>
+                </div>  
+            @endcan
         </div>
         
         <div class="row">
@@ -33,7 +35,9 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th style="width: 100px">Action</th>
+                                        @canany(['update appointment', 'view appointment', 'arrived appointment','cancel appointment'])
+                                            <th style="width: 100px">Action</th> 
+                                        @endcanany
                                         <th>Date & Time</th>
                                         <th>Booking Number</th>
                                         <th>Doctor</th>
@@ -97,7 +101,9 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
-                { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                @canany(['update appointment', 'view appointment', 'arrived appointment','cancel appointment'])
+                    { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                @endcan
                 { data: "date", name: "date", orderable: true, className: "text-center",  },
                 { data: "booking_number", name: "booking_number", orderable: true, searchable: false, className: "text-center", },
                 { data: "doctor", name: "doctor", orderable: true },  

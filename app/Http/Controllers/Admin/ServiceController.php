@@ -23,6 +23,7 @@ class ServiceController extends Controller
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
+                    $user            = auth()->user();
                     $editRoute       = 'admin.services.edit';
                     $deleteRoute     = 'admin.services.destroy';
                     $viewRoute       = 'admin.services.show';
@@ -31,16 +32,20 @@ class ServiceController extends Controller
 
                     $action = "";
 
-                    $action .= '
-                        <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
-                            <i class="fe fe-pencil"></i>
-                        </a> ';
+                    if ($user->can('update services')) {
+                        $action .= '
+                            <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
+                                <i class="fe fe-pencil"></i>
+                            </a> ';
+                    }
 
-                    $action .= '
-                        <button class="btn btn-danger delete-item" 
-                            data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
-                            <i class="fe fe-trash"></i>
-                        </button> ';
+                    if ($user->can('delete services')) {
+                        $action .= '
+                            <button class="btn btn-danger delete-item" 
+                                data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
+                                <i class="fe fe-trash"></i>
+                            </button> ';
+                    }
 
                     $group = '<div class="btn-group btn-group-sm mb-1 mb-md-0" role="group">
                         ' . $action . '
@@ -65,7 +70,11 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        //
+        $user = auth()->user();
+
+        if (!$user->can('create services')) {
+            abort(403);
+        }
     }
 
     /**
@@ -73,41 +82,47 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make([
-            'name'                  => $request->name,
-            'description'           => $request->description,
-            'picture'               => $request->picture
-        ], [
-            'name'                  => 'required|min:5|unique:services,name,NULL,id',
-            'description'           => 'required|min:5',
-            'picture'               => 'required|mimes:jpg,jpeg,png|max:1000',
-        ]);
+        $user = auth()->user();
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 400,
-                'errors' => $validator->messages(),
+        if ($user->can('create services')) {
+            $validator = Validator::make([
+                'name'                  => $request->name,
+                'description'           => $request->description,
+                'picture'               => $request->picture
+            ], [
+                'name'                  => 'required|min:5|unique:services,name,NULL,id',
+                'description'           => 'required|min:5',
+                'picture'               => 'required|mimes:jpg,jpeg,png|max:1000',
             ]);
-        } else {
-            DB::beginTransaction();
-            try {
-                Service::create([
-                    'name'                  => $request->name,
-                    'description'           => $request->description,
-                    'picture'               => request('picture') ? $request->file('picture')->store('images/services') : null
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'errors' => $validator->messages(),
                 ]);
-                DB::commit();
-                return response()->json([
-                    'status'  => 200,
-                    'message' => 'Service has been created',
-                ], 200);
-            } catch (Throwable $th) {
-                DB::rollBack();
-                return response()->json([
-                    'status'  => 500,
-                    'message' => $th->getMessage(),
-                ], 500);
+            } else {
+                DB::beginTransaction();
+                try {
+                    Service::create([
+                        'name'                  => $request->name,
+                        'description'           => $request->description,
+                        'picture'               => request('picture') ? $request->file('picture')->store('images/services') : null
+                    ]);
+                    DB::commit();
+                    return response()->json([
+                        'status'  => 200,
+                        'message' => 'Service has been created',
+                    ], 200);
+                } catch (Throwable $th) {
+                    DB::rollBack();
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => $th->getMessage(),
+                    ], 500);
+                }
             }
+        } else {
+            abort(403);
         }
     }
 
@@ -124,26 +139,32 @@ class ServiceController extends Controller
      */
     public function edit($id)
     {
-        try {
-            $id = Crypt::decryptString($id);
-            $data = Service::find($id);
+        $user = auth()->user();
 
-            if ($data) {
+        if ($user->can('update services')) {
+            try {
+                $id = Crypt::decryptString($id);
+                $data = Service::find($id);
+
+                if ($data) {
+                    return response()->json([
+                        'status'    => 200,
+                        'data'      => $data,
+                    ]);
+                } else {
+                    return response()->json([
+                        'status'    => 404,
+                        'message'   => 'Service Not Found',
+                    ]);
+                }
+            } catch (\Throwable $e) {
                 return response()->json([
-                    'status'    => 200,
-                    'data'      => $data,
-                ]);
-            } else {
-                return response()->json([
-                    'status'    => 404,
-                    'message'   => 'Service Not Found',
-                ]);
+                    'status'  => 500,
+                    'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
+                ], 500);
             }
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status'  => 500,
-                'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
-            ], 500);
+        } else {
+            abort(403);
         }
     }
 
@@ -152,66 +173,72 @@ class ServiceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = Service::find($id);
+        $user = auth()->user();
 
-        $validator = Validator::make([
-            'name'                  => $request->name,
-            'description'           => $request->description,
-            'picture'               => $request->picture
-        ], [
-            'name'                  => 'required|min:5|unique:services,name,' . $data->id,
-            'description'           => 'required|min:5',
-            'picture'               => request('picture') ? 'mimes:jpg,jpeg,png|max:1000' : '',
-        ]);
+        if ($user->can('update services')) {
+            $data = Service::find($id);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 400,
-                'errors' => $validator->messages(),
+            $validator = Validator::make([
+                'name'                  => $request->name,
+                'description'           => $request->description,
+                'picture'               => $request->picture
+            ], [
+                'name'                  => 'required|min:5|unique:services,name,' . $data->id,
+                'description'           => 'required|min:5',
+                'picture'               => request('picture') ? 'mimes:jpg,jpeg,png|max:1000' : '',
             ]);
-        } else {
-            if ($data) {
-                DB::beginTransaction();
 
-                //--Membuat kondisi langsung mendelete gambar yang lama pada storage
-                if (request('picture')) {
-                    if ($data->picture) {
-                        Storage::delete($data->picture);
-                    }
-                    $picture = request()->file('picture')->store('images/services');
-                } elseif ($data->picture) {
-                    $picture = $data->picture;
-                } else {
-                    $picture = null;
-                }
-                //--End
-
-                try {
-                    $data->update([
-                        'name'                  => $request->name,
-                        'description'           => $request->description,
-                        'picture'               => $picture,
-                    ]);
-
-                    DB::commit();
-
-                    return response()->json([
-                        'status'  => 200,
-                        'message' => 'Service has been updated',
-                    ], 200);
-                } catch (\Throwable $th) {
-                    DB::rollBack();
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => $th->getMessage(),
-                    ], 500);
-                }
-            } else {
+            if ($validator->fails()) {
                 return response()->json([
-                    'status' => 404,
-                    'message' => 'Data not found..!',
+                    'status' => 400,
+                    'errors' => $validator->messages(),
                 ]);
+            } else {
+                if ($data) {
+                    DB::beginTransaction();
+
+                    //--Membuat kondisi langsung mendelete gambar yang lama pada storage
+                    if (request('picture')) {
+                        if ($data->picture) {
+                            Storage::delete($data->picture);
+                        }
+                        $picture = request()->file('picture')->store('images/services');
+                    } elseif ($data->picture) {
+                        $picture = $data->picture;
+                    } else {
+                        $picture = null;
+                    }
+                    //--End
+
+                    try {
+                        $data->update([
+                            'name'                  => $request->name,
+                            'description'           => $request->description,
+                            'picture'               => $picture,
+                        ]);
+
+                        DB::commit();
+
+                        return response()->json([
+                            'status'  => 200,
+                            'message' => 'Service has been updated',
+                        ], 200);
+                    } catch (\Throwable $th) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => $th->getMessage(),
+                        ], 500);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => 404,
+                        'message' => 'Data not found..!',
+                    ]);
+                }
             }
+        } else {
+            abort(403);
         }
     }
 
@@ -220,38 +247,44 @@ class ServiceController extends Controller
      */
     public function destroy($id)
     {
-        DB::beginTransaction();
-        try {
-            $id = Crypt::decryptString($id);
-            $data = Service::find($id);
+        $user = auth()->user();
 
-            if (!$data) {
+        if ($user->can('delete services')) {
+            DB::beginTransaction();
+            try {
+                $id = Crypt::decryptString($id);
+                $data = Service::find($id);
+
+                if (!$data) {
+                    return response()->json([
+                        'status'  => 404,
+                        'message' => "Data not found!",
+                    ], 404);
+                }
+
+                //Kondisi apabila terdapat path gambar pada tabel
+                if ($data->picture != null) {
+                    Storage::delete($data->picture);
+                    $data->delete();
+                } else {
+                    $data->delete();
+                }
+                //End kondisi
+
+                DB::commit();
+
                 return response()->json([
-                    'status'  => 404,
-                    'message' => "Data not found!",
-                ], 404);
+                    'status'  => 200,
+                    'message' => "Service has been deleted..!",
+                ], 200);
+            } catch (\Throwable $e) {
+                return response()->json([
+                    'status'  => 500,
+                    'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
+                ], 500);
             }
-
-            //Kondisi apabila terdapat path gambar pada tabel
-            if ($data->picture != null) {
-                Storage::delete($data->picture);
-                $data->delete();
-            } else {
-                $data->delete();
-            }
-            //End kondisi
-
-            DB::commit();
-
-            return response()->json([
-                'status'  => 200,
-                'message' => "Service has been deleted..!",
-            ], 200);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status'  => 500,
-                'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
-            ], 500);
+        } else {
+            abort(403);
         }
     }
 }

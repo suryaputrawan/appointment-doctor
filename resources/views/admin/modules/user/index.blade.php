@@ -17,11 +17,13 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-            <div class="col-sm-5 col">
-                <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
-                    Add
-                </a>
-            </div>
+            @can('create users')
+                <div class="col-sm-5 col">
+                    <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
+                        Add
+                    </a>
+                </div>
+            @endcan
         </div>
         
         <div class="row">
@@ -33,7 +35,9 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">#</th>
-                                        <th style="width: 100px">Action</th>
+                                        @can('update users')
+                                            <th style="width: 100px">Action</th> 
+                                        @endcan
                                         <th>Fullname</th>
                                         <th>Username</th>
                                         <th>Email</th>
@@ -97,7 +101,9 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
+                @can('update users')
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                @endcan
                 { data: "name", name: "name", orderable: true  },
                 { data: "username", name: "username", orderable: false, searchable: false },
                 { data: "email", name: "email", orderable: true },  
