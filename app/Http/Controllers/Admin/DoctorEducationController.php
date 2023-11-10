@@ -19,7 +19,27 @@ class DoctorEducationController extends Controller
     public function index()
     {
         if (request()->type == 'datatable') {
-            $data = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get();
+            $user = auth()->user();
+
+            if (!$user->hasRole('Super Admin|Admin')) {
+                $data = Doctor::with([
+                    'doctorLocation'    => function ($query) {
+                        $query->select('id', 'doctor_id', 'hospital_id');
+                    }
+                ])
+                    ->whereHas('doctorLocation', function ($query) {
+                        $query->where('hospital_id', auth()->user()->hospital_id);
+                    })
+                    ->where('isAktif', 1)->orderBy('name', 'asc')
+                    ->get();
+            } else {
+                $data = Doctor::with([
+                    'doctorLocation'    => function ($query) {
+                        $query->select('id', 'doctor_id', 'hospital_id');
+                    }
+                ])
+                    ->where('isAktif', 1)->orderBy('name', 'asc')->get();
+            }
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
@@ -28,6 +48,7 @@ class DoctorEducationController extends Controller
                     $dataLabel       = $data->name;
 
                     $action = "";
+
 
                     $action .= '
                         <a class="btn btn-primary" id="btn-add" type="button" data-url="' . route($addRoute, $dataId) . '"

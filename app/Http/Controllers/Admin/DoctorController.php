@@ -36,7 +36,7 @@ class DoctorController extends Controller
 
                     $action = "";
 
-                    if ($user->can('create doctors')) {
+                    if ($user->can('update doctors')) {
                         $action .= '
                             <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
                                 <i class="fe fe-pencil"></i>

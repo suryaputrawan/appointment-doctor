@@ -22,22 +22,57 @@ class PracticeScheduleController extends Controller
      */
     public function index()
     {
-        if (request()->type == 'datatable') {
-            $data = PracticeSchedule::with([
-                'doctor'    => function ($query) {
-                    $query->select('id', 'name', 'isAktif');
-                },
-                'hospital'  => function ($query) {
-                    $query->select('id', 'name');
+        $user = auth()->user();
+
+        if (!$user->hasRole('Super Admin|Admin')) {
+            $hospital = Hospital::orderBy('name', 'asc')->where('id', $user->hospital_id)
+                ->get(['id', 'name']);
+
+            $doctor = Doctor::with([
+                'doctorLocation'    => function ($query) {
+                    $query->select('id', 'doctor_id', 'hospital_id');
                 }
             ])
-                ->orderBy('date', 'desc')
-                ->orderBy('doctor_id', 'asc')
-                ->orderBy('start_time', 'asc')->get();
+                ->whereHas('doctorLocation', function ($query) use ($user) {
+                    $query->where('hospital_id', $user->hospital_id);
+                })
+                ->where('isAktif', 1)->orderBy('name', 'asc')
+                ->get(['id', 'name']);
+        } else {
+            $hospital = Hospital::orderBy('name', 'asc')->get(['id', 'name']);
+            $doctor = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']);
+        }
+
+        if (request()->type == 'datatable') {
+            if (!$user->hasRole('Super Admin|Admin')) {
+                $data = PracticeSchedule::with([
+                    'doctor'    => function ($query) {
+                        $query->select('id', 'name', 'isAktif');
+                    },
+                    'hospital'  => function ($query) {
+                        $query->select('id', 'name');
+                    }
+                ])
+                    ->where('hospital_id', $user->hospital_id)
+                    ->orderBy('date', 'desc')
+                    ->orderBy('doctor_id', 'asc')
+                    ->orderBy('start_time', 'asc')->get();
+            } else {
+                $data = PracticeSchedule::with([
+                    'doctor'    => function ($query) {
+                        $query->select('id', 'name', 'isAktif');
+                    },
+                    'hospital'  => function ($query) {
+                        $query->select('id', 'name');
+                    }
+                ])
+                    ->orderBy('date', 'desc')
+                    ->orderBy('doctor_id', 'asc')
+                    ->orderBy('start_time', 'asc')->get();
+            }
 
             return datatables()->of($data)
-                ->addColumn('action', function ($data) {
-                    $user            = auth()->user();
+                ->addColumn('action', function ($data) use ($user) {
                     $editRoute       = 'admin.practice-schedules.edit';
                     $deleteRoute     = 'admin.practice-schedules.destroy';
                     $viewRoute       = 'admin.practice-schedules.show';
@@ -98,8 +133,8 @@ class PracticeScheduleController extends Controller
         return view('admin.modules.practice-schedule.index', [
             'pageTitle'     => 'List Of Doctor Practice Schedule',
             'breadcrumb'    => 'Practice Schedules',
-            'doctor'        => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
-            'hospital'      => Hospital::orderBy('name', 'asc')->get(['id', 'name'])
+            'doctor'        => $doctor,
+            'hospital'      => $hospital
         ]);
     }
 
@@ -110,13 +145,32 @@ class PracticeScheduleController extends Controller
     {
         $user = auth()->user();
 
+        if (!$user->hasRole('Super Admin|Admin')) {
+            $hospital = Hospital::orderBy('name', 'asc')->where('id', $user->hospital_id)
+                ->get(['id', 'name']);
+
+            $doctor = Doctor::with([
+                'doctorLocation'    => function ($query) {
+                    $query->select('id', 'doctor_id', 'hospital_id');
+                }
+            ])
+                ->whereHas('doctorLocation', function ($query) use ($user) {
+                    $query->where('hospital_id', $user->hospital_id);
+                })
+                ->where('isAktif', 1)->orderBy('name', 'asc')
+                ->get(['id', 'name']);
+        } else {
+            $hospital = Hospital::orderBy('name', 'asc')->get(['id', 'name']);
+            $doctor = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']);
+        }
+
         if ($user->can('create doctor schedules')) {
             return view('admin.modules.practice-schedule.create', [
                 'pageTitle'     => 'Create Practice Schedule',
                 'breadcrumb'    => 'Create Practice Schedule',
                 'btnSubmit'     => 'Save',
-                'doctor'        => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
-                'hospital'      => Hospital::orderBy('name', 'asc')->get(['id', 'name'])
+                'doctor'        => $doctor,
+                'hospital'      => $hospital
             ]);
         } else {
             abort(403);

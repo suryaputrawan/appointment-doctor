@@ -20,21 +20,38 @@ class AppointmentController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+
         if (request()->type == 'datatable') {
-            $data = Appointment::with([
-                'doctor'    =>  function ($query) {
-                    $query->select('id', 'name');
-                },
-                'hospital'  => function ($query) {
-                    $query->select('id', 'name');
-                }
-            ])
-                ->orderBy('booking_number', 'desc')
-                ->get();
+
+            if (!$user->hasRole('Super Admin|Admin')) {
+                $data = Appointment::with([
+                    'doctor'    =>  function ($query) {
+                        $query->select('id', 'name');
+                    },
+                    'hospital'  => function ($query) {
+                        $query->select('id', 'name');
+                    }
+                ])
+                    ->where('hospital_id', $user->hospital_id)
+                    ->orderBy('booking_number', 'desc')
+                    ->get();
+            } else {
+
+                $data = Appointment::with([
+                    'doctor'    =>  function ($query) {
+                        $query->select('id', 'name');
+                    },
+                    'hospital'  => function ($query) {
+                        $query->select('id', 'name');
+                    }
+                ])
+                    ->orderBy('booking_number', 'desc')
+                    ->get();
+            }
 
             return datatables()->of($data)
-                ->addColumn('action', function ($data) {
-                    $user           = auth()->user();
+                ->addColumn('action', function ($data) use ($user) {
                     $editRoute      = 'admin.appointment.edit';
                     $arrivedRoute   = 'admin.appointment.arrived';
                     $cancelRoute    = 'admin.appointment.cancel';
@@ -121,12 +138,27 @@ class AppointmentController extends Controller
     {
         $user = auth()->user();
 
+        if (!$user->hasRole('Super Admin|Admin')) {
+            $doctor = Doctor::with([
+                'doctorLocation'    => function ($query) {
+                    $query->select('id', 'doctor_id', 'hospital_id');
+                }
+            ])
+                ->whereHas('doctorLocation', function ($query) use ($user) {
+                    $query->where('hospital_id', $user->hospital_id);
+                })
+                ->where('isAktif', 1)->orderBy('name', 'asc')
+                ->get(['id', 'name']);
+        } else {
+            $doctor = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']);
+        }
+
         if ($user->can('create appointment')) {
             return view('admin.modules.appointment.create', [
                 'pageTitle'     => 'Create Appointment',
                 'breadcrumb'    => 'Create Appointment',
                 'btnSubmit'     => 'Save',
-                'doctor'        => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
+                'doctor'        => $doctor,
             ]);
         } else {
             abort(403);
@@ -250,6 +282,21 @@ class AppointmentController extends Controller
     {
         $user = auth()->user();
 
+        if (!$user->hasRole('Super Admin|Admin')) {
+            $doctor = Doctor::with([
+                'doctorLocation'    => function ($query) {
+                    $query->select('id', 'doctor_id', 'hospital_id');
+                }
+            ])
+                ->whereHas('doctorLocation', function ($query) use ($user) {
+                    $query->where('hospital_id', $user->hospital_id);
+                })
+                ->where('isAktif', 1)->orderBy('name', 'asc')
+                ->get(['id', 'name']);
+        } else {
+            $doctor = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']);
+        }
+
         if ($user->can('update appointment')) {
             try {
                 $id = Crypt::decryptString($id);
@@ -272,7 +319,7 @@ class AppointmentController extends Controller
                     'breadcrumb'    => 'Edit Appointment',
                     'btnSubmit'     => 'Save Change',
                     'data'          => $data,
-                    'doctors'       => Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']),
+                    'doctors'       => $doctor,
                     'schedule'      => $schedule
                 ]);
             } catch (\Throwable $e) {

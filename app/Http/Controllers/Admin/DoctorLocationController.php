@@ -12,6 +12,7 @@ use App\Models\DoctorLocationDay;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DoctorLocationRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 class DoctorLocationController extends Controller
@@ -21,26 +22,46 @@ class DoctorLocationController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+
         if (request()->type == 'datatable') {
-            $data = DoctorLocation::with([
-                'doctorLocationDay' => function ($query) {
-                    $query->select('id', 'doctor_location_id', 'day', 'start_time', 'end_time');
-                },
-                'doctor' => function ($query) {
-                    $query->select('id', 'name');
-                },
-                'hospital'  => function ($query) {
-                    $query->select('id', 'name');
-                }
-            ])
-                ->whereHas('doctor', function ($query) {
-                    $query->where('isAktif', 1);
-                })
-                ->orderBy('doctor_id')->get();
+            if (!$user->hasRole('Super Admin|Admin')) {
+                $data = DoctorLocation::with([
+                    'doctorLocationDay' => function ($query) {
+                        $query->select('id', 'doctor_location_id', 'day', 'start_time', 'end_time');
+                    },
+                    'doctor' => function ($query) {
+                        $query->select('id', 'name');
+                    },
+                    'hospital'  => function ($query) {
+                        $query->select('id', 'name');
+                    }
+                ])
+                    ->where('hospital_id', $user->hospital_id)
+                    ->whereHas('doctor', function ($query) {
+                        $query->where('isAktif', 1);
+                    })
+                    ->orderBy('doctor_id')->get();
+            } else {
+                $data = DoctorLocation::with([
+                    'doctorLocationDay' => function ($query) {
+                        $query->select('id', 'doctor_location_id', 'day', 'start_time', 'end_time');
+                    },
+                    'doctor' => function ($query) {
+                        $query->select('id', 'name');
+                    },
+                    'hospital'  => function ($query) {
+                        $query->select('id', 'name');
+                    }
+                ])
+                    ->whereHas('doctor', function ($query) {
+                        $query->where('isAktif', 1);
+                    })
+                    ->orderBy('doctor_id')->get();
+            }
 
             return datatables()->of($data)
-                ->addColumn('action', function ($data) {
-                    $user            = auth()->user();
+                ->addColumn('action', function ($data) use ($user) {
                     $editRoute       = 'admin.doctor-location.edit';
                     $deleteRoute     = 'admin.doctor-location.destroy';
                     $viewRoute       = 'admin.doctor-location.show';
@@ -96,12 +117,19 @@ class DoctorLocationController extends Controller
     {
         $user = auth()->user();
 
+        if (!$user->hasRole('Super Admin|Admin')) {
+            $hospital = Hospital::orderBy('name', 'asc')->where('id', $user->hospital_id)
+                ->get(['id', 'name']);
+        } else {
+            $hospital = Hospital::orderBy('name', 'asc')->get(['id', 'name']);
+        }
+
         if ($user->can('create doctors')) {
             return view('admin.modules.doctor-location.create', [
                 'pageTitle'     => 'Create Doctor Location',
                 'breadcrumb'    => 'Create Doctor locations',
                 'btnSubmit'     => 'Save',
-                'hospital'      => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
+                'hospital'      => $hospital,
                 'doctor'        => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
             ]);
         } else {
