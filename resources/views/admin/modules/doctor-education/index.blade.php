@@ -24,7 +24,7 @@
             <div class="col-sm-12 mt-3">
                 <div class="card">
                     <div class="card-body">
-                        <div class="table-responsive">
+                        <div class="table">
                             <table id="datatable" class="datatable table table-stripped" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>

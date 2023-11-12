@@ -42,6 +42,7 @@
                                         <th>Doctor Name</th>
                                         <th>Specialization</th>
                                         <th>Speciality</th>
+                                        <th>RS / Clinic</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -134,6 +135,7 @@
                 { data: "doctor", name: "doctor", orderable: true  },
                 { data: "specialization", name: "specialization", orderable: false, searchable: false },
                 { data: "speciality", name: "speciality", orderable: true },  
+                { data: "hospitals", name: "hospitals", orderable: true },  
                 { data: "status", name: "status", orderable: false, searchable: false },
             ],
         });
