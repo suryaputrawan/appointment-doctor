@@ -23,7 +23,7 @@ class DoctorController extends Controller
     public function index()
     {
         if (request()->type == 'datatable') {
-            $data = Doctor::query()->orderBy('name', 'asc')->get();
+            $data = Doctor::with('doctorLocation')->orderBy('name', 'asc')->get();
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
@@ -71,6 +71,15 @@ class DoctorController extends Controller
                         return '';
                     }
                 })
+                ->addColumn('hospitals', function ($data) {
+                    $hospital = DoctorLocation::with('hospital')->where('doctor_id', $data->id)->get();
+
+                    if ($hospital != null) {
+                        return $hospital->implode('hospital.name', ', ');
+                    } else {
+                        return '';
+                    }
+                })
                 ->addColumn('status', function ($data) {
                     if ($data->isAktif == 0) {
                         return '<a class="btn btn-sm btn-danger" style="color:white">Non Aktif</a>';
@@ -78,7 +87,7 @@ class DoctorController extends Controller
                         return '<a class="btn btn-sm btn-success" style="color:white">Aktif</a>';
                     }
                 })
-                ->rawColumns(['action', 'doctor', 'speciality', 'educations', 'status'])
+                ->rawColumns(['action', 'doctor', 'speciality', 'hospitals', 'status'])
                 ->make(true);
         }
 

@@ -26,21 +26,22 @@
 
         <!-- User Menu -->
         <li class="nav-item dropdown has-arrow">
-            <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+            <h6 class="dropdown-toggle nav-link mt-3" data-toggle="dropdown">{{ auth()->user()->name }}</h6>
+            {{-- <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                 <span class="user-img"><img class="rounded-circle" src="{{ asset('assets/admin/img/profiles/avatar-01.jpg') }}" width="31" alt="Ryan Taylor"></span>
-            </a>
+            </a> --}}
             <div class="dropdown-menu">
                 <div class="user-header">
-                    <div class="avatar avatar-sm">
+                    {{-- <div class="avatar avatar-sm">
                         <img src="{{ asset('assets/admin/img/profiles/avatar-01.jpg') }}" alt="User Image" class="avatar-img rounded-circle">
-                    </div>
+                    </div> --}}
                     <div class="user-text">
                         <h6>{{ auth()->user()->name }}</h6>
                         <p class="text-muted mb-0">{{ auth()->user()->email }}</p>
                     </div>
                 </div>
                 <a class="dropdown-item" href="profile.html">My Profile</a>
-                <a class="dropdown-item" href="settings.html">Settings</a>
+                {{-- <a class="dropdown-item" href="settings.html">Settings</a> --}}
                 <a class="dropdown-item" href="{{ route('logout') }}">Logout</a>
             </div>
         </li>

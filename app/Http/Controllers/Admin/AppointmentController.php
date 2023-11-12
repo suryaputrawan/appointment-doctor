@@ -105,7 +105,7 @@ class AppointmentController extends Controller
                     $bookingTime1 = Carbon::parse($data->start_time)->format('H:i');
                     $bookingTime2 = Carbon::parse($data->end_time)->format('H:i');
 
-                    return $bookingDate . ' ' . $bookingTime1 . '-' . $bookingTime2;
+                    return $bookingDate . ' [ ' . $bookingTime1 . ' - ' . $bookingTime2 . ' ] Wita';
                 })
                 ->addColumn('doctor', function ($data) {
                     return $data->doctor->name;
