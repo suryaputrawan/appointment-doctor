@@ -2,9 +2,17 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Exception;
+use Throwable;
+use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -42,5 +50,52 @@ class AuthController extends Controller
         Auth::logout();
         Session::flush();
         return redirect()->route('login');
+    }
+
+    public function showForgotPasswordForm()
+    {
+        return view('auth.reset-password');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->where('isaktif', 1)->first();
+
+        if ($user) {
+            DB::beginTransaction();
+
+            try {
+                $password = Str::random(10);
+
+                $user->update([
+                    'password'              => Hash::make($password),
+                    'password_change_at'    => null,
+                ]);
+
+                DB::commit();
+
+                Mail::to($user->email)->send(new ResetPasswordMail($password));
+
+                return back()->with('success', 'Email has been send to [' . $request->email . ']. Please check for an email from ADOS to view your new password.');
+            } catch (Throwable $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+            } catch (Exception $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+            }
+        }
+
+        return redirect()->route('login')->with('error', 'Email address [' . $request->email . '] does not exist in the system !');
     }
 }

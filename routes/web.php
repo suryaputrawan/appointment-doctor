@@ -26,6 +26,9 @@ Route::get('/admin', [AuthController::class, 'showloginform'])->name('login');
 Route::post('/admin/postlogin', [AuthController::class, 'postlogin'])->name('postlogin');
 Route::get('/admin/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/admin/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot.password');
+Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('reset.password');
+
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

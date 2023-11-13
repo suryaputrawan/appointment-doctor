@@ -4,7 +4,7 @@
 <!-- doccure/login.html  30 Nov 2019 04:12:20 GMT -->
 <head>
 		<meta charset="utf-8">
-		<title>ADOS - Login</title>
+		<title>ADOS - Forgot Password</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
 		
 		<!-- Favicons -->
@@ -37,35 +37,33 @@
 									<div class="col-md-7 col-lg-6 login-left">
 										<img src="{{ asset('assets/client/img/login-banner.png') }}" class="img-fluid" alt="login">	
 									</div>
-									<div class="col-md-12 col-lg-6 login-right">
+                                    <div class="col-md-12 col-lg-6 login-right">
 										<div class="login-header">
-											<h3>Login <span>ADOS</span></h3>
+											<h3>Forgot Password?</h3>
+											<p class="small text-muted">Enter your email to get a new password</p>
 										</div>
-										<form action="{{ route('postlogin') }}" method="POST">
+										
+										<!-- Forgot Password Form -->
+										<form action="{{ route('reset.password') }}" method="POST" enctype="multipart/form-data">
                                             @csrf
 											<div class="form-group form-focus">
-                                                <input name="username" class="form-control floating @error('username') is-invalid @enderror" type="text">
-												<label class="focus-label">Username</label>
-                                                @error('username')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-											</div>
-											<div class="form-group form-focus">
-												<input name="password" class="form-control floating @error('username') is-invalid @enderror" type="password" placeholder="Password">
-                                                <label class="focus-label">Password</label>
-                                                @error('password')
+												<input name="email" class="form-control floating @error('email') is-invalid @enderror" type="email">
+												<label class="focus-label">Email</label>
+                                                @error('email')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
 											</div>
 											<div class="text-right">
-												<a class="forgot-link" href="{{ route('forgot.password') }}">Forgot Password ?</a>
+												<a class="forgot-link" href="{{ route('login') }}">Remember your password?</a>
 											</div>
-                                            <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="btnLogin">Login</button>
-                                            <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="btnLogin-loading" style="display: none">
+                                            <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="btnReset">Reset Password</button>
+                                            <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="btnReset-loading" style="display: none">
                                                 <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                                <span>Login</span>
+                                                <span>Reset Password</span>
                                             </button>
 										</form>
+										<!-- /Forgot Password Form -->
+										
 									</div>
 								</div>
 							</div>
@@ -124,10 +122,10 @@
                 @endif
 
                 //environment button
-                $('#btnLogin').on('click', function () {
-                    $('#btnLogin-loading').toggle();
-                    $('#btnLogin-loading').prop('disabled',true);
-                    $('#btnLogin').toggle();
+                $('#btnReset').on('click', function () {
+                    $('#btnReset-loading').toggle();
+                    $('#btnReset-loading').prop('disabled',true);
+                    $('#btnReset').toggle();
                 });
             });
         </script>

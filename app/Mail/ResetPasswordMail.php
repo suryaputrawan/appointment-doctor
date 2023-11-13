@@ -9,16 +9,19 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class BookingPatientMail extends Mailable
+class ResetPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
+
+    public $password;
+    public $user;
 
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($password)
     {
-        //
+        $this->password = $password;
     }
 
     /**
@@ -27,7 +30,7 @@ class BookingPatientMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Booking Patient Mail',
+            subject: 'Reset Password Login ADOS',
         );
     }
 
@@ -37,7 +40,7 @@ class BookingPatientMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'mail.reset-password',
         );
     }
 
