@@ -132,17 +132,27 @@
                                             <h4 class="doc-name"><a href="{{ route('client.doctor.show', Crypt::encryptString($doctor->id)) }}">{{ $doctor->name }}</a></h4>
                                             <p class="doc-speciality">{{ $doctor->specialization }} - {{ $doctor->speciality->name }}</p>
                                             <h5 class="doc-department mb-3"><img src="{{ $doctor->speciality->takePicture }}" class="img-fluid" alt="Speciality">{{ $doctor->speciality->name }}</h5>
-                                            <div class="clinic-details">
+                                            <div class="clinic-details mb-1">
                                                 <span class="doc-location"><i class="fas fa-map-marker-alt"></i>
                                                 @foreach ($doctor->doctorLocation as $index => $location)
                                                    @if ($index == 0)
-                                                    {{ $location->hospital->name }}
+                                                     {{ $location->hospital->name }}
                                                    @else
                                                     , {{ $location->hospital->name }}
                                                    @endif
                                                 @endforeach
                                                 </span>
                                             </div>
+                                            <div class="mb-3">
+                                                <?php
+                                                $item = $doctor->practiceSchedules->first();
+                                                ?>
+                                                @if (\Carbon\Carbon::now()->format('Y-m-d') == $item->date)
+                                                    <i class="far fa-clock"></i> <span class="text-success"> Available now</span>
+                                                @else
+                                                    <i class="far fa-clock"></i> <span class="text-warning"> Available on {{ \Carbon\Carbon::parse($item->date)->format('D, d M') }}</span> 
+                                                @endif
+                                            </div>  
                                         </div>
                                     </div>
                                     <div class="doc-info-right">

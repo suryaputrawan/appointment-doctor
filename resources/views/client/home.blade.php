@@ -118,6 +118,17 @@
                                                 @endforeach
                                             </div>
                                         </div>
+                                        <li>
+                                            <?php
+                                            $item = $doctor->practiceSchedules->first();
+                                            ?>
+                                            @if (\Carbon\Carbon::now()->format('Y-m-d') == $item->date)
+                                                <i class="far fa-clock"></i> <span class="text-success"> Available now</span>
+                                                <i class="fas fa-check-circle verified"></i>
+                                            @else
+                                                <i class="far fa-clock"></i> <span class="text-warning"> Available on {{ \Carbon\Carbon::parse($item->date)->format('D, d M') }}</span> 
+                                            @endif
+                                        </li>
                                     </ul>
                                     <div class="row row-sm">
                                         <div class="col-6">

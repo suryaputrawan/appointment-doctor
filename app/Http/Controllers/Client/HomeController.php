@@ -19,6 +19,9 @@ class HomeController extends Controller
             },
             'doctorLocation'    => function ($query) {
                 $query->with('hospital');
+            },
+            'practiceSchedules' => function ($query) {
+                $query->select('id', 'doctor_id', 'hospital_id', 'date', 'start_time', 'end_time', 'booking_status');
             }
         ])
             ->where('isAktif', 1)

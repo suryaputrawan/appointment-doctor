@@ -70,6 +70,9 @@ class DoctorController extends Controller
             'doctorLocation'    => function ($query) {
                 $query->select('id', 'doctor_id', 'hospital_id')
                     ->with('hospital');
+            },
+            'practiceSchedules' => function ($query) {
+                $query->select('id', 'doctor_id', 'hospital_id', 'date', 'start_time', 'end_time', 'booking_status');
             }
         ])
             ->when($date, function ($query) use ($date) {
