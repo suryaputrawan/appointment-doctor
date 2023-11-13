@@ -10,8 +10,11 @@ use Illuminate\Http\Request;
 use App\Models\PracticeSchedule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Mail\BookingInfoDoctorMail;
+use App\Mail\BookingMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
@@ -193,7 +196,7 @@ class AppointmentController extends Controller
                 $time = PracticeSchedule::where('id', $request->booking_time)->first();
                 $bookingNumber = Appointment::whereDate('created_at', $dateNow)->get();
 
-                Appointment::create([
+                $appointment = Appointment::create([
                     'booking_number'    => Carbon::now()->format('Ymd') . $bookingNumber->count() + 1,
                     'date'              => $time->date,
                     'start_time'        => $time->start_time,
@@ -212,6 +215,14 @@ class AppointmentController extends Controller
                 $time->update([
                     'booking_status'    => 1,
                 ]);
+
+                $doctorMail = Doctor::where('id', $appointment->doctor_id)->first();
+                $hospitalMail = Hospital::where('id', $appointment->hospital_id)->first();
+
+                //--Send email
+                Mail::to($appointment->patient_email)->send(new BookingMail($appointment));
+                Mail::to($hospitalMail->email)->send(new BookingMail($appointment));
+                Mail::to($doctorMail->email)->send(new BookingInfoDoctorMail($appointment));
 
                 DB::commit();
                 if (isset($_POST['btnSimpan'])) {

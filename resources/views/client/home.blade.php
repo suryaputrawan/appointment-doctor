@@ -25,8 +25,6 @@
                             <option value="{{ $data->name }}">{{ $data->name }}</option>
                             @endforeach
                         </select>
-                        {{-- <input type="text" class="form-control" placeholder="Search Location"> --}}
-                        {{-- <span class="form-text">Select hospital or clinic</span> --}}
                     </div>
                     <div class="form-group search-info">
                         <select name="speciality[]" class="form-control select">
@@ -35,8 +33,6 @@
                             <option value="{{ $data->name }}">{{ $data->name }}</option>
                             @endforeach
                         </select>
-                        {{-- <input type="text" class="form-control" placeholder="Search Doctors, Clinics, Hospitals, Diseases Etc"> --}}
-                        {{-- <span class="form-text">Select Specialities</span> --}}
                     </div>
                     <button type="submit" class="btn btn-primary search-btn"><i class="fas fa-search"></i> <span>Search</span></button>
                 </form>
@@ -122,7 +118,9 @@
                                             <?php
                                             $item = $doctor->practiceSchedules->first();
                                             ?>
-                                            @if (\Carbon\Carbon::now()->format('Y-m-d') == $item->date)
+                                            @if ($item == null)
+                                                <i class="far fa-clock"></i> <span class="text-success"></span>
+                                            @elseif (\Carbon\Carbon::now()->format('Y-m-d') == $item->date)
                                                 <i class="far fa-clock"></i> <span class="text-success"> Available now</span>
                                                 <i class="fas fa-check-circle verified"></i>
                                             @else

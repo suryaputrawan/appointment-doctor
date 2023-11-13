@@ -207,7 +207,7 @@
                 data   : formData,
                 processData: false,
                 contentType: false,
-                success: function(response) {                   
+                success: function(response) {              
                     submitButton.prop('disabled',false);
                     submitButtonLoading.toggle();
 
@@ -232,6 +232,9 @@
                         });
                         $.each(response.errors.specialities, function(key, error) {
                             $('#error-specialities').append(error);
+                        });
+                        $.each(response.errors.email, function(key, error) {
+                            $('#error-email').append(error);
                         });
                         $.each(response.errors.about_me, function(key, error) {
                             $('#error-about').append(error);
@@ -303,6 +306,7 @@
                         $('#gender').val(response.data.gender).trigger('change');
                         $('#specialization').val(response.data.specialization);
                         $('#specialities').val(response.data.speciality_id).trigger('change');
+                        $('#email').val(response.data.email);
                         $('#about-me').val(response.data.about_me);
                         $('#status').val(response.data.isAktif).trigger('change');
                         $('#preview').eq(0).html('<img src="/storage/'+response.data.picture+'"height="150" alt="Preview Gambar">');

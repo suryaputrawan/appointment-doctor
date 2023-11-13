@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Client;
 
 use Carbon\Carbon;
 use App\Models\Doctor;
+use App\Models\Hospital;
+use App\Mail\BookingMail;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use App\Models\DoctorLocation;
 use App\Models\PracticeSchedule;
 use Illuminate\Support\Facades\DB;
+use App\Mail\BookingInfoDoctorMail;
 use App\Http\Controllers\Controller;
-use App\Models\Appointment;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 
 class AppointmentController extends Controller
@@ -62,6 +66,19 @@ class AppointmentController extends Controller
             $dateNow = Carbon::now()->format('Y-m-d');
 
             $time = PracticeSchedule::where('id', $request->booking_time)->first();
+
+            if ($time->booking_status == 1) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Time has been booked, please select another time or date");
+            }
+
+            $time->update([
+                'booking_status'    => 1,
+            ]);
+
             $bookingNumber = Appointment::whereDate('created_at', $dateNow)->get();
 
             $appointment = Appointment::create([
@@ -80,11 +97,16 @@ class AppointmentController extends Controller
                 'status'            => 'Booking',
             ]);
 
-            $time->update([
-                'booking_status'    => 1,
-            ]);
+            $doctorMail = Doctor::where('id', $appointment->doctor_id)->first();
+            $hospitalMail = Hospital::where('id', $appointment->hospital_id)->first();
+
+            //--Send email
+            Mail::to($appointment->patient_email)->send(new BookingMail($appointment));
+            Mail::to($hospitalMail->email)->send(new BookingMail($appointment));
+            Mail::to($doctorMail->email)->send(new BookingInfoDoctorMail($appointment));
 
             DB::commit();
+
             return redirect()->route('client.appointment.success', Crypt::encryptString($appointment->id));
         } catch (\Exception $e) {
             DB::rollBack();

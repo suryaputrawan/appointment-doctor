@@ -120,6 +120,7 @@ class DoctorController extends Controller
         if ($user->can('create doctors')) {
             $validator = Validator::make([
                 'name'                  => $request->name,
+                'email'                 => $request->email,
                 'gender'                => $request->gender,
                 'specialization'        => $request->specialization,
                 'specialities'          => $request->specialities,
@@ -127,6 +128,7 @@ class DoctorController extends Controller
                 'picture'               => $request->picture
             ], [
                 'name'                  => 'required|max:100|min:5|unique:doctors,name,NULL,id',
+                'email'                 => 'required|email|unique:doctors,email',
                 'gender'                => 'required',
                 'specialization'        => 'required|min:3',
                 'specialities'          => 'required',
@@ -145,6 +147,7 @@ class DoctorController extends Controller
                     Doctor::create([
                         'slug'                  => Str::slug($request->name),
                         'name'                  => $request->name,
+                        'email'                 => $request->email,
                         'gender'                => $request->gender,
                         'specialization'        => $request->specialization,
                         'speciality_id'         => $request->specialities,
@@ -224,6 +227,7 @@ class DoctorController extends Controller
 
             $validator = Validator::make([
                 'name'                  => $request->name,
+                'email'                 => $request->email,
                 'gender'                => $request->gender,
                 'specialization'        => $request->specialization,
                 'specialities'          => $request->specialities,
@@ -231,6 +235,7 @@ class DoctorController extends Controller
                 'picture'               => $request->picture
             ], [
                 'name'                  => 'required|max:100|min:5|unique:doctors,name,' . $data->id,
+                'email'                 => 'required|email|unique:doctors,email,' . $data->id,
                 'gender'                => 'required',
                 'specialization'        => 'required|min:3',
                 'specialities'          => 'required',
@@ -264,6 +269,7 @@ class DoctorController extends Controller
                         $data->update([
                             'slug'                  => Str::slug($request->name),
                             'name'                  => $request->name,
+                            'email'                 => $request->email,
                             'gender'                => $request->gender,
                             'specialization'        => $request->specialization,
                             'speciality_id'         => $request->specialities,

@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <div class="row form-row">
-                        <div class="col-12 col-sm-12">
+                        <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label>Specialities <span class="text-danger">*</span></label>
                                 <select name="specialities" id="specialities" class="form-control select">
@@ -50,6 +50,14 @@
                                     @endforeach
                                 </select>
                                 <p id="error-specialities" style="color: red" class="error"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label>Email <span class="text-danger">*</span></label>
+                                <input name="email" id="email" type="email" class="form-control" value="{{ old('email') }}">
+                                <p id="error-email" style="color: red" class="error"></p>
                             </div>
                         </div>
                     </div>
