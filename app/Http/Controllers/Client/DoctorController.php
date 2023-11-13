@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Client;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use App\Models\Doctor;
-use App\Models\DoctorEducation;
-use App\Models\DoctorLocation;
 use App\Models\Hospital;
 use App\Models\Speciality;
+use Illuminate\Http\Request;
+use App\Models\DoctorLocation;
+use App\Models\DoctorEducation;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 
 class DoctorController extends Controller
@@ -72,7 +73,8 @@ class DoctorController extends Controller
                     ->with('hospital');
             },
             'practiceSchedules' => function ($query) {
-                $query->select('id', 'doctor_id', 'hospital_id', 'date', 'start_time', 'end_time', 'booking_status');
+                $query->where('date', '>=', Carbon::now()->format('Y-m-d'))
+                    ->select('id', 'doctor_id', 'hospital_id', 'date', 'start_time', 'end_time', 'booking_status');
             }
         ])
             ->when($date, function ($query) use ($date) {

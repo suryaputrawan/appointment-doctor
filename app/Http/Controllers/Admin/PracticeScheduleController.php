@@ -53,6 +53,12 @@ class PracticeScheduleController extends Controller
                         $query->select('id', 'name');
                     }
                 ])
+                    ->when(request('date') != null && request('date') != 'NaN', function ($query) {
+                        return $query->where('date', '=', request('date'));
+                    })
+                    ->when(request('doctor_id') != null && request('doctor_id') != 'NaN', function ($query) {
+                        return $query->where('doctor_id', '=', request('doctor_id'));
+                    })
                     ->where('hospital_id', $user->hospital_id)
                     ->orderBy('date', 'desc')
                     ->orderBy('doctor_id', 'asc')
@@ -66,6 +72,12 @@ class PracticeScheduleController extends Controller
                         $query->select('id', 'name');
                     }
                 ])
+                    ->when(request('date') != null && request('date') != 'NaN', function ($query) {
+                        return $query->where('date', '=', request('date'));
+                    })
+                    ->when(request('doctor_id') != null && request('doctor_id') != 'NaN', function ($query) {
+                        return $query->where('doctor_id', '=', request('doctor_id'));
+                    })
                     ->orderBy('date', 'desc')
                     ->orderBy('doctor_id', 'asc')
                     ->orderBy('start_time', 'asc')->get();

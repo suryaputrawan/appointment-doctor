@@ -31,19 +31,7 @@
                 <div class="card">
                     <div class="card-header">
                         <form>
-                            <div class="row">
-                                {{-- <div class="col-12 col-md-3">
-                                    <div class="mb-3">
-                                        <label class="form-label">Date</label>
-                                        <select name="status_filter" id="status-filter" class="js-example-basic-single form-control" data-width="100%" data-toggle="select2">
-                                            <option selected disabled>All Status</option>
-                                            @foreach ($status as $data)
-                                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div> --}}
-            
+                            <div class="row">            
                                 <div class="col-12 col-md-3">
                                     <div class="mb-3">
                                         <label class="form-label">Date</label>

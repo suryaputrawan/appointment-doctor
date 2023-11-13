@@ -7,6 +7,7 @@ use App\Models\Doctor;
 use App\Models\Hospital;
 use App\Models\Service;
 use App\Models\Speciality;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -21,7 +22,8 @@ class HomeController extends Controller
                 $query->with('hospital');
             },
             'practiceSchedules' => function ($query) {
-                $query->select('id', 'doctor_id', 'hospital_id', 'date', 'start_time', 'end_time', 'booking_status');
+                $query->where('date', '>=', Carbon::now()->format('Y-m-d'))
+                    ->select('id', 'doctor_id', 'hospital_id', 'date', 'start_time', 'end_time', 'booking_status');
             }
         ])
             ->where('isAktif', 1)

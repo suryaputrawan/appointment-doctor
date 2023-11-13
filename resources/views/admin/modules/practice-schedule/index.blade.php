@@ -29,7 +29,51 @@
         <div class="row">
             <div class="col-sm-12 mt-3">
                 <div class="card">
+                    <div class="card-header text-right">
+                        <button class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                            <i class="fe fe-filter"> Filter Data</i>
+                        </button>
+                    </div>
+
                     <div class="card-body">
+                        <div class="collapse mb-2" id="collapseExample">
+                            <form>
+                                <div class="row">            
+                                    <div class="col-12 col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Date</label>
+                                            <input name="date_filter" id="date-filter" type="date" class="form-control @error('date') is-invalid @enderror" value="{{ old('date') }}">
+                                            @error('date')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                
+                                    <div class="col-12 col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Doctor</label>
+                                            <select name="doctor_filter" id="doctor-filter" class="form-control select" data-width="100%">
+                                                <option selected disabled>All Doctor</option>
+                                                @foreach ($doctor as $data)
+                                                <option value="{{ $data->id }}">{{ $data->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                
+                                    <div class="col-12 col-md-2 mb-3" style="display: flex; gap: 8px">
+                                        <button type="button" id="btn-filter" class="btn btn-primary" style="align-self: flex-end">
+                                            Filter
+                                        </button>
+                                        <button type="button" id="btn-reset" class="btn btn-secondary" style="align-self: flex-end">
+                                            Reset
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <hr>
+                        </div>
+
                         <div class="table">
                             <table id="datatable" class="datatable table table-stripped" width="100%" cellspacing="0">
                                 <thead>
@@ -75,7 +119,14 @@
 
         //datatable initialization
         let dataTable = $("#datatable").DataTable({
-            ajax: "{{ route('admin.practice-schedules.index') }}?type=datatable",
+            ajax: {
+                url: "{{ route('admin.practice-schedules.index') }}?type=datatable",
+                data: function(d) {
+                    d.date = $('input[name=date_filter]').val();
+                    d.doctor_id = Number($('select[name=doctor_filter] option:selected').val());
+                }
+            },
+            // ajax: "{{ route('admin.practice-schedules.index') }}?type=datatable",
             processing: true,
             serverSide : true,
             responsive: true,
@@ -306,6 +357,18 @@
             });
         }
         @endif
+
+        //Filter Data
+        $('#btn-filter').on('click', function() {
+            dataTable.ajax.reload();
+        })
+
+        //Reset Data
+        $('#btn-reset').on('click', function() {
+            $('#date-filter').val('').change();
+            $("#doctor-filter").prop('selectedIndex', 0).change();
+            dataTable.ajax.reload();
+        });
     });
 </script>
 @endpush
