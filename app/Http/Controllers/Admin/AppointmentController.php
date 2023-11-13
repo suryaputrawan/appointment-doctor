@@ -25,33 +25,57 @@ class AppointmentController extends Controller
     {
         $user = auth()->user();
 
+        if (!$user->hasRole('Super Admin|Admin')) {
+            $data = Appointment::with([
+                'doctor'    =>  function ($query) {
+                    $query->select('id', 'name');
+                },
+                'hospital'  => function ($query) {
+                    $query->select('id', 'name');
+                }
+            ])
+                ->when(request('date') != null && request('date') != 'NaN', function ($query) {
+                    return $query->where('date', '=', request('date'));
+                })
+                ->when(request('doctor_id') != null && request('doctor_id') != 'NaN', function ($query) {
+                    return $query->where('doctor_id', '=', request('doctor_id'));
+                })
+                ->where('hospital_id', $user->hospital_id)
+                ->orderBy('booking_number', 'desc')
+                ->get();
+
+            $doctor = Doctor::with([
+                'doctorLocation'    => function ($query) {
+                    $query->select('id', 'doctor_id', 'hospital_id');
+                }
+            ])
+                ->whereHas('doctorLocation', function ($query) use ($user) {
+                    $query->where('hospital_id', $user->hospital_id);
+                })
+                ->where('isAktif', 1)->orderBy('name', 'asc')
+                ->get(['id', 'name']);
+        } else {
+            $data = Appointment::with([
+                'doctor'    =>  function ($query) {
+                    $query->select('id', 'name');
+                },
+                'hospital'  => function ($query) {
+                    $query->select('id', 'name');
+                }
+            ])
+                ->when(request('date') != null && request('date') != 'NaN', function ($query) {
+                    return $query->where('date', '=', request('date'));
+                })
+                ->when(request('doctor_id') != null && request('doctor_id') != 'NaN', function ($query) {
+                    return $query->where('doctor_id', '=', request('doctor_id'));
+                })
+                ->orderBy('booking_number', 'desc')
+                ->get();
+
+            $doctor = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']);
+        }
+
         if (request()->type == 'datatable') {
-
-            if (!$user->hasRole('Super Admin|Admin')) {
-                $data = Appointment::with([
-                    'doctor'    =>  function ($query) {
-                        $query->select('id', 'name');
-                    },
-                    'hospital'  => function ($query) {
-                        $query->select('id', 'name');
-                    }
-                ])
-                    ->where('hospital_id', $user->hospital_id)
-                    ->orderBy('booking_number', 'desc')
-                    ->get();
-            } else {
-
-                $data = Appointment::with([
-                    'doctor'    =>  function ($query) {
-                        $query->select('id', 'name');
-                    },
-                    'hospital'  => function ($query) {
-                        $query->select('id', 'name');
-                    }
-                ])
-                    ->orderBy('booking_number', 'desc')
-                    ->get();
-            }
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) use ($user) {
@@ -131,6 +155,7 @@ class AppointmentController extends Controller
         return view('admin.modules.appointment.index', [
             'pageTitle'     => 'List of Appointment',
             'breadcrumb'    => 'Appointment',
+            'doctor'        =>  $doctor
         ]);
     }
 
