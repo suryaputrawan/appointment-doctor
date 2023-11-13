@@ -5,17 +5,6 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/plugins/datatables/datatables.min.css') }}">
     <!-- Select2 CSS -->
     <link rel="stylesheet" href="{{ asset('assets/admin/css/select2.min.css') }}">
-
-    <style>
-        .group {
-            display: flex;
-            align-items: center;
-        }
-    
-        .group label {
-            margin-left: 10px;
-        }
-    </style>
 @endpush
 
 @section('content')

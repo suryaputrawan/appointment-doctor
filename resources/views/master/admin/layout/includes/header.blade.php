@@ -40,7 +40,7 @@
                         <p class="text-muted mb-0">{{ auth()->user()->email }}</p>
                     </div>
                 </div>
-                <a class="dropdown-item" href="profile.html">My Profile</a>
+                <a class="dropdown-item" href="{{ route('admin.profile.edit') }}">My Profile</a>
                 {{-- <a class="dropdown-item" href="settings.html">Settings</a> --}}
                 <a class="dropdown-item" href="{{ route('logout') }}">Logout</a>
             </div>

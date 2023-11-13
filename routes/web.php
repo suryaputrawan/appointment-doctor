@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\DoctorController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\HospitalController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -14,8 +15,8 @@ use App\Http\Controllers\Permissions\AssignController;
 use App\Http\Controllers\Admin\DoctorLocationController;
 use App\Http\Controllers\Admin\DoctorEducationController;
 use App\Http\Controllers\Admin\PracticeScheduleController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Permissions\PermissionController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 Route::name('client.')->group(function () {
     include 'client.php';
@@ -86,5 +87,12 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
             });
         });
         // end route role permission
+
+        //Profile Route
+        Route::group(['prefix' => 'profile'], function () {
+            Route::get('user', [ProfileController::class, 'edit'])->name('profile.edit');
+            Route::put('user/{user}', [ProfileController::class, 'update'])->name('profile.update');
+            Route::put('user/password/update', [ProfileController::class, 'updatePassword'])->name('password.update');
+        });
     });
 });

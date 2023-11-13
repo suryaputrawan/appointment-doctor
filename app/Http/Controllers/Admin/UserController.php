@@ -114,7 +114,7 @@ class UserController extends Controller
                             'username'              => strtolower($request->username),
                             'email'                 => $request->email,
                             'hospital_id'           => $request->hospital,
-                            'password'              => Hash::make($request->username),
+                            'password'              => Hash::make('@12345678'),
                             'isAktif'               => $request->status
                         ]);
                     }

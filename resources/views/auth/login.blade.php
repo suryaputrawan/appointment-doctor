@@ -60,7 +60,11 @@
 											<div class="text-right">
 												<a class="forgot-link" href="#">Forgot Password ?</a>
 											</div>
-											<button class="btn btn-primary btn-block btn-lg login-btn" type="submit">Login</button>
+                                            <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="btnLogin">Login</button>
+                                            <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="btnLogin-loading" style="display: none">
+                                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                                <span>Login</span>
+                                            </button>
 										</form>
 									</div>
 								</div>
@@ -81,11 +85,53 @@
 		<!-- Bootstrap Core JS -->
 		<script src="{{ asset('assets/client/js/popper.min.js') }}"></script>
 		<script src="{{ asset('assets/client/js/bootstrap.min.js') }}"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		
 		<!-- Custom JS -->
 		<script src="{{ asset('assets/client/js/script.js') }}"></script>
+
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+                //Toast for session success
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+        
+                @if (session('success')) {
+                    Toast.fire({
+                        icon: 'success',
+                        title: "{{ session('success') }}",
+                    });
+                }
+                @endif
+
+                @if (session('error')) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "{{ session('error') }}",
+                    });
+                }
+                @endif
+
+                //environment button
+                $('#btnLogin').on('click', function () {
+                    $('#btnLogin-loading').toggle();
+                    $('#btnLogin-loading').prop('disabled',true);
+                    $('#btnLogin').toggle();
+                });
+            });
+        </script>
 		
 	</body>
 
-<!-- doccure/login.html  30 Nov 2019 04:12:20 GMT -->
 </html>
