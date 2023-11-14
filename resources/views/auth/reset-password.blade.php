@@ -105,18 +105,13 @@
                     }
                 });
         
-                @if (session('success')) {
-                    Toast.fire({
-                        icon: 'success',
-                        title: "{{ session('success') }}",
-                    });
-                }
-                @endif
-
                 @if (session('error')) {
-                    Toast.fire({
-                        icon: 'error',
-                        title: "{{ session('error') }}",
+                    Swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: "{{ session('error') }}",
+                    showConfirmButton: true,
                     });
                 }
                 @endif

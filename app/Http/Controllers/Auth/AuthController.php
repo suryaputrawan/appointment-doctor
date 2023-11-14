@@ -73,14 +73,14 @@ class AuthController extends Controller
 
                 $user->update([
                     'password'              => Hash::make($password),
-                    'password_change_at'    => null,
+                    // 'password_change_at'    => null,
                 ]);
 
                 DB::commit();
 
                 Mail::to($user->email)->send(new ResetPasswordMail($password));
 
-                return back()->with('success', 'Email has been send to [' . $request->email . ']. Please check for an email from ADOS to view your new password.');
+                return redirect()->route('login')->with('success', 'Email has been send to [' . $request->email . ']. Please check for an email from ADOS to view your new password.');
             } catch (Throwable $e) {
                 DB::rollBack();
                 return redirect()
@@ -96,6 +96,6 @@ class AuthController extends Controller
             }
         }
 
-        return redirect()->route('login')->with('error', 'Email address [' . $request->email . '] does not exist in the system !');
+        return back()->with('error', 'Email address [' . $request->email . '] does not exist in the system !');
     }
 }

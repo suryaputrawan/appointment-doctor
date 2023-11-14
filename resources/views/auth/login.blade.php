@@ -93,36 +93,29 @@
 
         <script type="text/javascript">
 
-            $(document).ready(function() {
-                //Toast for session success
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
+            @if (session('error')) {
+                Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Oops...',
+                text: "{{ session('error') }}",
+                showConfirmButton: true,
                 });
-        
-                @if (session('success')) {
-                    Toast.fire({
-                        icon: 'success',
-                        title: "{{ session('success') }}",
-                    });
-                }
-                @endif
+            }
+            @endif
 
-                @if (session('error')) {
-                    Toast.fire({
-                        icon: 'error',
-                        title: "{{ session('error') }}",
-                    });
-                }
-                @endif
+            @if (session('success')) {
+                Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Success',
+                text: "{{ session('success') }}",
+                showConfirmButton: true,
+                });
+            }
+            @endif
 
+            $(document).ready(function () {
                 //environment button
                 $('#btnLogin').on('click', function () {
                     $('#btnLogin-loading').toggle();
