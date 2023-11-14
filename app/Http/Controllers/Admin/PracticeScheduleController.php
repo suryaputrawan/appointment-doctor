@@ -96,11 +96,13 @@ class PracticeScheduleController extends Controller
 
                     $action = "";
 
-                    if ($user->can('update doctor schedules')) {
-                        $action .= '
+                    if ($data->date >= Carbon::now()->format('Y-m-d')) {
+                        if ($user->can('update doctor schedules')) {
+                            $action .= '
                             <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
                                 <i class="fe fe-pencil"></i>
                             </a> ';
+                        }
                     }
 
                     if ($user->can('delete doctor schedules')) {
