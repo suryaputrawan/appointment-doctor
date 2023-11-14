@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('slug');
             $table->string('name');
+            $table->string('email')->unique();
             $table->char('gender');
             $table->string('specialization');
             $table->foreignId('speciality_id')->constrained('specialities')->cascadeOnDelete();

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('doctors', function (Blueprint $table) {
-            $table->string('email')->after('name')->unique();
+        Schema::table('users', function (Blueprint $table) {
+            $table->timestamp('password_change_at')->nullable();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('doctors', function (Blueprint $table) {
-            $table->dropColumn('email');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('password_change_at');
         });
     }
 };

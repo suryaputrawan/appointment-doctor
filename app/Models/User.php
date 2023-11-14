@@ -26,7 +26,8 @@ class User extends Authenticatable
         'email',
         'password',
         'hospital_id',
-        'isAktif'
+        'isAktif',
+        'password_change_at'
     ];
 
     /**
