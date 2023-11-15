@@ -152,7 +152,7 @@
 <section class="section section-features">
     <div class="container-fluid">
         <div class="section-header text-center">	
-            <h2 class="mt-2">Availabe Services in Our Hospital or Clinic</h2>
+            <h2 class="mt-2">Available Services in Our Clinic</h2>
             {{-- <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. </p> --}}
         </div>	
         <div class="row justify-content-center">

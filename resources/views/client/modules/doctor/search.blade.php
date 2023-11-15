@@ -52,7 +52,9 @@
                                 @endif
                                 >
                             </div>
-                            <div class="filter-widget">
+
+                            {{-- Gender --}}
+                            {{-- <div class="filter-widget">
                                 <h4>Gender</h4>
                                 <div>
                                     <label class="custom_check">
@@ -74,7 +76,10 @@
                                         <span class="checkmark"></span> Female Doctor
                                     </label>
                                 </div>
-                            </div>
+                            </div> --}}
+                            {{-- End Gender --}}
+
+                            {{-- Speciality --}}
                             <div class="filter-widget">
                                 <h4>Select Specialist</h4>
                                 @foreach ($speciality as $item)
@@ -90,8 +95,11 @@
                                     </div>
                                 @endforeach
                             </div>
+                            {{-- End Speciality --}}
+
+                            {{-- Hospital / Clinic --}}
                             <div class="filter-widget">
-                                <h4>Select Hospital / Clinic</h4>
+                                <h4>Select Clinic</h4>
                                 @foreach ($hospital as $item)
                                     <div>
                                         <label class="custom_check">
@@ -105,6 +113,8 @@
                                     </div>
                                 @endforeach
                             </div>
+                            {{-- End Hospital / Clinic --}}
+                            
                             <div class="btn-search">
                                 <button type="submit" class="btn btn-block">Search</button>
                             </div>
