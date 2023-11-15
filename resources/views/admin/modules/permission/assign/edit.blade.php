@@ -69,6 +69,13 @@
                                         <?php $lastGroup = ''; ?>
                                         <table class="table table-stripped" width="100%" cellspacing="0">
                                             <tbody>
+                                                <tr>
+                                                    <td><h6 class="text-danger">Super Admin Permissions</h6></td>
+                                                    <td>
+                                                        <input type="checkbox" id="checkAll">
+                                                        <label for="super admin permissions">All Permissions</label><br>
+                                                    </td>
+                                                </tr>
                                                 @foreach ($permissions as $permission)
                                                     <?php $words = explode(" ", $permission->name); ?>
                                                     <?php $group = implode(' ', array_slice($words, 1));; ?>
@@ -77,12 +84,12 @@
                                                             </tr>
                                                         @endif
                                                         <tr>
-                                                            <td><h6 style="color: blue">{{ $group }}</h6></td>
+                                                            <td><h6 style="text-transform:capitalize">{{ $group }}</h6></td>
                                                         <?php $lastGroup = $group; ?>
                                                     @endif
                                                     <td>
                                                         <input type="checkbox" name="permissions[]" value="{{ $permission->name }}" {{ $data->permissions()->find($permission->id) ? "checked" : "" }}>
-                                                        <label for="{{ $permission->name }}">{{ array_shift($words) }}</label><br>
+                                                        <label for="{{ $permission->name }}" style="text-transform: capitalize">{{ array_shift($words) }}</label><br>
                                                     </td>
                                                 @endforeach
                                             </tbody> 
@@ -149,6 +156,10 @@
             $('#btnSave-loading').prop('disabled',true);
             $('#btnSave').toggle();
             $('#btnCancel').toggle();
+        });
+
+        $("#checkAll").click(function(){
+            $('input:checkbox').not(this).prop('checked', this.checked);
         });
     });
 </script>
