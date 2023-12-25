@@ -135,7 +135,7 @@ class AppointmentController extends Controller
                 ->where('doctor_id', $id_doctor)
                 ->get();
 
-            $option = "<option>Select Hospital</option>";
+            $option = "<option selected disabled>Select Clinic</option>";
 
             foreach ($data as $item) {
                 $selectedState = '';
@@ -180,7 +180,7 @@ class AppointmentController extends Controller
                 ->where('date', '>=', $dateNow)
                 ->get()->groupBy('date');
 
-            $option = "<option>Select Date</option>";
+            $option = "<option selected disabled>Select Date</option>";
 
             foreach ($data as $index => $item) {
                 $selectedState = '';
@@ -228,7 +228,7 @@ class AppointmentController extends Controller
 
             $hospital = Hospital::where('id', $id_hospital)->first();
 
-            $option = "<option>Select Time</option>";
+            $option = "<option selected disabled>Select Time</option>";
 
             foreach ($data as $item) {
                 $selectedState = '';

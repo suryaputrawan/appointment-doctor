@@ -159,6 +159,8 @@ class PracticeScheduleController extends Controller
     {
         $user = auth()->user();
 
+        $slotDuration = ['15', '30', '45', '60'];
+
         if (!$user->hasRole('Super Admin|Admin')) {
             $hospital = Hospital::orderBy('name', 'asc')->where('id', $user->hospital_id)
                 ->get(['id', 'name']);
@@ -184,7 +186,8 @@ class PracticeScheduleController extends Controller
                 'breadcrumb'    => 'Create Practice Schedule',
                 'btnSubmit'     => 'Save',
                 'doctor'        => $doctor,
-                'hospital'      => $hospital
+                'hospital'      => $hospital,
+                'slotDuration'  => $slotDuration
             ]);
         } else {
             abort(403);
@@ -206,13 +209,27 @@ class PracticeScheduleController extends Controller
                 if ($request->date && $request->start_time && $request->end_time) {
                     for ($i = 0; $i < count($request->date); $i++) {
                         if ($request->date[$i]) {
-                            PracticeSchedule::firstOrCreate([
-                                'doctor_id'             => $request->doctor,
-                                'hospital_id'           => $request->hospital,
-                                'date'                  => $request->date[$i],
-                                'start_time'            => $request->start_time[$i],
-                                'end_time'              => $request->end_time[$i],
-                            ]);
+                            $waktuAwal = Carbon::parse($request->start_time[$i]);
+                            $waktuAkhir = Carbon::parse($request->end_time[$i]);
+                            $hasilWaktuAwal = [];
+
+                            while ($waktuAwal < $waktuAkhir) {
+                                $hasilWaktuAwal[] = $waktuAwal->copy();
+                                $waktuAwal->addMinutes($request->duration[$i]);
+                            }
+
+                            foreach ($hasilWaktuAwal as $waktuAwal) {
+                                $waktuAkhir = $waktuAwal->copy();
+                                $waktuAkhir->addMinutes($request->duration[$i]);
+
+                                PracticeSchedule::firstOrCreate([
+                                    'doctor_id'   => $request->doctor,
+                                    'hospital_id' => $request->hospital,
+                                    'date'        => $request->date[$i],
+                                    'start_time'  => $waktuAwal->toTimeString(),
+                                    'end_time'    => $waktuAkhir->toTimeString(),
+                                ]);
+                            }
                         }
                     }
                 }

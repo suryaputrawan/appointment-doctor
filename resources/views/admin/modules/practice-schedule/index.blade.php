@@ -85,7 +85,7 @@
                                         <th>Date</th>
                                         <th>Doctor Name</th>
                                         <th>Time</th>
-                                        <th>Hospital / Clinic</th>
+                                        <th>Clinic</th>
                                         <th>Booking Status</th>
                                     </tr>
                                 </thead>

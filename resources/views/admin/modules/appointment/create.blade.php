@@ -167,7 +167,7 @@
                             </div>
 
                             <div class="text-right">
-                                <button name="btnCreateSimpan" class="btn btn-warning" type="submit" id="btnCreateSave">Simpan dan Tambah</button>
+                                <button name="btnCreateSimpan" class="btn btn-warning" type="submit" id="btnCreateSave">Save & Create</button>
                                 <button class="btn btn-warning" type="submit" id="btnCreateSave-loading" style="display: none">
                                     <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                                     <span>Save & Create</span>
