@@ -42,7 +42,7 @@
                                         <th>Doctor Name</th>
                                         <th>Specialization</th>
                                         <th>Speciality</th>
-                                        <th>RS / Clinic</th>
+                                        <th>Clinic</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>

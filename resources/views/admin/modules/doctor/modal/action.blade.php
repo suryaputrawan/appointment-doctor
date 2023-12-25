@@ -95,7 +95,7 @@
                             <span id="submit-loading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" style="display: none;"></span>
                             <span id="btn-submit-text">Save</span>
                         </button>
-                        <button class="btn btn-danger btn-cancel" type="button">Batal</button>
+                        <button class="btn btn-danger btn-cancel" type="button">Cancel</button>
                     </div>
                 </form>
             </div>

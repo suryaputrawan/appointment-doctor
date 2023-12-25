@@ -35,7 +35,8 @@
                             <p>Booking Number : <strong>{{ $data->booking_number }}</strong></p>
                             <p>Appointment booked with <strong>{{ $data->doctor->name }}</strong><br> on <strong>{{ \Carbon\Carbon::parse($data->date)->format('d M Y') }} 
                                 {{ \Carbon\Carbon::parse($data->start_time)->format('H:i') }} to {{ \Carbon\Carbon::parse($data->end_time)->format('H:i') }} Wita</strong> at 
-                            <strong>{{ $data->hospital->name }}</strong></p>
+                            <strong>{{ $data->hospital->name }}</strong></p><br>
+                            <p style="font-weight:bold; font-style:italic">* Please arrive 15 minutes before your appointment time</p>
                             <a href="{{ route('client.home') }}" class="btn btn-primary view-inv-btn">Home</a>
                         </div>
                     </div>

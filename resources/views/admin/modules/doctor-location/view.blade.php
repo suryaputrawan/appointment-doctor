@@ -50,7 +50,7 @@
 
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
-                                    <label> Hospital / Clinic Name <span class="text-danger">*</span></label>
+                                    <label>Clinic Name <span class="text-danger">*</span></label>
                                     <select name="hospital" class="select @error('hospital') is-invalid @enderror" disabled>
                                         <option selected disabled>-- Please Selected --</option>
                                         @foreach ($hospitals as $hospital)

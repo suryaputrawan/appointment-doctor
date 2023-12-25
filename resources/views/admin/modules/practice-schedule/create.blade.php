@@ -3,8 +3,7 @@
 @push('plugin-style')
     <!-- Datatables CSS -->
     <link rel="stylesheet" href="{{ asset('assets/admin/plugins/datatables/datatables.min.css') }}">
-    <!-- Select2 CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/select2.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 @endpush
 
 @section('content')
@@ -59,8 +58,8 @@
                                 </div>
 
                                 <div class="col-12 col-sm-6">
-                                    <div class="form-group">
-                                        <label> Hospital / Clinic Name <span class="text-danger">*</span></label>
+                                    <div class="mb-3">
+                                        <label>Clinic Name <span class="text-danger">*</span></label>
                                         <select name="hospital" class="select @error('hospital') is-invalid @enderror">
                                             <option selected disabled>-- Please Selected --</option>
                                             @foreach ($hospital as $data)
@@ -147,10 +146,10 @@
                             </div>
 
                             <div class="text-right">
-                                <button name="btnCreateSimpan" class="btn btn-warning" type="submit" id="btnCreateSave">Simpan dan Tambah</button>
+                                <button name="btnCreateSimpan" class="btn btn-warning" type="submit" id="btnCreateSave">Save & Create</button>
                                 <button class="btn btn-warning" type="submit" id="btnCreateSave-loading" style="display: none">
                                     <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                    <span>Simpan dan Tambah</span>
+                                    <span>Save & Create</span>
                                 </button>
 
                                 <button name="btnSimpan" class="btn btn-primary" type="submit" id="btnSave">{{ $btnSubmit }}</button>
@@ -172,7 +171,7 @@
     <!-- Datatables JS -->
     <script src="{{ asset('assets/admin/plugins/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/admin/plugins/datatables/datatables.min.js') }}"></script>
-    <script src="{{ asset('assets/admin/js/select2.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 

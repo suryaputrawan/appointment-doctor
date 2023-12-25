@@ -1,7 +1,7 @@
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
     <head>
-        <title>Success Appointment</title>
+        <title>Patient Appointment</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -53,7 +53,7 @@
                                                                             <tr>
                                                                                 <td style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif;width: 160px;" width="160"> 
                                                                                     <a href="{{ route('client.home') }}" target="_blank" style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif;"> 
-                                                                                        <img src="{{ asset('assets/client/img/logo.png') }}" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" alt="Helpdesk" height="auto" width="160"> 
+                                                                                        <img src="{{ asset('assets/client/img/logo.png') }}" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" alt="ADOS" height="auto" width="160"> 
                                                                                     </a> 
                                                                                 </td>
                                                                             </tr>
@@ -83,7 +83,7 @@
                                                                             <tr>
                                                                                 <td align="left" style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif; font-size: 0px; padding: 0; word-break: break-word;">
                                                                                     <div style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif; font-size: 22px; font-weight: bold; line-height: 30px; text-align: left; color: #4F4F4F;">
-                                                                                        Patient has been success booked to you..
+                                                                                        Patient has been successfully book the appointment with you.
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>
@@ -94,6 +94,7 @@
                                                                                         <strong>Time :</strong> {{ \Carbon\Carbon::parse($appointment->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($appointment->end_time)->format('H:i') }} Wita <br>
                                                                                         <strong>Hospital / Clinic :</strong> {{ $appointment->hospital->name }} <br>
                                                                                         <strong>Patient Name :</strong> {{ $appointment->patient_name }} <br>
+                                                                                        <strong>Patient DOB :</strong> {{ \Carbon\Carbon::parse($appointment->patient_dob)->format('d M Y') }} <br>
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>

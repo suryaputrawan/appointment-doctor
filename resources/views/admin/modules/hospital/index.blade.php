@@ -38,7 +38,7 @@
                                         @canany(['update hospitals', 'delete hospitals'])
                                             <th style="width: 100px">ACTION</th>
                                         @endcanany
-                                        <th>Hospital Name</th>
+                                        <th>Name</th>
                                         <th>Address</th>
                                         <th>Email</th>
                                     </tr>

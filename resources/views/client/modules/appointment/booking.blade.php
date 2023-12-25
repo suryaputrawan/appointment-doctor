@@ -94,7 +94,7 @@
                                             <div class="form-group">
                                                 <label>Sex <span class="text-danger">*</span></label>
                                                 <select name="sex" id="sex" class="select @error('sex') is-invalid @enderror">
-                                                    <option selected disabled>Select Sex</option>
+                                                    <option selected disabled>Select</option>
                                                     <option value="M"
                                                         {{ old('sex') == "M" ? 'selected' : null }}>Male
                                                     </option>
@@ -149,9 +149,9 @@
                                     <div class="row">
                                         <div class="col-md-6 col-sm-12">
                                             <div class="form-group card-label">
-                                                <label>Hospital <span class="text-danger">*</span></label>
+                                                <label>Clinic <span class="text-danger">*</span></label>
                                                 <select name="hospital" id="hospital" class="select @error('hospital') is-invalid @enderror">
-                                                    <option selected disabled>Select Hospital</option>
+                                                    <option selected disabled>Select</option>
                                                     @foreach ($hospitals as $item)
                                                     <option value="{{ $item->hospital_id }}"
                                                         {{ old('hospital') == $item->hospital_id ? 'selected' : null }}>{{ $item->hospital->name }}

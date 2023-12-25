@@ -32,7 +32,7 @@ class AppointmentController extends Controller
 
             return view('client.modules.appointment.booking', [
                 'breadcrumb'    => 'Booking',
-                'btnSubmit'     => 'Make Appointment',
+                'btnSubmit'     => 'Book an Appointment',
                 'data'          => $data,
                 'hospitals'     => DoctorLocation::with([
                     'hospital'  => function ($query) {
@@ -60,12 +60,13 @@ class AppointmentController extends Controller
             'hospital'      => 'required',
         ]);
 
+        $dateNow = Carbon::now()->format('Y-m-d');
+        $time = PracticeSchedule::where('id', $request->booking_time)->first();
+        $bookingNumber = Appointment::whereDate('created_at', $dateNow)->get();
+
         DB::beginTransaction();
 
         try {
-            $dateNow = Carbon::now()->format('Y-m-d');
-
-            $time = PracticeSchedule::where('id', $request->booking_time)->first();
 
             if ($time->booking_status == 1) {
                 DB::rollBack();
@@ -78,8 +79,6 @@ class AppointmentController extends Controller
             $time->update([
                 'booking_status'    => 1,
             ]);
-
-            $bookingNumber = Appointment::whereDate('created_at', $dateNow)->get();
 
             $appointment = Appointment::create([
                 'booking_number'    => Carbon::now()->format('Ymd') . $bookingNumber->count() + 1,
@@ -227,6 +226,8 @@ class AppointmentController extends Controller
                 ->orderBy('start_time', 'asc')
                 ->get();
 
+            $hospital = Hospital::where('id', $id_hospital)->first();
+
             $option = "<option>Select Time</option>";
 
             foreach ($data as $item) {
@@ -249,7 +250,7 @@ class AppointmentController extends Controller
             } elseif ($data->count() == 0) {
                 return response()->json([
                     'status' => 201,
-                    'message' => 'No Available time slot / Tidak ada waktu kosong untuk tanggal tersebut',
+                    'message' => 'Fully booked, please whatsapp admin on ' . $hospital->whatsapp . ' to book the appointment',
                 ]);
             } else {
                 return response()->json([

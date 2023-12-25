@@ -26,7 +26,7 @@
                                     <td><h6 id="time-view"></h6></td>
                                 </tr>
                                 <tr>
-                                    <td>Hospital</td>
+                                    <td>Clinic</td>
                                     <td class="px-2">:</td>
                                     <td><h6 id="hospital-view"></h6></td>
                                 </tr>

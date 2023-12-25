@@ -61,7 +61,7 @@
 
                                 <div class="col-12 col-sm-6">
                                     <div class="form-group">
-                                        <label> Hospital / Clinic Name <span class="text-danger">*</span></label>
+                                        <label> Clinic Name <span class="text-danger">*</span></label>
                                         <select name="hospital" class="select @error('hospital') is-invalid @enderror">
                                             <option selected disabled>-- Please Selected --</option>
                                             @foreach ($hospital as $data)
@@ -148,10 +148,10 @@
                             </div>
 
                             <div class="text-right">
-                                <button name="btnCreateSimpan" class="btn btn-warning" type="submit" id="btnCreateSave">Simpan dan Tambah</button>
+                                <button name="btnCreateSimpan" class="btn btn-warning" type="submit" id="btnCreateSave">Save & Create</button>
                                 <button class="btn btn-warning" type="submit" id="btnCreateSave-loading" style="display: none">
                                     <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                    <span>Simpan dan Tambah</span>
+                                    <span>Save & Create</span>
                                 </button>
 
                                 <button name="btnSimpan" class="btn btn-primary" type="submit" id="btnSave">{{ $btnSubmit }}</button>

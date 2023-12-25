@@ -11,7 +11,7 @@
                     <div class="row form-row">
                         <div class="col-12 col-sm-12">
                             <div class="form-group">
-                                <label>RS / Clinic Name <span class="text-danger">*</span></label>
+                                <label>Clinic Name <span class="text-danger">*</span></label>
                                 <input name="name" id="name" type="text" class="form-control" value="{{ old('name') }}">
                                 <p id="error-name" style="color: red" class="error"></p>
                             </div>

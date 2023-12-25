@@ -129,7 +129,7 @@
         
                                 <div class="col-12 col-sm-6">
                                     <div class="form-group">
-                                        <label>Hospital <span class="text-danger">*</span></label>
+                                        <label>Clinic <span class="text-danger">*</span></label>
                                         <select name="hospital" id="hospital" class="form-control select @error('hospital') is-invalid @enderror" data-width="100%">
                                             <option selected disabled></option>
                                         </select>
@@ -170,7 +170,7 @@
                                 <button name="btnCreateSimpan" class="btn btn-warning" type="submit" id="btnCreateSave">Simpan dan Tambah</button>
                                 <button class="btn btn-warning" type="submit" id="btnCreateSave-loading" style="display: none">
                                     <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                    <span>Simpan dan Tambah</span>
+                                    <span>Save & Create</span>
                                 </button>
 
                                 <button name="btnSimpan" class="btn btn-primary" type="submit" id="btnSave">{{ $btnSubmit }}</button>

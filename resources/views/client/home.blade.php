@@ -10,7 +10,7 @@
     <div class="container-fluid">
         <div class="banner-wrapper">
             <div class="banner-header text-center">
-                <h1>Search Doctor, Make an Appointment</h1>
+                <h1>Search Doctor, book appointment</h1>
                 {{-- <p>Discover the best doctors, clinic & hospital the city nearest to you.</p> --}}
             </div>
                 
@@ -20,7 +20,7 @@
                     @csrf
                     <div class="form-group search-location">
                         <select name="hospital[]" class="form-control select">
-                            <option selected disabled>Select Hospital / Clinic</option>
+                            <option selected disabled>Select Clinic</option>
                             @foreach ($hospital as $data)
                             <option value="{{ $data->name }}">{{ $data->name }}</option>
                             @endforeach
@@ -81,7 +81,7 @@
     <div class="container-fluid">
 
         <div class="section-header text-center">
-            <h2>Book Our Doctor Specialist</h2>
+            <h2>Book Our Specialist</h2>
             {{-- <p class="sub-title">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p> --}}
         </div>
         <div class="row">
@@ -121,7 +121,7 @@
                                             @if ($item == null)
                                                 <i class="far fa-clock"></i> <span class="text-success"></span>
                                             @elseif (\Carbon\Carbon::now()->format('Y-m-d') == $item->date)
-                                                <i class="far fa-clock"></i> <span class="text-success"> Available now</span>
+                                                <i class="far fa-clock"></i> <span class="text-success"> Available today</span>
                                                 <i class="fas fa-check-circle verified"></i>
                                             @else
                                                 <i class="far fa-clock"></i> <span class="text-warning"> Available on {{ \Carbon\Carbon::parse($item->date)->format('D, d M') }}</span> 

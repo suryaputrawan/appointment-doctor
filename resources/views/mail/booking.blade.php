@@ -53,7 +53,7 @@
                                                                             <tr>
                                                                                 <td style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif;width: 160px;" width="160"> 
                                                                                     <a href="{{ route('client.home') }}" target="_blank" style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif;"> 
-                                                                                        <img src="{{ asset('assets/client/img/logo.png') }}" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" alt="Helpdesk" height="auto" width="160"> 
+                                                                                        <img src="{{ asset('assets/client/img/logo.png') }}" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" alt="ADOS" height="auto" width="160"> 
                                                                                     </a> 
                                                                                 </td>
                                                                             </tr>
@@ -83,7 +83,7 @@
                                                                             <tr>
                                                                                 <td align="left" style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif; font-size: 0px; padding: 0; word-break: break-word;">
                                                                                     <div style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif; font-size: 22px; font-weight: bold; line-height: 30px; text-align: left; color: #4F4F4F;">
-                                                                                        Appointment Number <i>#{{ $appointment->booking_number }}#</i> booked successfully.
+                                                                                        Appointment number <i>#{{ $appointment->booking_number }}#</i> successfully booked.
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>
@@ -98,7 +98,13 @@
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>
-
+                                                                            <tr>
+                                                                                <td align="left" class="link-wrap" style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif; font-size: 0px; padding: 0; padding-bottom: 20px; word-break: break-word;">
+                                                                                    <div style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif; font-size: 14px; font-weight: 300; line-height: 25px; text-align: left; color: #fc0505;">
+                                                                                        *Please arrive 15 minutes before your appointment time <br>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
                                                                             <tr>
                                                                                 <td align="left" class="link-wrap" style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif; font-size: 0px; padding: 0; padding-bottom: 20px; word-break: break-word;">
                                                                                     <div style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif; font-size: 16px; font-weight: 300; line-height: 25px; text-align: left; color: #4F4F4F;">

@@ -135,7 +135,7 @@
         
                                 <div class="col-12 col-sm-6">
                                     <div class="form-group">
-                                        <label>Hospital <span class="text-danger">*</span></label>
+                                        <label>Clinic <span class="text-danger">*</span></label>
                                         <select name="hospital" id="hospital" class="form-control select @error('hospital') is-invalid @enderror" data-width="100%">
                                             <option value="{{ $data->hospital_id }}">{{ $data->hospital->name }}</option>
                                         </select>

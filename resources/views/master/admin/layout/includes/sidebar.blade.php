@@ -51,7 +51,8 @@
                     </li>
                 @endcan
                 @can('menu doctor schedules')
-                    <li class="{{ request()->routeIs('admin.practice-schedules.index') ? 'active' : '' }}"> 
+                    <li class="{{ request()->routeIs('admin.practice-schedules.index') || 
+                        request()->routeIs('admin.practice-schedules.create') ? 'active' : '' }}"> 
                         <a href="{{ route('admin.practice-schedules.index') }}"><i class="fe fe-calendar"></i> <span>Doctor Schedules</span></a>
                     </li>   
                 @endcan
