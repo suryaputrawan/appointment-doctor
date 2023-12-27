@@ -75,6 +75,9 @@
                                         @canany(['update appointment', 'view appointment', 'arrived appointment','cancel appointment'])
                                             <th style="width: 100px">Action</th> 
                                         @endcanany
+                                        @can('reschedule appointment')
+                                            <th>Reschedule</th>   
+                                        @endcan
                                         <th>Date & Time</th>
                                         <th>Booking Number</th>
                                         <th>Doctor</th>
@@ -146,6 +149,9 @@
                 },
                 @canany(['update appointment', 'view appointment', 'arrived appointment','cancel appointment'])
                     { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
+                @endcan
+                @can('reschedule appointment')
+                { data: "reschedule", name: "reschedule", orderable: false, searchable:false ,className: "text-center",  },
                 @endcan
                 { data: "date", name: "date", orderable: true, className: "text-center",  },
                 { data: "booking_number", name: "booking_number", orderable: true, searchable: true, className: "text-center", },

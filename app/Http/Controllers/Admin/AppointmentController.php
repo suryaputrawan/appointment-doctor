@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Mail\BookingInfoDoctorMail;
 use App\Mail\BookingMail;
+use App\Mail\RescheduleAppointmentMail;
+use App\Mail\RescheduleInfoDoctorMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
@@ -132,7 +134,7 @@ class AppointmentController extends Controller
                     $bookingTime1 = Carbon::parse($data->start_time)->format('H:i');
                     $bookingTime2 = Carbon::parse($data->end_time)->format('H:i');
 
-                    return $bookingDate . ' [ ' . $bookingTime1 . ' - ' . $bookingTime2 . ' ] Wita';
+                    return $bookingDate . ' [ ' . $bookingTime1 . ' - ' . $bookingTime2 . ' Wita]';
                 })
                 ->addColumn('doctor', function ($data) {
                     return $data->doctor->name;
@@ -148,7 +150,17 @@ class AppointmentController extends Controller
 
                     return $status;
                 })
-                ->rawColumns(['action', 'doctor', 'date', 'status'])
+                ->addColumn('reschedule', function ($data) {
+                    $rescheduleRoute    = 'admin.appointment.reschedule';
+                    $dataId             = Crypt::encryptString($data->id);
+
+                    if ($data->status == "Booking") {
+                        return '<a class="btn btn-sm btn-info" type="button" href="' . route($rescheduleRoute, $dataId) . '">
+                            <i class="fa fa-calendar"></i>
+                        </a> ';
+                    }
+                })
+                ->rawColumns(['action', 'doctor', 'date', 'status', 'reschedule'])
                 ->make(true);
         }
 
@@ -218,15 +230,19 @@ class AppointmentController extends Controller
 
             try {
                 $dateNow = Carbon::now()->format('Y-m-d');
-                $time = PracticeSchedule::where('id', $request->booking_time)->first();
+                // $time = PracticeSchedule::where('id', $request->booking_time)->first();
                 $bookingNumber = Appointment::whereDate('created_at', $dateNow)->get();
 
                 $appointment = Appointment::create([
                     'booking_number'    => Carbon::now()->format('Ymd') . $bookingNumber->count() + 1,
-                    'date'              => $time->date,
-                    'start_time'        => $time->start_time,
-                    'end_time'          => $time->end_time,
-                    'hospital_id'       => $time->hospital_id,
+                    // 'date'              => $time->date,
+                    // 'start_time'        => $time->start_time,
+                    // 'end_time'          => $time->end_time,
+                    // 'hospital_id'       => $time->hospital_id,
+                    'date'              => $request->booking_day_date,
+                    'start_time'        => Carbon::parse($request->booking_start_time)->format('H:i:s'),
+                    'end_time'          => Carbon::parse($request->booking_end_time)->format('H:i:s'),
+                    'hospital_id'       => $request->hospital,
                     'doctor_id'         => $request->doctor,
                     'patient_name'      => $request->patient_name,
                     'patient_dob'       => $request->dob,
@@ -237,9 +253,9 @@ class AppointmentController extends Controller
                     'status'            => 'Booking',
                 ]);
 
-                $time->update([
-                    'booking_status'    => 1,
-                ]);
+                // $time->update([
+                //     'booking_status'    => 1,
+                // ]);
 
                 $doctorMail = Doctor::where('id', $appointment->doctor_id)->first();
                 $hospitalMail = Hospital::where('id', $appointment->hospital_id)->first();
@@ -383,15 +399,10 @@ class AppointmentController extends Controller
                 'email'             => 'required|email',
                 'phone'             => 'required|min:7',
                 'address'           => 'required|min:5',
-                'doctor'            => 'required',
-                'hospital'          => 'required',
-                'booking_date'      => 'required',
-                'booking_time'      => 'required'
             ]);
 
             $id = Crypt::decryptString($id);
             $data = Appointment::find($id);
-            $time = PracticeSchedule::where('id', $request->booking_time)->first();
 
             if (!$data) {
                 return redirect()
@@ -403,11 +414,6 @@ class AppointmentController extends Controller
 
             try {
                 $data->update([
-                    'date'                  => $request->booking_date,
-                    'start_time'            => $time->start_time,
-                    'end_time'              => $time->end_time,
-                    'doctor_id'             => $request->doctor,
-                    'hospital_id'           => $request->hospital,
                     'patient_name'          => $request->patient_name,
                     'patient_dob'           => $request->dob,
                     'patient_sex'           => $request->gender,
@@ -521,6 +527,137 @@ class AppointmentController extends Controller
                 'status'  => 500,
                 'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
             ], 500);
+        }
+    }
+
+    public function reschedule($id)
+    {
+        $user = auth()->user();
+
+        if (!$user->hasRole('Super Admin|Admin')) {
+            $doctor = Doctor::with([
+                'doctorLocation'    => function ($query) {
+                    $query->select('id', 'doctor_id', 'hospital_id');
+                }
+            ])
+                ->whereHas('doctorLocation', function ($query) use ($user) {
+                    $query->where('hospital_id', $user->hospital_id);
+                })
+                ->where('isAktif', 1)->orderBy('name', 'asc')
+                ->get(['id', 'name']);
+        } else {
+            $doctor = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']);
+        }
+
+        if ($user->can('reschedule appointment')) {
+            try {
+                $id = Crypt::decryptString($id);
+                $data = Appointment::find($id);
+                $schedule = PracticeSchedule::where('doctor_id', $data->doctor_id)
+                    ->where('hospital_id', $data->hospital_id)
+                    ->where('date', $data->date)
+                    ->where('start_time', $data->start_time)
+                    ->where('end_time', $data->end_time)
+                    ->first();
+
+                if (!$data) {
+                    return redirect()
+                        ->back()
+                        ->with('error', "Data not found..");
+                }
+
+                return view('admin.modules.appointment.reschedule', [
+                    'pageTitle'     => 'Reschedule Appointment',
+                    'breadcrumb'    => 'Reschedule Appointment',
+                    'btnSubmit'     => 'Save Change',
+                    'data'          => $data,
+                    'doctors'       => $doctor,
+                    'schedule'      => $schedule
+                ]);
+            } catch (\Throwable $e) {
+                return redirect()
+                    ->back()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+            }
+        } else {
+            abort(403);
+        }
+    }
+
+    public function rescheduleUpdate(Request $request, $id)
+    {
+        $user = auth()->user();
+
+        if ($user->can('reschedule appointment')) {
+            $request->validate([
+                'doctor'            => 'required',
+                'hospital'          => 'required',
+                'booking_date'      => 'required',
+                'booking_time'      => 'required'
+            ]);
+
+            $id = Crypt::decryptString($id);
+            $data = Appointment::find($id);
+
+            // $schedule = PracticeSchedule::where('hospital_id', $data->hospital_id)
+            //     ->where('doctor_id', $data->doctor_id)
+            //     ->where('date', $data->date)
+            //     ->where('start_time', $data->start_time)
+            //     ->where('end_time', $data->end_time)->first();
+
+            // $time = PracticeSchedule::where('id', $request->booking_time)->first();
+
+            if (!$data) {
+                return redirect()
+                    ->back()
+                    ->with('error', "Data not found");
+            }
+
+            DB::beginTransaction();
+
+            try {
+                $data->update([
+                    'date'                  => $request->booking_day_date,
+                    // 'start_time'            => $time->start_time,
+                    // 'end_time'              => $time->end_time,
+                    'start_time'            => $request->booking_start_time,
+                    'end_time'              => $request->booking_end_time,
+                    'doctor_id'             => $request->doctor,
+                    'hospital_id'           => $request->hospital,
+                ]);
+
+                // $schedule->update([
+                //     'booking_status'        => 0
+                // ]);
+
+                // $time->update([
+                //     'booking_status'        => 1
+                // ]);
+
+                $doctorMail = Doctor::where('id', $data->doctor_id)->first();
+
+                Mail::to($data->patient_email)->send(new RescheduleAppointmentMail($data));
+                Mail::to($doctorMail->email)->send(new RescheduleInfoDoctorMail($data));
+
+                DB::commit();
+
+                return redirect()->route('admin.appointment.index')
+                    ->with('success', 'Appointment success to reschedule');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+            }
+        } else {
+            abort(403);
         }
     }
 }

@@ -55,6 +55,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
                 Route::put('appointment/cancel/{id}', [AppointmentController::class, 'cancel'])->name('appointment.cancel');
             });
 
+            Route::group(['middleware' => [\Spatie\Permission\Middleware\PermissionMiddleware::using('reschedule appointment')]], function () {
+                Route::get('appointment/reschedule/{id}', [AppointmentController::class, 'reschedule'])->name('appointment.reschedule');
+                Route::put('appointment/reschedule/{id}/update', [AppointmentController::class, 'rescheduleUpdate'])->name('appointment.rescheduleUpdate');
+            });
+
             Route::resource('appointment', AppointmentController::class);
 
             Route::resource('users', AdminUserController::class);

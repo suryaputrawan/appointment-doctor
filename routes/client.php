@@ -10,6 +10,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('getBookingHospital', [AppointmentController::class, 'getBookingHospital'])->name('getBookingHospital');
 Route::get('getBookingDate', [AppointmentController::class, 'getBookingDate'])->name('getBookingDate');
 Route::get('getBookingTime', [AppointmentController::class, 'getBookingTime'])->name('getBookingTime');
+Route::get('getJadwalDokter', [AppointmentController::class, 'getJadwalDokter'])->name('getJadwalDokter');
+Route::get('getWaktuDokter', [AppointmentController::class, 'getWaktuDokter'])->name('getWaktuDokter');
 
 Route::get('/profile-doctor/{id}', [DoctorController::class, 'show'])->name('doctor.show');
 

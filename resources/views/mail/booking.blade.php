@@ -92,7 +92,7 @@
                                                                                     <div style="font-family: Open Sans, Helvetica, Tahoma, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px; text-align: left; color: #4F4F4F;">
                                                                                         <br> <strong>Date :</strong> {{ \Carbon\Carbon::parse($appointment->date)->format('d M Y') }} <br>
                                                                                         <strong>Time :</strong> {{ \Carbon\Carbon::parse($appointment->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($appointment->end_time)->format('H:i') }} Wita <br>
-                                                                                        <strong>Hospital / Clinic :</strong> {{ $appointment->hospital->name }} <br>
+                                                                                        <strong>Clinic :</strong> {{ $appointment->hospital->name }} <br>
                                                                                         <strong>Doctor :</strong> {{ $appointment->doctor->name }} <br>
                                                                                         <strong>Patient Name :</strong> {{ $appointment->patient_name }} <br>
                                                                                     </div>

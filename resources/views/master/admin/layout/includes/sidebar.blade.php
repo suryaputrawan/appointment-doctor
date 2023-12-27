@@ -11,7 +11,8 @@
                 @can('menu appointment')
                     <li class="{{ request()->routeIs('admin.appointment.index') || 
                         request()->routeIs('admin.appointment.create') || 
-                        request()->routeIs('admin.appointment.edit') ? 'active' : '' }}"> 
+                        request()->routeIs('admin.appointment.edit') || 
+                        request()->routeIs('admin.appointment.reschedule') ? 'active' : '' }}"> 
                         <a href="{{ route('admin.appointment.index') }}"><i class="fe fe-layout"></i> <span>Appointments</span></a>
                     </li>
                 @endcan

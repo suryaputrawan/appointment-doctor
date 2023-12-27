@@ -21,6 +21,7 @@ class PermissionSeeder extends Seeder
             'view appointment',
             'arrived appointment',
             'cancel appointment',
+            'reschedule appointment',
             'menu specialities',
             'create specialities',
             'update specialities',

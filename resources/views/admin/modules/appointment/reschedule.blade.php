@@ -38,13 +38,15 @@
                                 Session::forget('error');
                             @endphp
                         @endif
-                        <form action="{{ route('admin.appointment.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('admin.appointment.rescheduleUpdate', Crypt::encryptString($data->id)) }}" method="POST" enctype="multipart/form-data">
                             @csrf
+                            @method('PUT')
                             <div class="row form-row">
                                 <div class="col-12 col-sm-9">
                                     <div class="form-group">
                                         <label>Patient Name <span class="text-danger">*</span></label>
-                                        <input name="patient_name" type="text" class="form-control @error('patient_name') is-invalid @enderror" value="{{ old('patient_name') }}">
+                                        <input name="patient_name" type="text" class="form-control @error('patient_name') is-invalid @enderror" 
+                                            value="{{ old('patient_name') ?? $data->patient_name }}" disabled>
                                         @error('patient_name')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -54,7 +56,8 @@
                                 <div class="col-12 col-sm-3">
                                     <div class="form-group">
                                         <label>Date Of Birth <span class="text-danger">*</span></label>
-                                        <input name="dob" type="date" class="form-control @error('dob') is-invalid @enderror" value="{{ old('dob') }}">
+                                        <input name="dob" type="date" class="form-control @error('dob') is-invalid @enderror" 
+                                            value="{{ old('dob') ?? $data->patient_dob }}" disabled>
                                         @error('dob')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -65,10 +68,10 @@
                                 <div class="col-12 col-sm-3">
                                     <div class="form-group">
                                         <label>Gender <span class="text-danger">*</span></label>
-                                        <select name="gender" id="gender" class="form-control select @error('gender') is-invalid @enderror">
-                                            <option value="">-- Please Selected --</option>
-                                            <option value="M" {{ old('gender') == "M" ? 'selected' : null }}>MALE</option>
-                                            <option value="F" {{ old('gender') == "F" ? 'selected' : null }}>FEMALE</option>
+                                        <select name="gender" id="gender" class="form-control select @error('gender') is-invalid @enderror" disabled>
+                                            <option selected disabled>-- Please Selected --</option>
+                                            <option value="M" {{ old('gender', $data->patient_sex) == "M" ? 'selected' : null }}>MALE</option>
+                                            <option value="F" {{ old('gender', $data->patient_sex) == "F" ? 'selected' : null }}>FEMALE</option>
                                         </select>
                                         @error('gender')
                                             <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
@@ -78,7 +81,8 @@
                                 <div class="col-12 col-sm-4">
                                     <div class="form-group">
                                         <label>Phone <span class="text-danger">*</span></label>
-                                        <input name="phone" type="text" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}">
+                                        <input name="phone" type="text" class="form-control @error('phone') is-invalid @enderror" 
+                                            value="{{ old('phone') ?? $data->patient_telp }}" disabled>
                                         @error('phone')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -87,7 +91,8 @@
                                 <div class="col-12 col-sm-5">
                                     <div class="form-group">
                                         <label>Email <span class="text-danger">*</span></label>
-                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}">
+                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" 
+                                            value="{{ old('email') ?? $data->patient_email }}" disabled>
                                         @error('email')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -99,7 +104,8 @@
                                 <div class="col-12 col-sm-12">
                                     <div class="form-group">
                                         <label>Address <span class="text-danger">*</span></label>
-                                        <input name="address" type="text" class="form-control @error('address') is-invalid @enderror" value="{{ old('address') }}">
+                                        <input name="address" type="text" class="form-control @error('address') is-invalid @enderror" 
+                                            value="{{ old('address') ?? $data->patient_address }}" disabled>
                                         @error('address')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -115,9 +121,9 @@
                                         <label>Doctor Name <span class="text-danger">*</span></label>
                                         <select name="doctor" id="doctor" class="form-control select @error('doctor') is-invalid @enderror">
                                             <option selected disabled>-- Please Selected --</option>
-                                            @foreach ($doctor as $data)
-                                            <option value="{{ $data->id }}"
-                                                {{ old('doctor') == $data->id ? 'selected' : null }}>{{ $data->name }}
+                                            @foreach ($doctors as $doctor)
+                                            <option value="{{ $doctor->id }}"
+                                                {{ old('doctor', $data->doctor_id) == $doctor->id ? 'selected' : null }}>{{ $doctor->name }}
                                             </option>
                                             @endforeach
                                         </select>
@@ -131,7 +137,7 @@
                                     <div class="form-group">
                                         <label>Clinic <span class="text-danger">*</span></label>
                                         <select name="hospital" id="hospital" class="form-control select @error('hospital') is-invalid @enderror" data-width="100%">
-                                            <option selected disabled></option>
+                                            <option value="{{ $data->hospital_id }}">{{ $data->hospital->name }}</option>
                                         </select>
                                         @error('hospital')
                                             <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
@@ -147,7 +153,7 @@
                                     <div class="form-group">
                                         <label>Date <span class="text-danger">*</span></label>
                                         <select name="booking_date" id="booking-date" class="form-control select @error('booking_date') is-invalid @enderror" data-width="100%">
-                                            <option selected disabled></option>
+                                            <option value="{{ $data->date }}">{{ \Carbon\Carbon::parse($data->date)->format('d M Y') }}</option>
                                         </select>
                                         @error('booking_date')
                                             <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
@@ -155,12 +161,13 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-12">
-                                    <input type="hidden" id="booking-start-time" name="booking_start_time">
-                                    <input type="hidden" id="booking-end-time" name="booking_end_time">
                                     <div class="form-group">
+                                        <input type="hidden" id="booking-start-time" name="booking_start_time">
+                                        <input type="hidden" id="booking-end-time" name="booking_end_time">
                                         <label>Time <span class="text-danger">*</span></label>
                                         <select name="booking_time" id="booking-time" class="form-control select @error('booking_time') is-invalid @enderror" data-width="100%">
-                                            <option selected disabled></option>
+                                            {{-- <option value="{{ $schedule->id }}">{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }} Wita</option> --}}
+                                            <option>{{ \Carbon\Carbon::parse($data->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($data->end_time)->format('H:i') }} Wita</option>
                                         </select>
                                         @error('booking_time')
                                             <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
@@ -171,13 +178,7 @@
                             </div>
 
                             <div class="text-right">
-                                <button name="btnCreateSimpan" class="btn btn-warning" type="submit" id="btnCreateSave">Save & Create</button>
-                                <button class="btn btn-warning" type="submit" id="btnCreateSave-loading" style="display: none">
-                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                    <span>Save & Create</span>
-                                </button>
-
-                                <button name="btnSimpan" class="btn btn-primary" type="submit" id="btnSave">{{ $btnSubmit }}</button>
+                                <button name="btnSimpan" class="btn btn-primary" type="submit" id="btnSave" style="display: none">{{ $btnSubmit }}</button>
                                 <button class="btn btn-primary" type="submit" id="btnSave-loading" style="display: none">
                                     <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                                     <span>{{ $btnSubmit }}</span>
@@ -467,6 +468,8 @@
             $('#booking-end-time').val("");
             $('#booking-day').val("");
             $('#booking-day-date').val("");
+
+            $('#btnSave').hide();
         });
 
         //Dependent hospital dropdown
@@ -481,6 +484,8 @@
             $('#booking-end-time').val("");
             $('#booking-day').val("");
             $('#booking-day-date').val("");
+
+            $('#btnSave').hide();
         });
 
         //Dependent date dropdown
@@ -505,6 +510,8 @@
             
             $('#booking-start-time').val("");
             $('#booking-end-time').val("");
+
+            $('#btnSave').hide();
         });
 
         $('#booking-time').on('change', function() {
@@ -515,6 +522,8 @@
 
             $('#booking-start-time').val(startTime);
             $('#booking-end-time').val(endTime);
+
+            $('#btnSave').show();
         });
 
         @if (old('doctor'))
@@ -544,18 +553,9 @@
         @endif
 
         //environment button
-        $('#btnCreateSave').on('click', function () {
-            $('#btnCreateSave-loading').toggle();
-            $('#btnCreateSave-loading').prop('disabled',true);
-            $('#btnCreateSave').toggle();
-            $('#btnSave').toggle();
-            $('#btnCancel').toggle();
-        });
-
         $('#btnSave').on('click', function () {
             $('#btnSave-loading').toggle();
             $('#btnSave-loading').prop('disabled',true);
-            $('#btnCreateSave').toggle();
             $('#btnSave').toggle();
             $('#btnCancel').toggle();
         });

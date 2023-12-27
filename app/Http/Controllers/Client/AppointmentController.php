@@ -13,6 +13,7 @@ use App\Models\PracticeSchedule;
 use Illuminate\Support\Facades\DB;
 use App\Mail\BookingInfoDoctorMail;
 use App\Http\Controllers\Controller;
+use App\Models\DoctorLocationDay;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 
@@ -293,6 +294,151 @@ class AppointmentController extends Controller
             return redirect()
                 ->back()
                 ->with('error', "Error on line {$e->getLine()}: {$e->getMessage()}");
+        }
+    }
+
+    public function getJadwalDokter(Request $request)
+    {
+        $jadwalPraktek = [];
+        $startDate = Carbon::parse('2023-12-01'); //Masih hardcode
+        $endDate = $startDate->copy()->addMonths(3);
+
+        $currentDate = Carbon::parse($startDate);
+
+        $id_hospital    = $request->id_hospital;
+        $id_doctor      = $request->id_doctor;
+
+        $doctorLocation = DoctorLocation::where('doctor_id', $id_doctor)
+            ->where('hospital_id', $id_hospital)
+            ->first();
+
+        while ($currentDate->lte($endDate)) {
+            $currentDayOfWeek = $currentDate->format('l');
+
+            $jadwal = DoctorLocationDay::where('day', $currentDayOfWeek)
+                ->where('doctor_location_id', $doctorLocation->id)
+                ->first();
+
+            if ($jadwal && ($currentDate->isToday() || $currentDate->gt(now()))) {
+                $jadwalPraktek[] = [
+                    'date' => $currentDate->toDateString(),
+                ];
+            }
+
+            $currentDate->addDay();
+        }
+
+        $option = "<option selected disabled>Select Date</option>";
+
+        foreach ($jadwalPraktek as $index => $item) {
+            $selectedState = '';
+            $index = $index + 1;
+
+            if ($request->selected) {
+                $selectedState = $index == $request->selected ? 'selected' : '';
+            }
+
+            $date = Carbon::parse($item['date'])->format('d M Y');
+            $valDate = Carbon::parse($item['date'])->format('Y-m-d');
+            $day = Carbon::parse($item['date'])->format('l');
+
+            $option .=  "<option value='$index' $selectedState data-day='$day' data-date='$valDate'>$date</option>";
+        }
+
+        if ($jadwalPraktek) {
+            return response()->json([
+                'status' => 200,
+                'data' => $option,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Date Not Found',
+            ]);
+        }
+    }
+
+    public function getWaktuDokter(Request $request)
+    {
+        $id_hospital    = $request->id_hospital;
+        $id_doctor      = $request->id_doctor;
+        $dateBooking    = $request->id_date;
+        $dateDay        = $request->id_day;
+
+        $doktorLocation = DoctorLocation::where('doctor_id', $id_doctor)->where('hospital_id', $id_hospital)->first();
+        $doctorSchedule = DoctorLocationDay::where('doctor_location_id', $doktorLocation->id)
+            ->where('day', $dateDay)->first();
+
+        $waktuAwal = Carbon::parse($doctorSchedule->start_time);
+        $waktuAkhir = Carbon::parse($doctorSchedule->end_time);
+        $duration = 15; //Masih hardcode
+        $hasilWaktuAwal = [];
+        $waktu = [];
+
+        while ($waktuAwal < $waktuAkhir) {
+            $hasilWaktuAwal[] = $waktuAwal->copy();
+            $waktuAwal->addMinutes($duration);
+        }
+
+        foreach ($hasilWaktuAwal as $waktuAwal) {
+            $waktuAkhir = $waktuAwal->copy();
+            $waktuAkhir->addMinutes($duration);
+
+            $conflictExists = Appointment::where('doctor_id', $id_doctor)
+                ->where('hospital_id', $id_hospital)
+                ->where('date', $dateBooking)
+                ->where('start_time', $waktuAwal)
+                ->where('end_time', $waktuAkhir)
+                ->exists();
+
+
+            if (!$conflictExists) {
+                $waktu[] = [
+                    'start_time' => $waktuAwal,
+                    'end_time' => $waktuAkhir
+                ];
+            }
+        }
+
+        $option = "<option selected disabled>Select Time</option>";
+
+        foreach ($waktu as $index => $item) {
+            $selectedState = '';
+            $index = $index + 1;
+
+            if ($request->selected) {
+                $selectedState = $index == $request->selected ? 'selected' : '';
+            }
+
+            $start_time = Carbon::parse($item['start_time'])->format('H:i');
+            $end_time = Carbon::parse($item['end_time'])->format('H:i');
+            $time = "$start_time - $end_time Wita";
+
+            $hospital = Hospital::where('id', $id_hospital)->first();
+
+            $option .=  "<option value='$index' $selectedState data-start-time='$start_time' data-end-time='$end_time'>$time</option>";
+        }
+
+        if ($waktu) {
+            return response()->json([
+                'status' => 200,
+                'data' => $option,
+            ]);
+            // } elseif ($waktu->count() == 0) {
+            //     return response()->json([
+            //         'status' => 201,
+            //         'message' => 'Fully booked, please whatsapp admin on ' . $hospital->whatsapp . ' to book the appointment',
+            //     ]);
+        } elseif (empty($waktu)) {
+            return response()->json([
+                'status' => 201,
+                'message' => 'Fully booked, please whatsapp admin on ' . $hospital->whatsapp . ' to book the appointment',
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Time Not Found',
+            ]);
         }
     }
 }

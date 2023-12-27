@@ -1,8 +1,7 @@
 @extends('master.client.layout.app')
 
 @push('plugin-style')
-    <!-- Select2 CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/client/plugins/select2/css/select2.min.cs') }}s">
+    <link rel="stylesheet" href="{{ asset('assets/client/plugins/select2/css/select2.min.css') }}">
 @endpush
 
 @section('banner')
@@ -17,9 +16,8 @@
             <!-- Search -->
             <div class="search-box">
                 <form action="{{ route('client.doctor.search') }}" method="GET">
-                    @csrf
                     <div class="form-group search-location">
-                        <select name="hospital[]" class="form-control select">
+                        <select name="hospital[]" id="hospital" class="form-control">
                             <option selected disabled>Select Clinic</option>
                             @foreach ($hospital as $data)
                             <option value="{{ $data->name }}">{{ $data->name }}</option>
@@ -27,7 +25,7 @@
                         </select>
                     </div>
                     <div class="form-group search-info">
-                        <select name="speciality[]" class="form-control select">
+                        <select name="specialist[]" id="specialist" class="form-control">
                             <option selected disabled>Select Specialities</option>
                             @foreach ($specialities as $data)
                             <option value="{{ $data->name }}">{{ $data->name }}</option>
@@ -176,6 +174,5 @@
 @endsection
 
 @push('script')
-    <!-- Select2 JS -->
     <script src="{{ asset('assets/client/plugins/select2/js/select2.min.js') }}"></script>
 @endpush
