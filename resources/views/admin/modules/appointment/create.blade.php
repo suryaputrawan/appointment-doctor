@@ -241,6 +241,7 @@
                         $('#hospital').html(response.data);
                         if (replaceChild == true) {
                             $('#booking-date').html('<option></option>');
+                            $('#booking-time').html('<option></option>');
                         }
                     }
                 },
@@ -495,7 +496,7 @@
 
             let id_hospital = $('#hospital').val();
             let id_doctor   = $('#doctor').val();
-            let id_date     = $('#booking-date').val();
+            let id_date     = $('#booking-day-date').val();
             $('#info-time').text('');
 
             var bookingDay = $('#booking-day').val();

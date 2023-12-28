@@ -167,19 +167,29 @@
 
                                     <div class="row">
                                         <div class="col-md-6 col-sm-12">
+                                            <input type="hidden" id="booking-day" name="booking_day">
+                                            <input type="hidden" id="booking-day-date" name="booking_day_date">
                                             <div class="form-group card-label">
                                                 <label>Date <span class="text-danger">*</span></label>
-                                                <select name="booking_date" id="booking-date" class="form-control select" data-width="100%">
+                                                <select name="booking_date" id="booking-date" class="form-control select @error('booking_date') is-invalid @enderror" data-width="100%">
                                                     <option selected disabled></option>
                                                 </select>
+                                                @error('booking_date')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-sm-12">
+                                            <input type="hidden" id="booking-start-time" name="booking_start_time">
+                                            <input type="hidden" id="booking-end-time" name="booking_end_time">
                                             <div class="form-group card-label" id="time-form">
                                                 <label>Time <span class="text-danger">*</span></label>
-                                                <select name="booking_time" id="booking-time" class="form-control select" data-width="100%">
+                                                <select name="booking_time" id="booking-time" class="form-control select @error('booking_time') is-invalid @enderror" data-width="100%">
                                                     <option selected disabled></option>
                                                 </select>
+                                                @error('booking_time')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
                                                 <span class="text-danger" id="info-time"></span>
                                             </div>
                                         </div>
@@ -317,41 +327,159 @@
             });
         }
 
+        function loadJadwalDokter(id_hospital, id_doctor, selected, replaceChild) {
+            let url = "{{ route('client.getJadwalDokter') }}";
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {
+                    id_hospital: id_hospital,
+                    id_doctor: id_doctor,
+                    selected: selected
+                },
+                cache: false,
+
+                success: function (response) {
+
+                    if (response.status == 404) {
+                        Toast.fire({
+                            icon: 'warning',
+                            title: response.message,
+                        });
+                    } else {
+                        $('#booking-date').html(response.data);
+                        if (replaceChild == true) {
+                            $('#booking-time').html('<option></option>');
+                        }
+                    }
+                },
+                error: function (response) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
+                    });
+                }
+            });
+        }
+
+        function loadWaktuDokter(id_hospital, id_doctor, id_date, id_day, selected, replaceChild) {
+
+            let url = "{{ route('client.getWaktuDokter') }}";
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {
+                    id_hospital: id_hospital,
+                    id_doctor: id_doctor,
+                    id_date: id_date,
+                    id_day: id_day,
+                    selected: selected
+                },
+                cache: false,
+
+                success: function (response) {
+
+                    if (response.status == 404) {
+                        Toast.fire({
+                            icon: 'warning',
+                            title: response.message,
+                        });
+                    } else if (response.status == 201) {
+                        $('#item-form').toggle();
+                        $('#info-item-form').toggle();
+                        $('#info-time').text(response.message);
+                    } else {
+                        $('#booking-time').html(response.data);
+                    } 
+                },
+                error: function (response) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
+                    });
+                }
+            });
+        }
+
         //Dependent hospital dropdown
         $('#hospital').on('change', function() {
             let id_hospital = $('#hospital').val();
             let id_doctor   = $('#doctor').val();
-            loadDateData(id_hospital, id_doctor, null, true);
+            // loadDateData(id_hospital, id_doctor, null, true);
+
+            loadJadwalDokter(id_hospital, id_doctor, null, true);
+
+            $('#booking-start-time').val("");
+            $('#booking-end-time').val("");
+            $('#booking-day').val("");
+            $('#booking-day-date').val("");
         });
 
         //Dependent date dropdown
         $('#booking-date').on('change', function() {
+            var selectedIndex = document.getElementById('booking-date').value;
+            var selectedOption = document.getElementById('booking-date').options[selectedIndex];
+            var dayBooking = selectedOption.getAttribute('data-day');
+            var dateBooking = selectedOption.getAttribute('data-date');
+
+            $('#booking-day').val(dayBooking);
+            $('#booking-day-date').val(dateBooking);
+
             let id_hospital = $('#hospital').val();
             let id_doctor   = $('#doctor').val();
-            let id_date     = $('#booking-date').val();
+            let id_date     = $('#booking-day-date').val();
             $('#info-time').text('');
 
-            loadTimeData(id_hospital, id_doctor, id_date, null, true);
+            var bookingDay = $('#booking-day').val();
+
+            // loadTimeData(id_hospital, id_doctor, id_date, null, true);
+            loadWaktuDokter(id_hospital, id_doctor, id_date, bookingDay, null, true);
+            
+            $('#booking-start-time').val("");
+            $('#booking-end-time').val("");
+        });
+
+        $('#booking-time').on('change', function() {
+            var selectedIndex = document.getElementById('booking-time').value;
+            var selectedOption = document.getElementById('booking-time').options[selectedIndex];
+            var startTime = selectedOption.getAttribute('data-start-time');
+            var endTime = selectedOption.getAttribute('data-end-time');
+
+            $('#booking-start-time').val(startTime);
+            $('#booking-end-time').val(endTime);
         });
 
         @if (old('hospital'))
             let id_hospital = $('#hospital').val();
             let id_doctor   = $('#doctor').val();
 
-            @if (old('booking_date'))
-                loadDateData(id_hospital, id_doctor, {!! old('booking_date') !!}, false);
-            @else
-                loadDateData(id_negara, id_doctor, null, false);
-            @endif
-
-            @if (old('booking_date'))
-                let id_date = {!! old('booking_date') !!};
-                @if (old('booking_time'))
-                    loadTimeData(id_hospital, id_doctor, id_date, {!! old('booking_time') !!});
-                @else
-                    loadCitiesData(id_provinsi, id_doctor, id_date);
-                @endif
-            @endif
+            loadJadwalDokter(id_hospital, id_doctor, null, true);
         @endif
 
         //--Environtment Button
@@ -361,6 +489,27 @@
             $('#btnSave').toggle();
             $('#btnCancel').toggle();
         });
+
+        //Toast for session success
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        @if (session('error')) {
+            Toast.fire({
+                icon: 'warning',
+                title: "{{ session('error') }}",
+            });
+        }
+        @endif
     });
 </script>
 @endpush

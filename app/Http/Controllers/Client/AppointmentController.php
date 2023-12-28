@@ -52,24 +52,30 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'fullname'      => 'required|min:5',
-            'dob'           => 'required',
-            'sex'           => 'required',
-            'email'         => 'required|email',
-            'phone'         => 'required|min:6',
-            'address'       => 'required|min:5',
-            'hospital'      => 'required',
+            'fullname'          => 'required|min:5',
+            'dob'               => 'required',
+            'sex'               => 'required',
+            'email'             => 'required|email',
+            'phone'             => 'required|min:6',
+            'address'           => 'required|min:5',
+            'hospital'          => 'required',
+            'booking_date'      => 'required',
+            'booking_time'      => 'required'
         ]);
 
         $dateNow = Carbon::now()->format('Y-m-d');
-        $time = PracticeSchedule::where('id', $request->booking_time)->first();
+        // $time = PracticeSchedule::where('id', $request->booking_time)->first();
         $bookingNumber = Appointment::whereDate('created_at', $dateNow)->get();
 
         DB::beginTransaction();
 
         try {
 
-            if ($time->booking_status == 1) {
+            $appointment = Appointment::where('date', $request->booking_day_date)->where('start_time', Carbon::parse($request->booking_start_time)->format('H:i:s'))
+                ->where('end_time', Carbon::parse($request->booking_end_time)->format('H:i:s'))
+                ->where('hospital_id', $request->hospital)->where('doctor_id', $request->doctor)->first();
+
+            if ($appointment) {
                 DB::rollBack();
                 return redirect()
                     ->back()
@@ -77,15 +83,27 @@ class AppointmentController extends Controller
                     ->with('error', "Time has been booked, please select another time or date");
             }
 
-            $time->update([
-                'booking_status'    => 1,
-            ]);
+            // if ($time->booking_status == 1) {
+            //     DB::rollBack();
+            //     return redirect()
+            //         ->back()
+            //         ->withInput()
+            //         ->with('error', "Time has been booked, please select another time or date");
+            // }
+
+            // $time->update([
+            //     'booking_status'    => 1,
+            // ]);
 
             $appointment = Appointment::create([
                 'booking_number'    => Carbon::now()->format('Ymd') . $bookingNumber->count() + 1,
-                'date'              => $time->date,
-                'start_time'        => $time->start_time,
-                'end_time'          => $time->end_time,
+                // 'date'              => $time->date,
+                // 'start_time'        => $time->start_time,
+                // 'end_time'          => $time->end_time,
+                // 'hospital_id'       => $request->hospital,
+                'date'              => $request->booking_day_date,
+                'start_time'        => Carbon::parse($request->booking_start_time)->format('H:i:s'),
+                'end_time'          => Carbon::parse($request->booking_end_time)->format('H:i:s'),
                 'hospital_id'       => $request->hospital,
                 'doctor_id'         => $request->doctor,
                 'patient_name'      => $request->fullname,
@@ -390,7 +408,6 @@ class AppointmentController extends Controller
                 ->where('start_time', $waktuAwal)
                 ->where('end_time', $waktuAkhir)
                 ->exists();
-
 
             if (!$conflictExists) {
                 $waktu[] = [
