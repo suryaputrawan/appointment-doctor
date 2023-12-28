@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Permissions\AssignController;
 use App\Http\Controllers\Admin\DoctorLocationController;
 use App\Http\Controllers\Admin\DoctorEducationController;
+use App\Http\Controllers\Admin\OffDutyDateController;
 use App\Http\Controllers\Admin\PracticeScheduleController;
 use App\Http\Controllers\Permissions\PermissionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -63,6 +64,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
             Route::resource('appointment', AppointmentController::class);
 
             Route::resource('users', AdminUserController::class);
+
+            Route::resource('off-duty', OffDutyDateController::class);
 
             // Route role and permission
             Route::group(['middleware' => [\Spatie\Permission\Middleware\RoleMiddleware::using('Super Admin')]], function () {

@@ -35,11 +35,12 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 20px">#</th>
-                                        @canany(['update services', 'delete services'])
+                                        @canany(['update off duty', 'delete off duty'])
                                             <th style="width: 100px">ACTION</th>   
                                         @endcanany
-                                        <th>Service Name</th>
-                                        <th>Description</th>
+                                        <th>Doctor</th>
+                                        <th>Off Duty Date</th>
+                                        <th>Reason</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -53,7 +54,7 @@
     </div>
 
     {{-- Modal Action --}}
-    @include('admin.modules.service.modal.action')
+    @include('admin.modules.off-duty.modal.action')
     {{-- End Modal Action --}}
 
 @endsection
@@ -68,32 +69,6 @@
 
 @push('custom-scripts')
 <script type="text/javascript">
-    //Preview Image
-    function previewImages() {
-        var preview = document.querySelector('#preview');
-        preview.innerHTML = '';
-        var files = document.querySelector('input[type=file]').files;
-    
-        function readAndPreview(file) {
-            // Make sure `file.name` matches our extensions criteria
-            if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
-                var reader = new FileReader();
-                reader.addEventListener('load', function() {
-                    var image = new Image();
-                    image.height = 150;
-                    image.title = file.name;
-                    image.src = this.result;
-                    preview.appendChild(image);
-                }, false);
-    
-                reader.readAsDataURL(file);
-            }
-        }
-    
-        if (files) {
-            [].forEach.call(files, readAndPreview);
-        }
-    };
 
     $(document).ready(function() {
 
@@ -111,7 +86,7 @@
 
         let dataTable = $("#datatable").DataTable({
             ...tableOptions,
-            ajax: "{{ route('admin.services.index') }}?type=datatable",
+            ajax: "{{ route('admin.off-duty.index') }}?type=datatable",
             processing: true,
             serverSide : true,
             responsive: false,
@@ -125,45 +100,44 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
-                @canany(['update services', 'delete services'])
+                @canany(['update off duty', 'delete off duty'])
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
                 @endcanany
-                { data: "service_name", name: "service_name", orderable: true  },
-                { data: "description", name: "description", orderable: false, searchable: false  },
+                { data: "doctor_name", name: "doctor_name", orderable: true  },
+                { data: "date", name: "date", orderable: false, searchable: false, className: "text-center",  },
+                { data: "reason", name: "reason", orderable: false, searchable: false  },
             ],
         });
         //-----End datatable inizialitation
 
         //----form environtment
-        let ajaxUrl = "{{ route('admin.services.store') }}";
+        let ajaxUrl = "{{ route('admin.off-duty.store') }}";
         let ajaxType = "POST";
 
         function clearForm() {
-            $("#service-form").find('input').val("");
-            $('#service-form').find('.error').text("");
-            $("#description").val("");
-            var preview = document.querySelector('#preview');
-            preview.innerHTML = '';
-            ajaxUrl = "{{ route('admin.services.store') }}";
+            $("#off-duty-form").find('input').val("");
+            $('#off-duty-form').find('.error').text("");
+
+            ajaxUrl = "{{ route('admin.off-duty.store') }}";
             ajaxType = "POST";
         }
         //---End Form environment
 
         //----Modal
         $(document).on('click', '#btn-add', function() {
-            $('#modal-add-service').modal('show');
-            $('#title').text('Add Service');
+            $('#modal-add-off-duty').modal('show');
+            $('#title').text('Add Off Duty');
             $("#btn-submit-text").text("Save");
         });
 
         $(".btn-cancel").click(function() {
-            $('#modal-add-service').modal('hide');
+            $('#modal-add-off-duty').modal('hide');
             clearForm();
         });
         //----End Modal
 
         //------ Submit Data
-        $('#service-form').on('submit', function(e) {
+        $('#off-duty-form').on('submit', function(e) {
             e.preventDefault();
 
             var submitButton = $(this).find("button[type='submit']");
@@ -174,7 +148,7 @@
             var formData = new FormData(this);
             formData.append("_method", ajaxType)
 
-            $('#service-form').find('.error').text("");
+            $('#off-duty-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -203,7 +177,7 @@
 
                     if (response.status == 200) {
                         clearForm();
-                        $('#modal-add-service').modal('hide');
+                        $('#modal-add-off-duty').modal('hide');
                         $('#datatable').DataTable().ajax.reload();
 
                         Toast.fire({
@@ -211,14 +185,14 @@
                             title: response.message,
                         });
                     } else if (response.status == 400) {
-                        $.each(response.errors.name, function(key, error) {
-                            $('#error-name').append(error);
+                        $.each(response.errors.doctor, function(key, error) {
+                            $('#error-doctor').append(error);
                         });
-                        $.each(response.errors.description, function(key, error) {
-                            $('#error-description').append(error);
+                        $.each(response.errors.date, function(key, error) {
+                            $('#error-date').append(error);
                         });
-                        $.each(response.errors.picture, function(key, error) {
-                            $('#error-picture').append(error);
+                        $.each(response.errors.reason, function(key, error) {
+                            $('#error-reason').append(error);
                         });
                     } else {
                         Toast.fire({
@@ -243,13 +217,13 @@
         //------ Load data to edit
         $(document).on('click', '#btn-edit', function(e) {
             e.preventDefault();
-            $('#modal-add-service').modal('show');
+            $('#modal-add-off-duty').modal('show');
             $('#title').text('Edit Service');
 
             var id = $(this).data('id');
             var url = $(this).data('url');
 
-            $('#service-form').find('.error').text("");
+            $('#off-duty-form').find('.error').text("");
 
             const Toast = Swal.mixin({
                 toast: true,
@@ -271,22 +245,22 @@
                 success: function(response) {
                     if (response.status == 404) {
                         clearForm();
-                        $('#modal-add-service').modal('hide');
+                        $('#modal-add-off-duty').modal('hide');
                         Toast.fire({
                             icon: 'warning',
                             title: response.message,
                         });
                     } else {
-                        ajaxUrl = "{{ route('admin.services.index') }}/"+response.data.id;
+                        ajaxUrl = "{{ route('admin.off-duty.index') }}/"+response.data.id;
                         ajaxType = "PUT";
 
-                        $('#name').val(response.data.name);
-                        $('#description').val(response.data.description);
-                        $('#preview').eq(0).html('<img src="/storage/'+response.data.picture+'"height="150" alt="Preview Gambar">');
+                        $('#doctor').val(response.data.doctor_id).trigger('change');
+                        $('#date').val(response.data.date);
+                        $('#reason').val(response.data.reason);
                     }
                 },
                 error: function(response){
-                    $('#modal-add-service').modal('hide');
+                    $('#modal-add-off-duty').modal('hide');
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use App\Mail\BookingInfoDoctorMail;
 use App\Http\Controllers\Controller;
 use App\Models\DoctorLocationDay;
+use App\Models\OffDutyDate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 
@@ -326,6 +327,8 @@ class AppointmentController extends Controller
         $id_hospital    = $request->id_hospital;
         $id_doctor      = $request->id_doctor;
 
+        $offDates = OffDutyDate::where('doctor_id', $id_doctor)->pluck('date');
+
         $doctorLocation = DoctorLocation::where('doctor_id', $id_doctor)
             ->where('hospital_id', $id_hospital)
             ->first();
@@ -333,14 +336,16 @@ class AppointmentController extends Controller
         while ($currentDate->lte($endDate)) {
             $currentDayOfWeek = $currentDate->format('l');
 
-            $jadwal = DoctorLocationDay::where('day', $currentDayOfWeek)
-                ->where('doctor_location_id', $doctorLocation->id)
-                ->first();
+            if (!$offDates->contains($currentDate->toDateString())) {
+                $jadwal = DoctorLocationDay::where('day', $currentDayOfWeek)
+                    ->where('doctor_location_id', $doctorLocation->id)
+                    ->first();
 
-            if ($jadwal && ($currentDate->isToday() || $currentDate->gt(now()))) {
-                $jadwalPraktek[] = [
-                    'date' => $currentDate->toDateString(),
-                ];
+                if ($jadwal && ($currentDate->isToday() || $currentDate->gt(now()))) {
+                    $jadwalPraktek[] = [
+                        'date' => $currentDate->toDateString(),
+                    ];
+                }
             }
 
             $currentDate->addDay();
