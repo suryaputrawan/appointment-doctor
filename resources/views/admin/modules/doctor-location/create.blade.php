@@ -86,6 +86,7 @@
                                                     <th>Day</th>
                                                     <th>Start Time</th>
                                                     <th>End Time</th>
+                                                    <th>Slot Duration</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -93,10 +94,23 @@
                                                 @if (old('day') || old('start_time') || old('end_time'))
                                                     @for ($i = 0; $i < count(old('day')); $i++)
                                                         <tr>
-                                                            <td>
+                                                            {{-- <td>
                                                                 <input type="text" class="form-control @error('day.'.$i) is-invalid @enderror" name="day[]" id="day" placeholder="Example : MON - FRI" value="{{ old('day.'.$i) }}" style='text-transform:uppercase' autocomplete="off">
                                                                 @error('day.'.$i)
                                                                     <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
+                                                            </td> --}}
+                                                            <td>
+                                                                <select name="day[]" id="day" class="select select-item @error('day.'.$i) is-invalid @enderror">
+                                                                    <option selected disabled>-- Please Selected --</option>
+                                                                    @foreach ($days as $data)
+                                                                    <option value="{{ $data }}"
+                                                                        {{ old('day.'.$i) == $data ? 'selected' : null }}>{{ $data }}
+                                                                    </option>
+                                                                    @endforeach
+                                                                </select>
+                                                                @error('day.'.$i)
+                                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
                                                                 @enderror
                                                             </td>
                                                             <td>
@@ -112,16 +126,41 @@
                                                                 @enderror
                                                             </td>
                                                             <td>
+                                                                <select name="duration[]" id="duration" class="select @error('duration') is-invalid @enderror" value="{{ old('duration.'.$i) }}">
+                                                                    @foreach ($slotDuration as $data)
+                                                                    <option value="{{ $data }}"
+                                                                        {{ old('duration.'.$i) == $data ? 'selected' : null }}>{{ $data }} Minutes
+                                                                    </option>
+                                                                    @endforeach
+                                                                </select>
+                                                                @error('duration.'.$i)
+                                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                                @enderror
+                                                            </td>
+                                                            <td>
                                                                 <button id="btn-item-delete" type="button" class="btn btn-danger waves-effect waves-light"><i class='fe fe-trash'></i></button>
                                                             </td>
                                                         </tr>
                                                     @endfor 
                                                     @else
                                                     <tr>
-                                                        <td>
+                                                        {{-- <td>
                                                             <input type="text" class="form-control @error('day') is-invalid @enderror" name="day[]" id="day" placeholder="Example : MON - FRI" value="{{ old('day') }}" style='text-transform:uppercase' autocomplete="off">
                                                             @error('day')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </td> --}}
+                                                        <td>
+                                                            <select name="day[]" id="day" class="select select-item @error('day') is-invalid @enderror">
+                                                                <option selected disabled>-- Please Selected --</option>
+                                                                @foreach ($days as $data)
+                                                                <option value="{{ $data }}"
+                                                                    {{ old('day') == $data ? 'selected' : null }}>{{ $data }}
+                                                                </option>
+                                                                @endforeach
+                                                            </select>
+                                                            @error('day')
+                                                                <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
                                                             @enderror
                                                         </td>
                                                         <td>
@@ -134,6 +173,18 @@
                                                             <input type="time" class="form-control @error('end_time') is-invalid @enderror" name="end_time[]" id="time" value="{{ old('end_time') }}" autocomplete="off">
                                                             @error('end_time')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </td>
+                                                        <td>
+                                                            <select name="duration[]" id="duration" class="select @error('duration') is-invalid @enderror">
+                                                                @foreach ($slotDuration as $data)
+                                                                <option value="{{ $data }}"
+                                                                    {{ old('duration') == $data ? 'selected' : null }}>{{ $data }} Minutes
+                                                                </option>
+                                                                @endforeach
+                                                            </select>
+                                                            @error('duration')
+                                                                <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
                                                             @enderror
                                                         </td>
                                                     </tr>
@@ -180,8 +231,19 @@
 @push('custom-scripts')
 <script type="text/javascript">
     let item = "<tr>"+
+                    // "<td>"+
+                    //     "<input type='text' class='form-control' name='day[]' placeholder='Example : MON - FRI' style='text-transform:uppercase' value='{{ old('day.*') }}' autocomplete='off'>"+
+                    //     "<p id='error-day' style='color: red' class='error'></p>"+
+                    // "</td>"+
                     "<td>"+
-                        "<input type='text' class='form-control' name='day[]' placeholder='Example : MON - FRI' style='text-transform:uppercase' value='{{ old('day.*') }}' autocomplete='off'>"+
+                        "<select name='day[]' class='select select-item @error('day') is-invalid @enderror'>"+
+                            "<option selected disabled>-- Please Selected --</option>"+
+                            "@foreach ($days as $data)"+
+                                "<option value='{{ $data }}'"+
+                                    "{{ old('day') == $data ? 'selected' : null }}>{{ $data }}"+
+                                "</option>"+
+                            "@endforeach"+
+                        "</select>"+
                         "<p id='error-day' style='color: red' class='error'></p>"+
                     "</td>"+
                     "<td>"+
@@ -193,14 +255,30 @@
                         "<p id='error-end_time' style='color: red' class='error'></p>"+
                     "</td>"+
                     "<td>"+
-                        "<button id='btn-item-delete' type='button' class='btn btn-sm btn-danger'><i class='fe fe-trash'></i></button>"+
+                        "<select class='select select-item @error('duration') is-invalid @enderror' name='duration[]'>"+
+                            "@foreach ($slotDuration as $item)"+
+                            "<option value='{{ $item }}'>{{ $item }} Minutes</option>"+
+                            "@endforeach"+
+                        "</select>"+
+                        "<p id='error-duration' style='color: red' class='error'></p>"+
+                    "</td>"+
+                    "<td>"+
+                        "<button id='btn-item-delete' type='button' class='btn btn-danger'><i class='fe fe-trash'></i></button>"+
                     "</td>"+
                 "</tr>"
     //--Repeat item form
 
+    function selectRefresh() {
+        $('.select-item').select2({
+            tags: true,
+            width: '100%'
+        });
+    }
+
     $(document).ready(function() {
         $('#btn-item-add').click(function() {
             $('#tb-item > tbody').append(item);
+            selectRefresh();
         });
 
         $('tbody').on('click','#btn-item-delete', function() {
@@ -210,6 +288,7 @@
     //--- End repeat item form
 
     $(document).ready(function() {
+        selectRefresh();
         //Toast for session success
         const Toast = Swal.mixin({
             toast: true,

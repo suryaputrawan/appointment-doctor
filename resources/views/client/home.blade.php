@@ -112,10 +112,11 @@
                                                 @endforeach
                                             </div>
                                         </div>
-                                        <li>
-                                            <?php
-                                            $item = $doctor->practiceSchedules->first();
-                                            ?>
+                                        {{-- <li>
+                                            @php
+                                                $item = $doctor->practiceSchedules->first();
+                                            @endphp
+
                                             @if ($item == null)
                                                 <i class="far fa-clock"></i> <span class="text-success"></span>
                                             @elseif (\Carbon\Carbon::now()->format('Y-m-d') == $item->date)
@@ -124,7 +125,29 @@
                                             @else
                                                 <i class="far fa-clock"></i> <span class="text-warning"> Available on {{ \Carbon\Carbon::parse($item->date)->format('D, d M') }}</span> 
                                             @endif
-                                        </li>
+                                        </li> --}}
+
+                                        {{-- @foreach ($doctors as $doctor)                                      
+                                            @foreach ($doctor->doctorLocation as $doctorLocation)
+                                                @php
+                                                    $daysString = "";
+                                                @endphp
+
+                                                @foreach ($doctorLocation->doctorLocationDay as $day)
+                                                     @php
+                                                        if ($day->doctor_location_id == $doctorLocation->id) {
+                                                            $daysString .= $day->day . ', ';
+                                                        }
+                                                    @endphp
+                                                @endforeach
+
+                                                @php
+                                                    $daysString = rtrim($daysString, ', ');
+                                                @endphp
+
+                                                {{ $daysString }}
+                                            @endforeach
+                                        @endforeach --}}
                                     </ul>
                                     <div class="row row-sm">
                                         <div class="col-6">

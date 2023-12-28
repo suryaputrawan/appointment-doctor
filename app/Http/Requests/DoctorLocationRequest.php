@@ -29,7 +29,9 @@ class DoctorLocationRequest extends FormRequest
             'start_time'        => ['array'],
             'start_time.*'      => ['required'],
             'end_time'          => ['array'],
-            'end_time.*'        => ['required']
+            'end_time.*'        => ['required'],
+            'duration'          => ['array'],
+            'duration.*'        => ['required']
         ];
     }
 

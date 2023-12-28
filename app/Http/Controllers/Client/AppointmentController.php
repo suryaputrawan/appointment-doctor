@@ -318,8 +318,8 @@ class AppointmentController extends Controller
     public function getJadwalDokter(Request $request)
     {
         $jadwalPraktek = [];
-        $startDate = Carbon::parse('2023-12-01'); //Masih hardcode
-        $endDate = $startDate->copy()->addMonths(3);
+        $startDate = Carbon::now()->startOfMonth();;
+        $endDate = $startDate->copy()->addMonths(2);
 
         $currentDate = Carbon::parse($startDate);
 
@@ -389,7 +389,7 @@ class AppointmentController extends Controller
 
         $waktuAwal = Carbon::parse($doctorSchedule->start_time);
         $waktuAkhir = Carbon::parse($doctorSchedule->end_time);
-        $duration = 15; //Masih hardcode
+        $duration = $doctorSchedule->duration;
         $hasilWaktuAwal = [];
         $waktu = [];
 

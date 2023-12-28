@@ -75,16 +75,27 @@
                                                 <th>Day</th>
                                                 <th>Start Time</th>
                                                 <th>End Time</th>
+                                                <th>Duration</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($days as $index => $day)
                                                     <tr>
-                                                        <td>
+                                                        {{-- <td>
                                                             <input type="text" class="form-control @error('day') is-invalid @enderror" name="day[]" id="day" placeholder="Example : MON - FRI" value="{{ old('day') ?? $day->day }}" style='text-transform:uppercase' disabled>
                                                             @error('day')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
+                                                        </td> --}}
+                                                        <td>
+                                                            <select name="day[]" id="day" class="select select-item" disabled>
+                                                                <option selected disabled>-- Please Selected --</option>
+                                                                @foreach ($dayArray as $item)
+                                                                <option value="{{ $item }}"
+                                                                    {{ old('day', $day->day) == $item ? 'selected' : null }}>{{ $item }}
+                                                                </option>
+                                                                @endforeach
+                                                            </select>
                                                         </td>
                                                         <td>
                                                             <input type="time" class="form-control @error('start_time') is-invalid @enderror" name="start_time[]" id="time" value="{{ old('start_time') ?? $day->start_time }}" disabled>
@@ -97,6 +108,16 @@
                                                             @error('end_time')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
+                                                        </td>
+                                                        <td>
+                                                            <select name="duration[]" id="duration" class="select" disabled>
+                                                                <option selected disabled>Please Setting</option>
+                                                                @foreach ($slotDuration as $item)
+                                                                <option value="{{ $item }}"
+                                                                    {{ old('duration', $day->duration) == $item ? 'selected' : null }}>{{ $item }} Minutes
+                                                                </option>
+                                                                @endforeach
+                                                            </select>
                                                         </td>
                                                     </tr>
                                                 @endforeach

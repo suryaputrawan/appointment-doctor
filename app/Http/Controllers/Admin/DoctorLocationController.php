@@ -116,6 +116,11 @@ class DoctorLocationController extends Controller
     public function create()
     {
         $user = auth()->user();
+        $days = [
+            'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+        ];
+
+        $slotDuration = ['15', '30', '45', '60'];
 
         if (!$user->hasRole('Super Admin|Admin')) {
             $hospital = Hospital::orderBy('name', 'asc')->where('id', $user->hospital_id)
@@ -130,7 +135,9 @@ class DoctorLocationController extends Controller
                 'breadcrumb'    => 'Create Doctor locations',
                 'btnSubmit'     => 'Save',
                 'hospital'      => $hospital,
-                'doctor'        => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
+                'doctor'        => Doctor::orderBy('name', 'asc')->get(['id', 'name']),
+                'days'          => $days,
+                'slotDuration'  => $slotDuration
             ]);
         } else {
             abort(403);
@@ -157,11 +164,12 @@ class DoctorLocationController extends Controller
                 if ($request->day && $request->start_time && $request->end_time) {
                     for ($i = 0; $i < count($request->day); $i++) {
                         if ($request->day[$i]) {
-                            DoctorLocationDay::create([
+                            DoctorLocationDay::firstOrCreate([
                                 'doctor_location_id'    => $location->id,
-                                'day'                   => strtoupper($request->day[$i]),
+                                'day'                   => $request->day[$i],
                                 'start_time'            => $request->start_time[$i],
                                 'end_time'              => $request->end_time[$i],
+                                'duration'              => $request->duration[$i]
                             ]);
                         }
                     }
@@ -204,6 +212,12 @@ class DoctorLocationController extends Controller
             $data = DoctorLocation::find($id);
             $days = DoctorLocationDay::where('doctor_location_id', $data->id)->get();
 
+            $dayArray = [
+                'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+            ];
+
+            $slotDuration = ['15', '30', '45', '60'];
+
             if (!$data) {
                 return redirect()
                     ->back()
@@ -215,8 +229,10 @@ class DoctorLocationController extends Controller
                 'breadcrumb'    => 'View Doctor location',
                 'data'          => $data,
                 'days'          => $days,
-                'hospitals'      => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
-                'doctors'        => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
+                'dayArray'      => $dayArray,
+                'slotDuration'  => $slotDuration,
+                'hospitals'     => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
+                'doctors'       => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
             ]);
         } catch (\Throwable $e) {
             return redirect()
@@ -238,6 +254,12 @@ class DoctorLocationController extends Controller
                 $data = DoctorLocation::find($id);
                 $days = DoctorLocationDay::where('doctor_location_id', $data->id)->get();
 
+                $dayArray = [
+                    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+                ];
+
+                $slotDuration = ['15', '30', '45', '60'];
+
                 if (!$data) {
                     return redirect()
                         ->back()
@@ -250,8 +272,10 @@ class DoctorLocationController extends Controller
                     'btnSubmit'     => 'Save Change',
                     'data'          => $data,
                     'days'          => $days,
-                    'hospitals'      => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
-                    'doctors'        => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
+                    'dayArray'      => $dayArray,
+                    'slotDuration'  => $slotDuration,
+                    'hospitals'     => Hospital::orderBy('name', 'asc')->get(['id', 'name']),
+                    'doctors'       => Doctor::orderBy('name', 'asc')->get(['id', 'name'])
                 ]);
             } catch (\Throwable $e) {
                 return redirect()
@@ -300,9 +324,10 @@ class DoctorLocationController extends Controller
                         if ($request->day[$i]) {
                             DoctorLocationDay::create([
                                 'doctor_location_id'    => $data->id,
-                                'day'                   => strtoupper($request->day[$i]),
+                                'day'                   => $request->day[$i],
                                 'start_time'            => $request->start_time[$i],
                                 'end_time'              => $request->end_time[$i],
+                                'duration'              => $request->duration[$i],
                             ]);
                         }
                     }

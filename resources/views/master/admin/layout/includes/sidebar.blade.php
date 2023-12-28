@@ -51,12 +51,12 @@
                         </ul>
                     </li>
                 @endcan
-                @can('menu doctor schedules')
+                {{-- @can('menu doctor schedules')
                     <li class="{{ request()->routeIs('admin.practice-schedules.index') || 
                         request()->routeIs('admin.practice-schedules.create') ? 'active' : '' }}"> 
                         <a href="{{ route('admin.practice-schedules.index') }}"><i class="fe fe-calendar"></i> <span>Doctor Schedules</span></a>
                     </li>   
-                @endcan
+                @endcan --}}
                 @can('menu hospitals')
                     <li class="{{ request()->routeIs('admin.hospitals.index') ? 'active' : '' }}"> 
                         <a href="{{ route('admin.hospitals.index') }}"><i class="fa fa-hospital-o" aria-hidden="true"></i> <span>Hospitals</span></a>

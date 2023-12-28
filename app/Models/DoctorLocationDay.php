@@ -15,7 +15,8 @@ class DoctorLocationDay extends Model
         'doctor_location_id',
         'day',
         'start_time',
-        'end_time'
+        'end_time',
+        'duration'
     ];
 
     public function doctorLocation()
