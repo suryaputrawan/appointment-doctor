@@ -2,6 +2,14 @@
 
 @push('plugin-style')
     <link rel="stylesheet" href="{{ asset('assets/client/plugins/select2/css/select2.min.css') }}">
+    <style>
+        .pro-content h6 {
+        font-size: 1em; /* You can adjust the font size as needed */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    </style>
 @endpush
 
 @section('banner')

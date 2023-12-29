@@ -17,7 +17,7 @@
                     <li class="breadcrumb-item active">{{ $breadcrumb }}</li>
                 </ul>
             </div>
-            @can('create services')
+            @can('create off duty')
                 <div class="col-sm-5 col">
                     <a id="btn-add" class="btn btn-primary float-right mt-2" type="button">
                         Add

@@ -153,10 +153,10 @@
                                                 @endforeach
                                                 </span>
                                             </div>
-                                            <div class="mb-3">
-                                                <?php
-                                                $item = $doctor->practiceSchedules->first();
-                                                ?>
+                                            {{-- <div class="mb-3">
+                                                @php
+                                                    $item = $doctor->practiceSchedules->first();
+                                                @endphp
                                                 @if ($item == null)
                                                  <i class="far fa-clock"></i> <span class="text-success"></span>
                                                 @elseif (\Carbon\Carbon::now()->format('Y-m-d') == $item->date)
@@ -164,7 +164,7 @@
                                                 @else
                                                     <i class="far fa-clock"></i> <span class="text-warning"> Available on {{ \Carbon\Carbon::parse($item->date)->format('D, d M') }}</span> 
                                                 @endif
-                                            </div>  
+                                            </div>   --}}
                                         </div>
                                     </div>
                                     <div class="doc-info-right">
