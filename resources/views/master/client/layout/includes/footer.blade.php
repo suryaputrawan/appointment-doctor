@@ -44,7 +44,7 @@
                     @endphp
                     <div class="row">
                         @foreach ($hospitals as $item)
-                            <div class="col-6">
+                            <div class="col-lg-6 col-md-12 col-sm-12">
                                 <div class="clinic-content">
                                     <h4 class="clinic-name mb-2" style="color: white">{{ $item->name }}</h4>
                                     <div class="clinic-details mb-0">
@@ -79,7 +79,7 @@
             <div class="row text-right">
                 <div class="col-12">
                     <div class="copyright-text text-end">
-                        <p class="mb-0">Copyright @2023</p>
+                        <p class="mb-0"><script>document.write(new Date().getFullYear())</script> &copy; ADOS</p>
                     </div>
                 </div>
             </div>
