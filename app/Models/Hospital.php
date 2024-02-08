@@ -21,6 +21,7 @@ class Hospital extends Model
         'instagram',
         'facebook',
         'logo',
+        'link_gmap'
     ];
 
     public function getTakeLogoAttribute()

@@ -66,6 +66,16 @@
                         </div>
                     </div>
                     <div class="row form-row">
+                        <div class="col-12 col-sm-12">
+                            <div class="form-group">
+                                <label>Link Google Map <span class="text-danger">*</span></label>
+                                <textarea name="gmap" id="gmap" cols="5" rows="3" class="form-control">{{ old('gmap') }}</textarea>
+                                {{-- <input name="gmap" id="gmap" type="text" class="form-control" value="{{ old('gmap') }}"> --}}
+                                <p id="error-gmap" style="color: red" class="error"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-row">
                         <div class="col-12 col-sm-6">
                             <div class="form-group">
                                 <label>Logo <span class="text-danger">(Max: 1Mb, Format: png) *</span></label>

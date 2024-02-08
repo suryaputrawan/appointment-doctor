@@ -144,6 +144,7 @@
         function clearForm() {
             $("#hospital-form").find('input').val("");
             $('#hospital-form').find('.error').text("");
+            $('#gmap').val('');
 
             var preview = document.querySelector('#preview');
             preview.innerHTML = '';
@@ -244,6 +245,9 @@
                         $.each(response.errors.logo, function(key, error) {
                             $('#error-logo').append(error);
                         });
+                        $.each(response.errors.gmap, function(key, error) {
+                            $('#error-gmap').append(error);
+                        });
                     } else {
                         Toast.fire({
                             icon: 'warning',
@@ -313,6 +317,7 @@
                         $('#email').val(response.data.email);
                         $('#instagram').val(response.data.instagram);
                         $('#facebook').val(response.data.facebook);
+                        $('#gmap').val(response.data.link_gmap);
 
                         $('#preview').eq(0).html('<img src="/storage/'+response.data.logo+'"height="150" alt="Preview Gambar">');
                     }

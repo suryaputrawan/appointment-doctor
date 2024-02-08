@@ -7,11 +7,10 @@
                 <!-- Footer Widget -->
                 <div class="footer-widget footer-about">
                     <div class="footer-logo">
-                        <img src="{{ asset('assets/client/img/logo.png') }}" alt="logo" width="150px" height="65px">
+                        <img src="{{ asset('assets/client/img/logo.png') }}" alt="logo" width="100px" height="35px">
                         <p style="color: white">Appointment Doctor Specialist</p>
                     </div>
                     <div class="footer-about-content">
-                        <p style="color: white">Copyright @2023</p>
                         {{-- <div class="social-icon">
                             <ul>
                                 <li>
@@ -36,98 +35,57 @@
                 <!-- /Footer Widget -->
                 
             </div>
-            
-            {{-- <div class="col-lg-3 col-md-6">
-            
-                <!-- Footer Widget -->
+
+            <div class="col-lg-9 col-md-6">
                 <div class="footer-widget footer-menu">
-                    <h2 class="footer-title">For Patients</h2>
-                    <ul>
-                        <li><a href="search.html"><i class="fas fa-angle-double-right"></i> Search for Doctors</a></li>
-                        <li><a href="login.html"><i class="fas fa-angle-double-right"></i> Login</a></li>
-                        <li><a href="register.html"><i class="fas fa-angle-double-right"></i> Register</a></li>
-                        <li><a href="booking.html"><i class="fas fa-angle-double-right"></i> Booking</a></li>
-                        <li><a href="patient-dashboard.html"><i class="fas fa-angle-double-right"></i> Patient Dashboard</a></li>
-                    </ul>
-                </div>
-                <!-- /Footer Widget -->
-                
-            </div>
-            
-            <div class="col-lg-3 col-md-6">
-            
-                <!-- Footer Widget -->
-                <div class="footer-widget footer-menu">
-                    <h2 class="footer-title">For Doctors</h2>
-                    <ul>
-                        <li><a href="appointments.html"><i class="fas fa-angle-double-right"></i> Appointments</a></li>
-                        <li><a href="chat.html"><i class="fas fa-angle-double-right"></i> Chat</a></li>
-                        <li><a href="login.html"><i class="fas fa-angle-double-right"></i> Login</a></li>
-                        <li><a href="doctor-register.html"><i class="fas fa-angle-double-right"></i> Register</a></li>
-                        <li><a href="doctor-dashboard.html"><i class="fas fa-angle-double-right"></i> Doctor Dashboard</a></li>
-                    </ul>
-                </div>
-                <!-- /Footer Widget -->
-                
-            </div>
-            
-            <div class="col-lg-3 col-md-6">
-            
-                <!-- Footer Widget -->
-                <div class="footer-widget footer-contact">
-                    <h2 class="footer-title">Contact Us</h2>
-                    <div class="footer-contact-info">
-                        <div class="footer-address">
-                            <span><i class="fas fa-map-marker-alt"></i></span>
-                            <p> 3556  Beech Street, San Francisco,<br> California, CA 94108 </p>
-                        </div>
-                        <p>
-                            <i class="fas fa-phone-alt"></i>
-                            +1 315 369 5943
-                        </p>
-                        <p class="mb-0">
-                            <i class="fas fa-envelope"></i>
-                            doccure@example.com
-                        </p>
+                    <h2 class="footer-title">Clinic Locations</h2>
+                    @php
+                        $hospitals = dataHospitals()
+                    @endphp
+                    <div class="row">
+                        @foreach ($hospitals as $item)
+                            <div class="col-6">
+                                <div class="clinic-content">
+                                    <h4 class="clinic-name mb-2" style="color: white">{{ $item->name }}</h4>
+                                    <div class="clinic-details mb-0">
+                                        <h5 class="clinic-direction mb-2" style="color: whitesmoke">
+                                            <i class="fas fa-map-marker-alt mr-2"></i> {{ $item->address }} -
+                                            <a href="{{ $item->link_gmap }}" target="_blank" rel="noopener noreferrer">Get Directions</a>
+                                        </h5>
+                                        <h6 class="clinic-direction mb-2" style="color: whitesmoke">
+                                            <i class="fas fa-phone-alt mr-2"></i> {{ $item->phone }}
+                                        </h6>
+                                        <h6 class="clinic-direction mb-5" style="color: whitesmoke">
+                                            <i class="fas fa-envelope mr-2"></i> {{ $item->email }}
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>                        
+                        @endforeach
                     </div>
                 </div>
-                <!-- /Footer Widget -->
-                
-            </div> --}}
-            
+            </div>
         </div>
     </div>
 </div>
 <!-- /Footer Top -->
 
 <!-- Footer Bottom -->
-{{-- <div class="footer-bottom">
+<div class="footer-bottom">
     <div class="container-fluid">
     
         <!-- Copyright -->
         <div class="copyright">
-            <div class="row">
-                <div class="col-md-6 col-lg-6">
-                    <div class="copyright-text">
-                        <p class="mb-0"><a href="templateshub.net">Templates Hub</a></p>
+            <div class="row text-right">
+                <div class="col-12">
+                    <div class="copyright-text text-end">
+                        <p class="mb-0">Copyright @2023</p>
                     </div>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                
-                    <!-- Copyright Menu -->
-                    <div class="copyright-menu">
-                        <ul class="policy-menu">
-                            <li><a href="term-condition.html">Terms and Conditions</a></li>
-                            <li><a href="privacy-policy.html">Policy</a></li>
-                        </ul>
-                    </div>
-                    <!-- /Copyright Menu -->
-                    
                 </div>
             </div>
         </div>
         <!-- /Copyright -->
         
     </div>
-</div> --}}
+</div>
 <!-- /Footer Bottom -->

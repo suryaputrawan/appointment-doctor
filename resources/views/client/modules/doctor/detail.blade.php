@@ -295,9 +295,9 @@
                                                 <div class="clinic-content">
                                                     <h4 class="clinic-name mb-2"><a href="#">{{ $doctorLocation->hospital->name }}</a></h4>
                                                     <div class="clinic-details mb-0">
-                                                        <h5 class="clinic-direction mb-2"> <i class="fas fa-map-marker-alt mr-2"></i> {{ $doctorLocation->hospital->address }} <br></h5>
+                                                        <h5 class="clinic-direction mb-2"> <i class="fas fa-map-marker-alt mr-2"></i> {{ $doctorLocation->hospital->address }} - <a href="{{ $doctorLocation->hospital->link_gmap }}" target="_blank" rel="noopener noreferrer">Get Directions</a> <br></h5>
                                                         <h6 class="clinic-direction mb-2"> <i class="fas fa-phone-alt mr-2"></i> {{ $doctorLocation->hospital->phone }} <br></h6>
-                                                        <h6 class="clinic-direction mb-2"> <i class="fas fa-envelope mr-2"></i> {{ $doctorLocation->hospital->email }} <br></h6>
+                                                        <h6 class="clinic-direction mb-5"> <i class="fas fa-envelope mr-2"></i> {{ $doctorLocation->hospital->email }} <br></h6>
                                                     </div>
                                                 </div>
                                             </div>

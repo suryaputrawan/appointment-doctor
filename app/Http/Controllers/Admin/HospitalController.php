@@ -93,7 +93,8 @@ class HospitalController extends Controller
                 'email'                 => $request->email,
                 'instagram'             => $request->instagram,
                 'facebook'              => $request->facebook,
-                'logo'                  => $request->logo
+                'logo'                  => $request->logo,
+                'gmap'                  => $request->gmap
             ], [
                 'name'                  => 'required|max:100|min:5|unique:hospitals,name,NULL,id',
                 'address'               => 'required|min:5',
@@ -101,6 +102,7 @@ class HospitalController extends Controller
                 'whatsapp'              => 'required|min:9',
                 'email'                 => 'required|email|unique:hospitals,email',
                 'logo'                  => 'required|mimes:png|max:1000',
+                'gmap'                  => 'required|min:30'
             ]);
 
             if ($validator->fails()) {
@@ -120,6 +122,7 @@ class HospitalController extends Controller
                         'instagram'             => $request->instagram,
                         'facebook'              => $request->facebook,
                         'logo'                  => request('logo') ? $request->file('logo')->store('images/hospital/logo') : null,
+                        'link_gmap'             => $request->gmap
                     ]);
                     DB::commit();
                     return response()->json([
@@ -200,6 +203,7 @@ class HospitalController extends Controller
                 'instagram'             => $request->instagram,
                 'facebook'              => $request->facebook,
                 'logo'                  => $request->logo,
+                'gmap'                  => $request->gmap
             ], [
                 'name'                  => 'required|max:100|min:5|unique:hospitals,name,' . $data->id,
                 'address'               => 'required|min:5',
@@ -207,6 +211,7 @@ class HospitalController extends Controller
                 'whatsapp'              => 'required|min:9',
                 'email'                 => 'required|email|unique:hospitals,email,' . $data->id,
                 'logo'                  => request('logo') ? 'mimes:png|max:1000' : '',
+                'gmap'                  => 'required|min:30'
             ]);
 
             if ($validator->fails()) {
@@ -240,7 +245,8 @@ class HospitalController extends Controller
                             'email'                 => $request->email,
                             'instagram'             => $request->instagram,
                             'facebook'              => $request->facebook,
-                            'logo'                  => $logo
+                            'logo'                  => $logo,
+                            'link_gmap'             => $request->gmap
                         ]);
 
                         DB::commit();
