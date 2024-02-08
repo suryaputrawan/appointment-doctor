@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Throwable;
 use Carbon\Carbon;
 use App\Models\Doctor;
+use App\Models\Hospital;
 use App\Models\OffDutyDate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,12 +20,23 @@ class OffDutyDateController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+
         if (request()->type == 'datatable') {
-            $data = OffDutyDate::with([
-                'doctor'    => function ($query) {
-                    $query->select('id', 'name');
-                },
-            ])->orderBy('date', 'desc')->get();
+            if (!$user->hasRole('Super Admin|Admin')) {
+                $data = OffDutyDate::with([
+                    'doctor'    => function ($query) {
+                        $query->select('id', 'name');
+                    },
+                ])->where('hospital_id', auth()->user()->hospital_id)
+                    ->orderBy('date', 'desc')->get();
+            } else {
+                $data = OffDutyDate::with([
+                    'doctor'    => function ($query) {
+                        $query->select('id', 'name');
+                    },
+                ])->orderBy('date', 'desc')->get();
+            }
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
@@ -65,11 +77,12 @@ class OffDutyDateController extends Controller
                 ->addColumn('date', function ($data) {
                     return Carbon::parse($data->date)->format('d M Y');
                 })
-                ->rawColumns(['action', 'doctor_name', 'date'])
+                ->addColumn('fasyankes', function ($data) {
+                    return $data->hospital->name;
+                })
+                ->rawColumns(['action', 'doctor_name', 'date', 'hospital'])
                 ->make(true);
         }
-
-        $user = auth()->user();
 
         if (!$user->hasRole('Super Admin|Admin')) {
             $doctor = Doctor::with([
@@ -82,14 +95,19 @@ class OffDutyDateController extends Controller
                 })
                 ->where('isAktif', 1)->orderBy('name', 'asc')
                 ->get(['id', 'name']);
+
+            $hospital = Hospital::orderBy('name', 'asc')->where('id', $user->hospital_id)
+                ->get(['id', 'name']);
         } else {
             $doctor = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']);
+            $hospital = Hospital::orderBy('name', 'asc')->get(['id', 'name']);
         }
 
         return view('admin.modules.off-duty.index', [
             'pageTitle'     => 'Off Duty Dates',
             'breadcrumb'    => 'Doctor Off Duty',
-            'doctor'        => $doctor
+            'doctor'        => $doctor,
+            'hospital'      => $hospital
         ]);
     }
 
@@ -112,13 +130,15 @@ class OffDutyDateController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->can('create services')) {
+        if ($user->can('create off duty')) {
             $validator = Validator::make([
                 'doctor'        => $request->doctor,
+                'fasyankes'      => $request->fasyankes,
                 'date'          => $request->date,
                 'reason'        => $request->reason
             ], [
                 'doctor'        => 'required',
+                'fasyankes'     => 'required',
                 'date'          => 'required',
                 'reason'        => 'required|min:3',
             ]);
@@ -134,12 +154,13 @@ class OffDutyDateController extends Controller
                     OffDutyDate::firstOrCreate([
                         'doctor_id'     => $request->doctor,
                         'date'          => $request->date,
+                        'hospital_id'   => $request->fasyankes,
                         'reason'        => $request->reason
                     ]);
                     DB::commit();
                     return response()->json([
                         'status'  => 200,
-                        'message' => 'Off duty has been created',
+                        'message' => 'Off duty doctor has been created',
                     ], 200);
                 } catch (Throwable $th) {
                     DB::rollBack();
@@ -209,10 +230,12 @@ class OffDutyDateController extends Controller
             $validator = Validator::make([
                 'doctor'        => $request->doctor,
                 'date'          => $request->date,
+                'fasyankes'     => $request->fasyankes,
                 'reason'        => $request->reason
             ], [
                 'doctor'        => 'required',
                 'date'          => 'required',
+                'fasyankes'     => 'required',
                 'reason'        => 'required|min:3',
             ]);
 
@@ -229,6 +252,7 @@ class OffDutyDateController extends Controller
                         $data->update([
                             'doctor_id'     => $request->doctor,
                             'date'          => $request->date,
+                            'hospital_id'   => $request->fasyankes,
                             'reason'        => $request->reason
                         ]);
 
@@ -236,7 +260,7 @@ class OffDutyDateController extends Controller
 
                         return response()->json([
                             'status'  => 200,
-                            'message' => 'Off duty has been updated',
+                            'message' => 'Off duty doctor has been updated',
                         ], 200);
                     } catch (\Throwable $th) {
                         DB::rollBack();
@@ -283,7 +307,7 @@ class OffDutyDateController extends Controller
 
                 return response()->json([
                     'status'  => 200,
-                    'message' => "Off duty has been deleted..!",
+                    'message' => "Off duty doctor has been deleted..!",
                 ], 200);
             } catch (\Throwable $e) {
                 return response()->json([

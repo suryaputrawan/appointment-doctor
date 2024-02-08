@@ -23,7 +23,19 @@ class DoctorController extends Controller
     public function index()
     {
         if (request()->type == 'datatable') {
-            $data = Doctor::with('doctorLocation')->orderBy('name', 'asc')->get();
+            $user = auth()->user();
+
+            if (!$user->hasRole('Super Admin|Admin')) {
+                $data = Doctor::with([
+                    'doctorLocation'    => function ($query) {
+                        $query->select('id', 'doctor_id', 'hospital_id');
+                    }
+                ])->whereHas('doctorLocation', function ($query) {
+                    $query->where('hospital_id', auth()->user()->hospital_id);
+                })->orderBy('name', 'asc')->get();
+            } else {
+                $data = Doctor::with('doctorLocation')->orderBy('name', 'asc')->get();
+            }
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {

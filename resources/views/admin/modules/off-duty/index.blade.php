@@ -39,6 +39,7 @@
                                             <th style="width: 100px">ACTION</th>   
                                         @endcanany
                                         <th>Doctor</th>
+                                        <th>Fasyankes</th>
                                         <th>Off Duty Date</th>
                                         <th>Reason</th>
                                     </tr>
@@ -104,6 +105,7 @@
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
                 @endcanany
                 { data: "doctor_name", name: "doctor_name", orderable: true  },
+                { data: "fasyankes", name: "fasyankes", orderable: true  },
                 { data: "date", name: "date", orderable: false, searchable: false, className: "text-center",  },
                 { data: "reason", name: "reason", orderable: false, searchable: false  },
             ],
@@ -117,6 +119,8 @@
         function clearForm() {
             $("#off-duty-form").find('input').val("");
             $('#off-duty-form').find('.error').text("");
+            $('#doctor').val("").trigger('change');
+            $('#fasyankes').val("").trigger('change');
 
             ajaxUrl = "{{ route('admin.off-duty.store') }}";
             ajaxType = "POST";
@@ -191,6 +195,9 @@
                         $.each(response.errors.date, function(key, error) {
                             $('#error-date').append(error);
                         });
+                        $.each(response.errors.fasyankes, function(key, error) {
+                            $('#error-fasyankes').append(error);
+                        });
                         $.each(response.errors.reason, function(key, error) {
                             $('#error-reason').append(error);
                         });
@@ -256,6 +263,7 @@
 
                         $('#doctor').val(response.data.doctor_id).trigger('change');
                         $('#date').val(response.data.date);
+                        $('#fasyankes').val(response.data.hospital_id).trigger('change');
                         $('#reason').val(response.data.reason);
                     }
                 },

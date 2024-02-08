@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('hospitals', function (Blueprint $table) {
-            $table->text('link_gmap')->nullable()->after('logo');
+        Schema::table('off_duty_dates', function (Blueprint $table) {
+            $table->foreignId('hospital_id')->nullable()->after('doctor_id')->constrained()->cascadeOnDelete();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('hospitals', function (Blueprint $table) {
-            $table->dropColumn('link_gmap');
+        Schema::table('off_duty_dates', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('hospital_id');
         });
     }
 };

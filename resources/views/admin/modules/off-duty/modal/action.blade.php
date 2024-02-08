@@ -32,6 +32,22 @@
                         </div>
                     </div>
                     <div class="row form-row">
+                        <div class="col-12 col-sm-8">
+                            <div class="form-group">
+                                <label>Fasyankes <span class="text-danger">*</span></label>
+                                <select name="fasyankes" id="fasyankes" class="form-control select">
+                                    <option value="">-- Please Selected --</option>
+                                    @foreach ($hospital as $data)
+                                    <option value="{{ $data->id }}"
+                                        {{ old('fasyankes') == $data->id ? 'selected' : null }}>{{ $data->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                <p id="error-fasyankes" style="color: red" class="error"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-row">
                         <div class="col-12 col-sm-12">
                             <div class="form-group">
                                 <label>Reason <span class="text-danger">*</span></label>

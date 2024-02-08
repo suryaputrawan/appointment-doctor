@@ -16,11 +16,17 @@ class OffDutyDate extends Model
     protected $fillable = [
         'doctor_id',
         'date',
+        'hospital_id',
         'reason'
     ];
 
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(Doctor::class, 'doctor_id', 'id');
+    }
+
+    public function hospital(): BelongsTo
+    {
+        return $this->belongsTo(Hospital::class, 'hospital_id', 'id');
     }
 }

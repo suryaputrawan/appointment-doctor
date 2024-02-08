@@ -327,7 +327,8 @@ class AppointmentController extends Controller
         $id_hospital    = $request->id_hospital;
         $id_doctor      = $request->id_doctor;
 
-        $offDates = OffDutyDate::where('doctor_id', $id_doctor)->pluck('date');
+        $offDates = OffDutyDate::where('doctor_id', $id_doctor)
+            ->where('hospital_id', $id_hospital)->pluck('date');
 
         $doctorLocation = DoctorLocation::where('doctor_id', $id_doctor)
             ->where('hospital_id', $id_hospital)
