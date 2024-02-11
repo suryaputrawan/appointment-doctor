@@ -9,6 +9,14 @@
     
     <!-- Fancybox CSS -->
     <link rel="stylesheet" href="{{ asset('assets/client/plugins/fancybox/jquery.fancybox.min.css') }}">
+
+    <style>
+        /* CSS disabled tanggal yang sudah lewat */
+        .disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+    </style>
 @endpush
 
 @section('breadcrumb')
@@ -46,7 +54,7 @@
                         <form action="{{ route('client.doctor.search') }}" method="get">
                             <div class="filter-widget">
                                 <h4>Select Date</h4>
-                                <input name="date" type="date" class="form-control" placeholder="Select Date"
+                                <input name="date" type="date" id="tanggal" class="form-control" placeholder="Select Date"
                                 @if (Request::get('date'))
                                     value="{{ Request::get('date') }}"
                                 @endif
@@ -210,4 +218,31 @@
     
     <!-- Fancybox JS -->
     <script src="{{ asset('assets/client/plugins/fancybox/jquery.fancybox.min.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var inputTanggal = document.getElementById('tanggal');
+            var tanggalSekarang = new Date();
+
+            // Mengatur nilai minimum input tanggal
+            inputTanggal.setAttribute('min', formatTanggal(tanggalSekarang));
+
+            // Mengubah warna tanggal yang sudah lewat
+            var tanggalItems = document.querySelectorAll('input[type="date"]');
+            tanggalItems.forEach(function(tanggalItem) {
+                var tanggalValue = new Date(tanggalItem.value);
+                if (tanggalValue < tanggalSekarang) {
+                    tanggalItem.classList.add('disabled');
+                }
+            });
+
+            // Fungsi untuk mengubah format tanggal
+            function formatTanggal(date) {
+                var tahun = date.getFullYear();
+                var bulan = (date.getMonth() + 1).toString().padStart(2, '0');
+                var hari = date.getDate().toString().padStart(2, '0');
+                return tahun + '-' + bulan + '-' + hari;
+            }
+        });
+    </script>
 @endpush
