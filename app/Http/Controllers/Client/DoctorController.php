@@ -48,6 +48,7 @@ class DoctorController extends Controller
     public function searchDoctor(Request $request)
     {
         $date = $request->date;
+        $day = Carbon::parse($date)->format('l');
         $gender = [];
         $specialist = [];
         $hospital = [];
@@ -70,16 +71,23 @@ class DoctorController extends Controller
             },
             'doctorLocation'    => function ($query) {
                 $query->select('id', 'doctor_id', 'hospital_id')
-                    ->with('hospital');
+                    ->with('hospital', 'doctorLocationDay');
             },
-            'practiceSchedules' => function ($query) {
-                $query->where('date', '>=', Carbon::now()->format('Y-m-d'))
-                    ->select('id', 'doctor_id', 'hospital_id', 'date', 'start_time', 'end_time', 'booking_status');
-            }
+            // 'practiceSchedules' => function ($query) {
+            //     $query->where('date', '>=', Carbon::now()->format('Y-m-d'))
+            //         ->select('id', 'doctor_id', 'hospital_id', 'date', 'start_time', 'end_time', 'booking_status');
+            // }
         ])
-            ->when($date, function ($query) use ($date) {
-                $query->whereHas('practiceSchedules', function ($q) use ($date) {
-                    $q->where('date', $date);
+            // ->when($date, function ($query) use ($date) {
+            //     $query->whereHas('practiceSchedules', function ($q) use ($date) {
+            //         $q->where('date', $date);
+            //     });
+            // })
+            ->when($date, function ($query) use ($day) {
+                $query->whereHas('doctorLocation', function ($q) use ($day) {
+                    $q->whereHas('doctorLocationDay', function ($qu) use ($day) {
+                        $qu->where('day', $day);
+                    });
                 });
             })
             ->when($gender, function ($query) use ($gender) {
