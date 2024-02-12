@@ -389,42 +389,64 @@ class AppointmentController extends Controller
         $dateBooking    = $request->id_date;
         $dateDay        = $request->id_day;
 
+        // Mengambil lokasi dokter berdasarkan id dokter dan id rumah sakit
         $doktorLocation = DoctorLocation::where('doctor_id', $id_doctor)->where('hospital_id', $id_hospital)->first();
+
+        // Mengambil jadwal dokter berdasarkan lokasi dokter dan hari
         $doctorSchedule = DoctorLocationDay::where('doctor_location_id', $doktorLocation->id)
             ->where('day', $dateDay)->first();
 
+        // Mengambil data rumah sakit berdasarkan id rumah sakit
+        $hospital = Hospital::where('id', $id_hospital)->first();
+
+        // Menginisialisasi waktu saat ini
+        $currentTime = Carbon::now('Asia/Singapore');
+
+        // Mengambil waktu awal dan akhir dari jadwal dokter
         $waktuAwal = Carbon::parse($doctorSchedule->start_time);
         $waktuAkhir = Carbon::parse($doctorSchedule->end_time);
         $duration = $doctorSchedule->duration;
         $hasilWaktuAwal = [];
         $waktu = [];
 
+        // Looping untuk menentukan waktu yang tersedia
         while ($waktuAwal < $waktuAkhir) {
             $hasilWaktuAwal[] = $waktuAwal->copy();
             $waktuAwal->addMinutes($duration);
         }
 
-        foreach ($hasilWaktuAwal as $waktuAwal) {
-            $waktuAkhir = $waktuAwal->copy();
-            $waktuAkhir->addMinutes($duration);
+        // Memeriksa konflik waktu dengan janji yang sudah ada
+        foreach ($hasilWaktuAwal as $start) {
+            $end = $start->copy();
+            $end->addMinutes($duration);
 
             $conflictExists = Appointment::where('doctor_id', $id_doctor)
                 ->where('hospital_id', $id_hospital)
                 ->where('date', $dateBooking)
-                ->where('start_time', $waktuAwal)
-                ->where('end_time', $waktuAkhir)
+                ->where('start_time', $start)
+                ->where('end_time', $end)
                 ->exists();
 
+            // Menambahkan waktu yang tersedia jika tidak ada konflik
             if (!$conflictExists) {
-                $waktu[] = [
-                    'start_time' => $waktuAwal,
-                    'end_time' => $waktuAkhir
-                ];
+                if ($dateBooking == $currentTime->toDateString()) {
+                    if ($start->format('H:i:s') > $currentTime->format('H:i:s')) {
+                        $waktu[] = [
+                            'start_time' => $start,
+                            'end_time' => $end
+                        ];
+                    }
+                } else {
+                    $waktu[] = [
+                        'start_time' => $start,
+                        'end_time' => $end
+                    ];
+                }
             }
         }
 
+        // Menyiapkan opsi waktu untuk dikirim sebagai respons JSON
         $option = "<option selected disabled>Select Time</option>";
-
         foreach ($waktu as $index => $item) {
             $selectedState = '';
             $index = $index + 1;
@@ -437,21 +459,15 @@ class AppointmentController extends Controller
             $end_time = Carbon::parse($item['end_time'])->format('H:i');
             $time = "$start_time - $end_time Wita";
 
-            $hospital = Hospital::where('id', $id_hospital)->first();
-
             $option .=  "<option value='$index' $selectedState data-start-time='$start_time' data-end-time='$end_time'>$time</option>";
         }
 
+        // Menyiapkan respons JSON berdasarkan ketersediaan waktu
         if ($waktu) {
             return response()->json([
                 'status' => 200,
                 'data' => $option,
             ]);
-            // } elseif ($waktu->count() == 0) {
-            //     return response()->json([
-            //         'status' => 201,
-            //         'message' => 'Fully booked, please whatsapp admin on ' . $hospital->whatsapp . ' to book the appointment',
-            //     ]);
         } elseif (empty($waktu)) {
             return response()->json([
                 'status' => 201,
