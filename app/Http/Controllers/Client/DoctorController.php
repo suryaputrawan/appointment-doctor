@@ -99,6 +99,7 @@ class DoctorController extends Controller
                 });
             })
             ->where('isAktif', 1)
+            ->orderBy('name', 'asc')
             ->simplePaginate(5);
 
         // menambahkan query string pada page pagination
