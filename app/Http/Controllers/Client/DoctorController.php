@@ -49,13 +49,9 @@ class DoctorController extends Controller
     {
         $date = $request->date;
         $day = Carbon::parse($date)->format('l');
-        $gender = [];
+
         $specialist = [];
         $hospital = [];
-
-        if ($request->gender) {
-            $gender = $_GET['gender'];
-        }
 
         if ($request->specialist) {
             $specialist = $_GET['specialist'];
@@ -90,9 +86,6 @@ class DoctorController extends Controller
                     });
                 });
             })
-            ->when($gender, function ($query) use ($gender) {
-                $query->whereIn('gender', $gender);
-            })
             ->when($specialist, function ($query) use ($specialist) {
                 $query->whereHas('speciality', function ($q) use ($specialist) {
                     $q->whereIn('name', $specialist);
@@ -106,7 +99,10 @@ class DoctorController extends Controller
                 });
             })
             ->where('isAktif', 1)
-            ->get();
+            ->simplePaginate(5);
+
+        // menambahkan query string pada page pagination
+        $doctors->appends($request->only('date', 'specialist', 'hospital'));
 
         return view('client.modules.doctor.search', [
             'doctors'       => $doctors,

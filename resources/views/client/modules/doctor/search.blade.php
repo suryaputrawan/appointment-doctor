@@ -54,38 +54,19 @@
                         <form action="{{ route('client.doctor.search') }}" method="get">
                             <div class="filter-widget">
                                 <h4>Select Date</h4>
-                                <input name="date" type="date" id="tanggal" class="form-control" placeholder="Select Date"
-                                @if (Request::get('date'))
-                                    value="{{ Request::get('date') }}"
-                                @endif
-                                >
+                                <div class="input-group">
+                                    <input name="date" type="date" id="tanggal" class="form-control" placeholder="Select Date"
+                                        @if (Request::get('date'))
+                                            value="{{ Request::get('date') }}"
+                                        @endif
+                                    >
+                                    <div class="input-group-append">
+                                        <button class="btn btn-secondary clear-date" type="button">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-
-                            {{-- Gender --}}
-                            {{-- <div class="filter-widget">
-                                <h4>Gender</h4>
-                                <div>
-                                    <label class="custom_check">
-                                        <input type="checkbox" name="gender[]" value="M"
-                                        @if(is_array(Request::get('gender')) && in_array('M', Request::get('gender'))) 
-                                            checked
-                                        @endif
-                                        >
-                                        <span class="checkmark"></span> Male Doctor
-                                    </label>
-                                </div>
-                                <div>
-                                    <label class="custom_check">
-                                        <input type="checkbox" name="gender[]" value="F"
-                                        @if(is_array(Request::get('gender')) && in_array('F', Request::get('gender'))) 
-                                            checked
-                                        @endif
-                                        >
-                                        <span class="checkmark"></span> Female Doctor
-                                    </label>
-                                </div>
-                            </div> --}}
-                            {{-- End Gender --}}
 
                             {{-- Speciality --}}
                             <div class="filter-widget">
@@ -185,6 +166,9 @@
                             </div>
                         </div>
                     @endforeach
+                    <div class="load-more text-center">
+                        {{ $doctors->links() }}
+                    </div>	
                 @else
                     <div class="card">
                         <div class="card-body">
@@ -194,10 +178,6 @@
                     </div>
                 @endif
                 <!-- /Doctor Widget -->
-
-                {{-- <div class="load-more text-center">
-                    <a class="btn btn-primary btn-sm" href="javascript:void(0);">Load More</a>	
-                </div>	 --}}
             </div>
         </div>
     </div>
@@ -220,6 +200,12 @@
     <script src="{{ asset('assets/client/plugins/fancybox/jquery.fancybox.min.js') }}"></script>
 
     <script>
+        $(document).ready(function() {
+            $('.clear-date').click(function() {
+                $('#tanggal').val('');
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             var inputTanggal = document.getElementById('tanggal');
             var tanggalSekarang = new Date();
@@ -231,7 +217,7 @@
             var tanggalItems = document.querySelectorAll('input[type="date"]');
             tanggalItems.forEach(function(tanggalItem) {
                 var tanggalValue = new Date(tanggalItem.value);
-                if (tanggalValue < tanggalSekarang) {
+                if (tanggalValue < tanggalSekarang && tanggalItem.value !== formatTanggal(tanggalSekarang)) {
                     tanggalItem.classList.add('disabled');
                 }
             });
