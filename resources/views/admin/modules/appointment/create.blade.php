@@ -152,6 +152,12 @@
                                         @error('booking_date')
                                             <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
                                         @enderror
+                                        <div id="loading-date" style="display: none">
+                                            <div class="d-flex align-items-center">
+                                                <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
+                                                <p>Please wait...</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-12">
@@ -166,6 +172,12 @@
                                             <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
                                         @enderror
                                         <span class="text-danger" id="info-time"></span>
+                                        <div id="loading-time" style="display: none">
+                                            <div class="d-flex align-items-center">
+                                                <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
+                                                <p>Please wait...</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -256,110 +268,112 @@
         //-- End get data date
 
         //-- Get data date
-        function loadDateData(id_hospital, id_doctor, selected, replaceChild) {
+        // function loadDateData(id_hospital, id_doctor, selected, replaceChild) {
 
-            let url = "{{ route('client.getBookingDate') }}";
+        //     let url = "{{ route('client.getBookingDate') }}";
 
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
+        //     const Toast = Swal.mixin({
+        //         toast: true,
+        //         position: 'top-end',
+        //         showConfirmButton: false,
+        //         timer: 3000,
+        //         timerProgressBar: true,
+        //         didOpen: (toast) => {
+        //             toast.addEventListener('mouseenter', Swal.stopTimer)
+        //             toast.addEventListener('mouseleave', Swal.resumeTimer)
+        //         }
+        //     });
 
-            $.ajax({
-                type: 'GET',
-                url: url,
-                data: {
-                    id_hospital: id_hospital,
-                    id_doctor: id_doctor,
-                    selected: selected
-                },
-                cache: false,
+        //     $.ajax({
+        //         type: 'GET',
+        //         url: url,
+        //         data: {
+        //             id_hospital: id_hospital,
+        //             id_doctor: id_doctor,
+        //             selected: selected
+        //         },
+        //         cache: false,
 
-                success: function (response) {
+        //         success: function (response) {
 
-                    if (response.status == 404) {
-                        Toast.fire({
-                            icon: 'warning',
-                            title: response.message,
-                        });
-                    } else {
-                        $('#booking-date').html(response.data);
-                        if (replaceChild == true) {
-                            $('#booking-time').html('<option></option>');
-                        }
-                    }
-                },
-                error: function (response) {
-                    Toast.fire({
-                        icon: 'error',
-                        title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
-                    });
-                }
-            });
-        }
+        //             if (response.status == 404) {
+        //                 Toast.fire({
+        //                     icon: 'warning',
+        //                     title: response.message,
+        //                 });
+        //             } else {
+        //                 $('#booking-date').html(response.data);
+        //                 if (replaceChild == true) {
+        //                     $('#booking-time').html('<option></option>');
+        //                 }
+        //             }
+        //         },
+        //         error: function (response) {
+        //             Toast.fire({
+        //                 icon: 'error',
+        //                 title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
+        //             });
+        //         }
+        //     });
+        // }
         //-- End get data date
 
         //-- Get data time
-        function loadTimeData(id_hospital, id_doctor, id_date, selected, replaceChild) {
+        // function loadTimeData(id_hospital, id_doctor, id_date, selected, replaceChild) {
 
-            let url = "{{ route('client.getBookingTime') }}";
+        //     let url = "{{ route('client.getBookingTime') }}";
 
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
+        //     const Toast = Swal.mixin({
+        //         toast: true,
+        //         position: 'top-end',
+        //         showConfirmButton: false,
+        //         timer: 3000,
+        //         timerProgressBar: true,
+        //         didOpen: (toast) => {
+        //             toast.addEventListener('mouseenter', Swal.stopTimer)
+        //             toast.addEventListener('mouseleave', Swal.resumeTimer)
+        //         }
+        //     });
 
-            $.ajax({
-                type: 'GET',
-                url: url,
-                data: {
-                    id_hospital: id_hospital,
-                    id_doctor: id_doctor,
-                    id_date: id_date,
-                    selected: selected
-                },
-                cache: false,
+        //     $.ajax({
+        //         type: 'GET',
+        //         url: url,
+        //         data: {
+        //             id_hospital: id_hospital,
+        //             id_doctor: id_doctor,
+        //             id_date: id_date,
+        //             selected: selected
+        //         },
+        //         cache: false,
 
-                success: function (response) {
+        //         success: function (response) {
 
-                    if (response.status == 404) {
-                        Toast.fire({
-                            icon: 'warning',
-                            title: response.message,
-                        });
-                    } else if (response.status == 201) {
-                        $('#item-form').toggle();
-                        $('#info-item-form').toggle();
-                        $('#info-time').text(response.message);
-                    } else {
-                        $('#booking-time').html(response.data);
-                    } 
-                },
-                error: function (response) {
-                    Toast.fire({
-                        icon: 'error',
-                        title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
-                    });
-                }
-            });
-        }
+        //             if (response.status == 404) {
+        //                 Toast.fire({
+        //                     icon: 'warning',
+        //                     title: response.message,
+        //                 });
+        //             } else if (response.status == 201) {
+        //                 $('#item-form').toggle();
+        //                 $('#info-item-form').toggle();
+        //                 $('#info-time').text(response.message);
+        //             } else {
+        //                 $('#booking-time').html(response.data);
+        //             } 
+        //         },
+        //         error: function (response) {
+        //             Toast.fire({
+        //                 icon: 'error',
+        //                 title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
+        //             });
+        //         }
+        //     });
+        // }
         //-- End get data time
 
         function loadJadwalDokter(id_hospital, id_doctor, selected, replaceChild) {
+            $('#loading-date').show();
+
             let url = "{{ route('client.getJadwalDokter') }}";
 
             const Toast = Swal.mixin({
@@ -385,7 +399,7 @@
                 cache: false,
 
                 success: function (response) {
-
+                    $('#loading-date').hide();
                     if (response.status == 404) {
                         Toast.fire({
                             icon: 'warning',
@@ -399,6 +413,7 @@
                     }
                 },
                 error: function (response) {
+                    $('#loading-date').hide();
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
@@ -408,6 +423,7 @@
         }
 
         function loadWaktuDokter(id_hospital, id_doctor, id_date, id_day, selected, replaceChild) {
+            $('#loading-time').show();
 
             let url = "{{ route('client.getWaktuDokter') }}";
 
@@ -436,7 +452,7 @@
                 cache: false,
 
                 success: function (response) {
-
+                    $('#loading-time').hide();
                     if (response.status == 404) {
                         Toast.fire({
                             icon: 'warning',
@@ -451,6 +467,7 @@
                     } 
                 },
                 error: function (response) {
+                    $('#loading-time').hide();
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
@@ -468,6 +485,8 @@
             $('#booking-end-time').val("");
             $('#booking-day').val("");
             $('#booking-day-date').val("");
+
+            $('#booking-time').html('<option></option>');
         });
 
         //Dependent hospital dropdown
@@ -482,6 +501,7 @@
             $('#booking-end-time').val("");
             $('#booking-day').val("");
             $('#booking-day-date').val("");
+            $('#booking-time').html('<option></option>');
         });
 
         //Dependent date dropdown
@@ -498,6 +518,7 @@
             let id_doctor   = $('#doctor').val();
             let id_date     = $('#booking-day-date').val();
             $('#info-time').text('');
+            $('#booking-time').html('<option></option>');
 
             var bookingDay = $('#booking-day').val();
 
