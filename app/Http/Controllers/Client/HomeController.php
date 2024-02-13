@@ -27,6 +27,7 @@ class HomeController extends Controller
             }
         ])
             ->where('isAktif', 1)
+            ->orderBy('name', 'asc')
             ->get();
 
         $specialities = Speciality::get(['id', 'name', 'picture']);
