@@ -98,12 +98,12 @@
                         @foreach ($doctors as $doctor)
                             <div class="profile-widget">
                                 <div class="doc-img">
-                                    <a href="{{ route('client.doctor.show', Crypt::encryptString($doctor->id)) }}">
+                                    <a href="{{ route('client.doctor.show', $doctor->slug) }}">
                                         <img class="img-fluid" alt="User Image" src="{{ $doctor->takePicture }}">
                                     </a>
                                 </div>
                                 <div class="pro-content">
-                                    <h6><a href={{ route('client.doctor.show', Crypt::encryptString($doctor->id)) }}">{{ $doctor->name }}</a></h6>
+                                    <h6><a href="{{ route('client.doctor.show', $doctor->slug) }}">{{ $doctor->name }}</a></h6>
                                     <p class="speciality">{{ $doctor->specialization }} - {{ $doctor->speciality->name }}</p>
                                     <ul class="available-info">
                                         <div class="row">
@@ -159,10 +159,10 @@
                                     </ul>
                                     <div class="row row-sm">
                                         <div class="col-6">
-                                            <a href="{{ route('client.doctor.show', Crypt::encryptString($doctor->id)) }}" class="btn view-btn">View Profile</a>
+                                            <a href="{{ route('client.doctor.show', $doctor->slug) }}" class="btn view-btn">View Profile</a>
                                         </div>
                                         <div class="col-6">
-                                            <a href="{{ route('client.patient.booking', Crypt::encryptString($doctor->id)) }}" class="btn book-btn">Book Now</a>
+                                            <a href="{{ route('client.patient.booking', $doctor->slug) }}" class="btn book-btn">Book Now</a>
                                         </div>
                                     </div>
                                 </div>

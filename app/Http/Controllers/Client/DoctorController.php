@@ -15,15 +15,16 @@ use Illuminate\Support\Facades\Crypt;
 
 class DoctorController extends Controller
 {
-    public function show(Request $request, $id)
+    public function show(Request $request, $slug)
     {
         $doctor = null;
         $doctorEducations = null;
         $doctorLocations = null;
 
         try {
-            $id = Crypt::decryptString($id);
-            $doctor = Doctor::with('speciality')->find($id);
+            // $id = Crypt::decryptString($id);
+            // $doctor = Doctor::with('speciality')->find($id);
+            $doctor = Doctor::with('speciality')->where('slug', $slug)->first();
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
         } catch (\Exception $e) {

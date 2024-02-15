@@ -20,11 +20,13 @@ use Illuminate\Support\Facades\Crypt;
 
 class AppointmentController extends Controller
 {
-    public function booking($id)
+    public function booking($slug)
     {
         try {
-            $id = Crypt::decryptString($id);
-            $data = Doctor::find($id);
+            // $id = Crypt::decryptString($id);
+            // $data = Doctor::find($id);
+
+            $data = Doctor::where('slug', $slug)->first();
 
             if (!$data) {
                 return redirect()

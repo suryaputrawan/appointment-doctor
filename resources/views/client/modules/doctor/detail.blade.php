@@ -91,7 +91,7 @@
                                 </a>
                             </div> --}}
                             <div class="clinic-booking">
-                                <a class="apt-btn" href="{{ route('client.patient.booking', Crypt::encryptString($doctor->id)) }}">Book Appointment</a>
+                                <a class="apt-btn" href="{{ route('client.patient.booking', $doctor->slug) }}">Book Appointment</a>
                             </div>
                         </div>
                     </div>
