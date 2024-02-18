@@ -189,8 +189,11 @@ class AppointmentController extends Controller
                 })
                 ->where('isAktif', 1)->orderBy('name', 'asc')
                 ->get(['id', 'name']);
+
+            $hospitals = Hospital::where('id', $user->hospital_id)->get(['id', 'name']);
         } else {
             $doctor = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']);
+            $hospitals = Hospital::get(['id', 'name']);
         }
 
         if ($user->can('create appointment')) {
@@ -199,6 +202,7 @@ class AppointmentController extends Controller
                 'breadcrumb'    => 'Create Appointment',
                 'btnSubmit'     => 'Save',
                 'doctor'        => $doctor,
+                'hospitals'     => $hospitals
             ]);
         } else {
             abort(403);
@@ -213,18 +217,35 @@ class AppointmentController extends Controller
         $user = auth()->user();
 
         if ($user->can('create appointment')) {
-            $request->validate([
-                'patient_name'      => 'required|min:5',
-                'dob'               => 'required',
-                'gender'            => 'required',
-                'email'             => 'required|email',
-                'phone'             => 'required|min:7',
-                'address'           => 'required|min:5',
-                'doctor'            => 'required',
-                'hospital'          => 'required',
-                'booking_date'      => 'required',
-                'booking_time'      => 'required'
-            ]);
+            if ($request->time_type == "schedule") {
+                $request->validate([
+                    'patient_name'      => 'required|min:5',
+                    'dob'               => 'required',
+                    'gender'            => 'required',
+                    'email'             => 'required|email',
+                    'phone'             => 'required|min:7',
+                    'address'           => 'required|min:5',
+                    'doctor'            => 'required',
+                    'hospital'          => 'required',
+                    'booking_date'      => 'required',
+                    'booking_time'      => 'required',
+                    'time_type'         => 'required',
+                ]);
+            } else {
+                $request->validate([
+                    'patient_name'      => 'required|min:5',
+                    'dob'               => 'required',
+                    'gender'            => 'required',
+                    'email'             => 'required|email',
+                    'phone'             => 'required|min:7',
+                    'address'           => 'required|min:5',
+                    'time_type'         => 'required',
+                    'doctor_name'       => 'required',
+                    'clinic_name'       => 'required',
+                    'date_appointment'  => 'required',
+                    'time_appointment'  => 'required'
+                ]);
+            }
 
             DB::beginTransaction();
 
@@ -233,25 +254,75 @@ class AppointmentController extends Controller
                 // $time = PracticeSchedule::where('id', $request->booking_time)->first();
                 $bookingNumber = Appointment::whereDate('created_at', $dateNow)->get();
 
-                $appointment = Appointment::create([
-                    'booking_number'    => Carbon::now()->format('Ymd') . $bookingNumber->count() + 1,
-                    // 'date'              => $time->date,
-                    // 'start_time'        => $time->start_time,
-                    // 'end_time'          => $time->end_time,
-                    // 'hospital_id'       => $time->hospital_id,
-                    'date'              => $request->booking_day_date,
-                    'start_time'        => Carbon::parse($request->booking_start_time)->format('H:i:s'),
-                    'end_time'          => Carbon::parse($request->booking_end_time)->format('H:i:s'),
-                    'hospital_id'       => $request->hospital,
-                    'doctor_id'         => $request->doctor,
-                    'patient_name'      => $request->patient_name,
-                    'patient_dob'       => $request->dob,
-                    'patient_sex'       => $request->gender,
-                    'patient_address'   => $request->address,
-                    'patient_email'     => $request->email,
-                    'patient_telp'      => $request->phone,
-                    'status'            => 'Booking',
-                ]);
+                if ($request->time_type == 'schedule') {
+                    $cekAppointmentSchedule = Appointment::where('date', $request->booking_day_date)
+                        ->where('start_time', Carbon::parse($request->booking_start_time)->format('H:i:s'))
+                        ->where('end_time', Carbon::parse($request->booking_end_time)->format('H:i:s'))
+                        ->where('hospital_id', $request->hospital)
+                        ->where('doctor_id', $request->doctor)->first();
+
+                    if ($cekAppointmentSchedule) {
+                        DB::rollBack();
+                        return redirect()
+                            ->back()
+                            ->withInput()
+                            ->with('error', "Time has been booked, please select another time or date");
+                    } else {
+                        $appointment = Appointment::create([
+                            'booking_number'    => Carbon::now()->format('Ymd') . $bookingNumber->count() + 1,
+                            // 'date'              => $time->date,
+                            // 'start_time'        => $time->start_time,
+                            // 'end_time'          => $time->end_time,
+                            // 'hospital_id'       => $time->hospital_id,
+                            'date'              => $request->booking_day_date,
+                            'start_time'        => Carbon::parse($request->booking_start_time)->format('H:i:s'),
+                            'end_time'          => Carbon::parse($request->booking_end_time)->format('H:i:s'),
+                            'hospital_id'       => $request->hospital,
+                            'doctor_id'         => $request->doctor,
+                            'patient_name'      => $request->patient_name,
+                            'patient_dob'       => $request->dob,
+                            'patient_sex'       => $request->gender,
+                            'patient_address'   => $request->address,
+                            'patient_email'     => $request->email,
+                            'patient_telp'      => $request->phone,
+                            'status'            => 'Booking',
+                            'user_id'           => auth()->user()->id,
+                            'time_type'         => $request->time_type
+                        ]);
+                    }
+                } else {
+                    $cekAppointment = Appointment::where('date', $request->date_appointment)
+                        ->where('hospital_id', $request->clinic_name)
+                        ->where('start_time', Carbon::parse($request->time_appointment)->format('H:i:s'))
+                        ->where('doctor_id', $request->doctor_name)
+                        ->first();
+
+                    if ($cekAppointment) {
+                        DB::rollBack();
+                        return redirect()
+                            ->back()
+                            ->withInput()
+                            ->with('error', "Time has been booked, please select another time or date");
+                    } else {
+                        $appointment = Appointment::create([
+                            'booking_number'    => Carbon::now()->format('Ymd') . $bookingNumber->count() + 1,
+                            'date'              => $request->date_appointment,
+                            'start_time'        => Carbon::parse($request->time_appointment)->format('H:i:s'),
+                            'end_time'          => Carbon::parse($request->time_appointment)->addMinutes(30)->format('H:i:s'),
+                            'hospital_id'       => $request->clinic_name,
+                            'doctor_id'         => $request->doctor_name,
+                            'patient_name'      => $request->patient_name,
+                            'patient_dob'       => $request->dob,
+                            'patient_sex'       => $request->gender,
+                            'patient_address'   => $request->address,
+                            'patient_email'     => $request->email,
+                            'patient_telp'      => $request->phone,
+                            'status'            => 'Booking',
+                            'user_id'           => auth()->user()->id,
+                            'time_type'         => $request->time_type
+                        ]);
+                    }
+                }
 
                 // $time->update([
                 //     'booking_status'    => 1,
@@ -372,7 +443,7 @@ class AppointmentController extends Controller
                     'btnSubmit'     => 'Save Change',
                     'data'          => $data,
                     'doctors'       => $doctor,
-                    'schedule'      => $schedule
+                    'schedule'      => $schedule,
                 ]);
             } catch (\Throwable $e) {
                 return redirect()
@@ -545,20 +616,24 @@ class AppointmentController extends Controller
                 })
                 ->where('isAktif', 1)->orderBy('name', 'asc')
                 ->get(['id', 'name']);
+
+            $hospitals = Hospital::where('id', $user->hospital_id)->get(['id', 'name']);
         } else {
             $doctor = Doctor::where('isAktif', 1)->orderBy('name', 'asc')->get(['id', 'name']);
+
+            $hospitals = Hospital::get(['id', 'name']);
         }
 
         if ($user->can('reschedule appointment')) {
             try {
                 $id = Crypt::decryptString($id);
                 $data = Appointment::find($id);
-                $schedule = PracticeSchedule::where('doctor_id', $data->doctor_id)
-                    ->where('hospital_id', $data->hospital_id)
-                    ->where('date', $data->date)
-                    ->where('start_time', $data->start_time)
-                    ->where('end_time', $data->end_time)
-                    ->first();
+                // $schedule = PracticeSchedule::where('doctor_id', $data->doctor_id)
+                //     ->where('hospital_id', $data->hospital_id)
+                //     ->where('date', $data->date)
+                //     ->where('start_time', $data->start_time)
+                //     ->where('end_time', $data->end_time)
+                //     ->first();
 
                 if (!$data) {
                     return redirect()
@@ -572,7 +647,8 @@ class AppointmentController extends Controller
                     'btnSubmit'     => 'Save Change',
                     'data'          => $data,
                     'doctors'       => $doctor,
-                    'schedule'      => $schedule
+                    // 'schedule'      => $schedule,
+                    'hospitals'     => $hospitals
                 ]);
             } catch (\Throwable $e) {
                 return redirect()
@@ -589,12 +665,21 @@ class AppointmentController extends Controller
         $user = auth()->user();
 
         if ($user->can('reschedule appointment')) {
-            $request->validate([
-                'doctor'            => 'required',
-                'hospital'          => 'required',
-                'booking_date'      => 'required',
-                'booking_time'      => 'required'
-            ]);
+            if ($request->time_type == 'schedule') {
+                $request->validate([
+                    'doctor'            => 'required',
+                    'hospital'          => 'required',
+                    'booking_date'      => 'required',
+                    'booking_time'      => 'required'
+                ]);
+            } else {
+                $request->validate([
+                    'doctor_name'           => 'required',
+                    'clinic_name'           => 'required',
+                    'date_appointment'      => 'required',
+                    'time_appointment'      => 'required'
+                ]);
+            }
 
             $id = Crypt::decryptString($id);
             $data = Appointment::find($id);
@@ -616,15 +701,53 @@ class AppointmentController extends Controller
             DB::beginTransaction();
 
             try {
-                $data->update([
-                    'date'                  => $request->booking_day_date,
-                    // 'start_time'            => $time->start_time,
-                    // 'end_time'              => $time->end_time,
-                    'start_time'            => $request->booking_start_time,
-                    'end_time'              => $request->booking_end_time,
-                    'doctor_id'             => $request->doctor,
-                    'hospital_id'           => $request->hospital,
-                ]);
+                if ($request->time_type == "schedule") {
+                    $cekAppointmentSchedule = Appointment::where('date', $request->booking_day_date)
+                        ->where('start_time', Carbon::parse($request->booking_start_time)->format('H:i:s'))
+                        ->where('end_time', Carbon::parse($request->booking_end_time)->format('H:i:s'))
+                        ->where('hospital_id', $request->hospital)
+                        ->where('doctor_id', $request->doctor)->first();
+
+                    if ($cekAppointmentSchedule) {
+                        DB::rollBack();
+                        return redirect()
+                            ->back()
+                            ->withInput()
+                            ->with('error', "Time has been booked, please select another time or date");
+                    } else {
+                        $data->update([
+                            'date'                  => $request->booking_day_date,
+                            // 'start_time'            => $time->start_time,
+                            // 'end_time'              => $time->end_time,
+                            'start_time'            => $request->booking_start_time,
+                            'end_time'              => $request->booking_end_time,
+                            'doctor_id'             => $request->doctor,
+                            'hospital_id'           => $request->hospital,
+                        ]);
+                    }
+                } else {
+                    $cekAppointment = Appointment::where('date', $request->date_appointment)
+                        ->where('hospital_id', $request->clinic_name)
+                        ->where('start_time', Carbon::parse($request->time_appointment)->format('H:i:s'))
+                        ->where('doctor_id', $request->doctor_name)
+                        ->first();
+
+                    if ($cekAppointment) {
+                        DB::rollBack();
+                        return redirect()
+                            ->back()
+                            ->withInput()
+                            ->with('error', "Time has been booked, please select another time or date");
+                    } else {
+                        $data->update([
+                            'date'                  => $request->date_appointment,
+                            'start_time'            => Carbon::parse($request->time_appointment)->format('H:i:s'),
+                            'end_time'              => Carbon::parse($request->time_appointment)->addMinutes(30)->format('H:i:s'),
+                            'doctor_id'             => $request->doctor_name,
+                            'hospital_id'           => $request->clinic_name,
+                        ]);
+                    }
+                }
 
                 // $schedule->update([
                 //     'booking_status'        => 0

@@ -74,9 +74,12 @@ class AppointmentController extends Controller
 
         try {
 
-            $appointment = Appointment::where('date', $request->booking_day_date)->where('start_time', Carbon::parse($request->booking_start_time)->format('H:i:s'))
+            $appointment = Appointment::where('date', $request->booking_day_date)
+                ->where('start_time', Carbon::parse($request->booking_start_time)->format('H:i:s'))
                 ->where('end_time', Carbon::parse($request->booking_end_time)->format('H:i:s'))
-                ->where('hospital_id', $request->hospital)->where('doctor_id', $request->doctor)->first();
+                ->where('hospital_id', $request->hospital)
+                ->where('doctor_id', $request->doctor)
+                ->first();
 
             if ($appointment) {
                 DB::rollBack();
@@ -116,6 +119,7 @@ class AppointmentController extends Controller
                 'patient_email'     => $request->email,
                 'patient_telp'      => $request->phone,
                 'status'            => 'Booking',
+                'time_type'         => 'schedule'
             ]);
 
             $doctorMail = Doctor::where('id', $appointment->doctor_id)->first();

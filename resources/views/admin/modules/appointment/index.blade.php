@@ -19,8 +19,8 @@
             </div>
             @can('create appointment')
                 <div class="col-sm-5 col">
-                    <a href="{{ route('admin.appointment.create') }}" class="btn btn-primary float-right mt-2" type="button">
-                        Add
+                    <a href="{{ route('admin.appointment.create') }}" class="btn btn-info float-right mt-2" type="button">
+                        Create Appointment
                     </a>
                 </div>  
             @endcan

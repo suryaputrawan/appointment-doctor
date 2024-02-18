@@ -114,80 +114,308 @@
                             </div>
         
                             <hr>
-        
+
                             <div class="row form-row">
-                                <div class="col-12 col-sm-6">
+                                <div class="col-12 col-md-3">
                                     <div class="form-group">
-                                        <label>Doctor Name <span class="text-danger">*</span></label>
-                                        <select name="doctor" id="doctor" class="form-control select @error('doctor') is-invalid @enderror">
-                                            <option selected disabled>-- Please Selected --</option>
-                                            @foreach ($doctors as $doctor)
-                                            <option value="{{ $doctor->id }}"
-                                                {{ old('doctor', $data->doctor_id) == $doctor->id ? 'selected' : null }}>{{ $doctor->name }}
+                                        <label>Time type <span class="text-danger">*</span></label>
+                                        <select name="time_type" id="time-type" class="form-control select @error('time_type') is-invalid @enderror">d
+                                            <option value="schedule"
+                                                {{ old('time_type', $data->time_type) == 'schedule' ? 'selected' : null }}>Schedule Time
                                             </option>
-                                            @endforeach
+                                            <option value="manual"
+                                                {{ old('time_type', $data->time_type) == 'manual' ? 'selected' : null }}>Manual Time
+                                            </option>
                                         </select>
-                                        @error('doctor')
-                                            <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-        
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-group">
-                                        <label>Clinic <span class="text-danger">*</span></label>
-                                        <select name="hospital" id="hospital" class="form-control select @error('hospital') is-invalid @enderror" data-width="100%">
-                                            <option value="{{ $data->hospital_id }}">{{ $data->hospital->name }}</option>
-                                        </select>
-                                        @error('hospital')
+                                        @error('time_type')
                                             <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
                                         @enderror
                                     </div>
                                 </div>
                             </div>
+
+                            @if ($data->time_type == "schedule")
+                                <div id="appointment-schedule">
+                                    <div class="row form-row">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-group">
+                                                <label>Doctor Name <span class="text-danger">*</span></label>
+                                                <select name="doctor" id="doctor" class="form-control select @error('doctor') is-invalid @enderror">
+                                                    <option selected disabled>-- Please Selected --</option>
+                                                    @foreach ($doctors as $doctor)
+                                                    <option value="{{ $doctor->id }}"
+                                                        {{ old('doctor', $data->doctor_id) == $doctor->id ? 'selected' : null }}>{{ $doctor->name }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('doctor')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-group">
+                                                <label>Clinic <span class="text-danger">*</span></label>
+                                                <select name="hospital" id="hospital" class="form-control select @error('hospital') is-invalid @enderror" data-width="100%">
+                                                    <option value="{{ $data->hospital_id }}">{{ $data->hospital->name }}</option>
+                                                </select>
+                                                @error('hospital')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                                <div id="loading-hospital" style="display: none">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
+                                                        <p>Please wait...</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
         
-                            <div class="row">
-                                <div class="col-md-4 col-sm-12">
-                                    <input type="hidden" id="booking-day">
-                                    <input type="hidden" id="booking-day-date" name="booking_day_date">
-                                    <div class="form-group">
-                                        <label>Date <span class="text-danger">*</span></label>
-                                        <select name="booking_date" id="booking-date" class="form-control select @error('booking_date') is-invalid @enderror" data-width="100%">
-                                            <option value="{{ $data->date }}">{{ \Carbon\Carbon::parse($data->date)->format('d M Y') }}</option>
-                                        </select>
-                                        @error('booking_date')
-                                            <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
-                                        @enderror
-                                        <div id="loading-date" style="display: none">
-                                            <div class="d-flex align-items-center">
-                                                <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
-                                                <p>Please wait...</p>
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-12">
+                                            <input type="hidden" id="booking-day">
+                                            <input type="hidden" id="booking-day-date" name="booking_day_date">
+                                            <div class="form-group">
+                                                <label>Date <span class="text-danger">*</span></label>
+                                                <select name="booking_date" id="booking-date" class="form-control select @error('booking_date') is-invalid @enderror" data-width="100%">
+                                                    <option value="{{ $data->date }}">{{ \Carbon\Carbon::parse($data->date)->format('d M Y') }}</option>
+                                                </select>
+                                                @error('booking_date')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                                <div id="loading-date" style="display: none">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
+                                                        <p>Please wait...</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-12">
+                                            <div class="form-group">
+                                                <input type="hidden" id="booking-start-time" name="booking_start_time">
+                                                <input type="hidden" id="booking-end-time" name="booking_end_time">
+                                                <label>Time <span class="text-danger">*</span></label>
+                                                <select name="booking_time" id="booking-time" class="form-control select @error('booking_time') is-invalid @enderror" data-width="100%">
+                                                    {{-- <option value="{{ $schedule->id }}">{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }} Wita</option> --}}
+                                                    <option>{{ \Carbon\Carbon::parse($data->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($data->end_time)->format('H:i') }} Wita</option>
+                                                </select>
+                                                @error('booking_time')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                                <span class="text-danger" id="info-time"></span>
+                                                <div id="loading-time" style="display: none">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
+                                                        <p>Please wait...</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-sm-12">
-                                    <div class="form-group">
-                                        <input type="hidden" id="booking-start-time" name="booking_start_time">
-                                        <input type="hidden" id="booking-end-time" name="booking_end_time">
-                                        <label>Time <span class="text-danger">*</span></label>
-                                        <select name="booking_time" id="booking-time" class="form-control select @error('booking_time') is-invalid @enderror" data-width="100%">
-                                            {{-- <option value="{{ $schedule->id }}">{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }} Wita</option> --}}
-                                            <option>{{ \Carbon\Carbon::parse($data->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($data->end_time)->format('H:i') }} Wita</option>
-                                        </select>
-                                        @error('booking_time')
-                                            <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
-                                        @enderror
-                                        <span class="text-danger" id="info-time"></span>
-                                        <div id="loading-time" style="display: none">
-                                            <div class="d-flex align-items-center">
-                                                <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
-                                                <p>Please wait...</p>
+
+                                <div id="appointment-manual" style="display: none">
+                                    <div class="row form-row">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-group">
+                                                <label>Doctor Name <span class="text-danger">*</span></label>
+                                                <select name="doctor_name" id="doctor-name" class="form-control select @error('doctor_name') is-invalid @enderror">
+                                                    <option value="">-- Please Selected --</option>
+                                                    @foreach ($doctors as $doctor)
+                                                    <option value="{{ $doctor->id }}"
+                                                        {{ old('doctor_name', $data->doctor_id) == $doctor->id ? 'selected' : null }}>{{ $doctor->name }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('doctor_name')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-group">
+                                                <label>Clinic <span class="text-danger">*</span></label>
+                                                <select name="clinic_name" id="clinic-name" class="form-control select @error('clinic_name') is-invalid @enderror" data-width="100%">
+                                                    <option value="">Please Selected</option>
+                                                    @foreach ($hospitals as $hospital)
+                                                    <option value="{{ $hospital->id }}"
+                                                        {{ old('clinic_name', $data->hospital_id) == $hospital->id ? 'selected' : null }}>{{ $hospital->name }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('clinic_name')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-12">
+                                            <div class="form-group">
+                                                <label>Date <span class="text-danger">*</span></label>
+                                                <input name="date_appointment" id="date-appointment" type="date" class="form-control @error('date_appointment') is-invalid @enderror" value="{{ old('date_appointment') ?? $data->date }}">
+                                                @error('date_appointment')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-12">
+                                            <div class="form-group">
+                                                <label>Time <span class="text-danger">*</span></label>
+                                                <input name="time_appointment" id="time-appointment" type="time" class="form-control @error('time_appointment') is-invalid @enderror" value="{{ old('time_appointment') ?? $data->start_time }}">
+                                                @error('time_appointment')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            @else 
+                                <div id="appointment-schedule" style="display: none">
+                                    <div class="row form-row">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-group">
+                                                <label>Doctor Name <span class="text-danger">*</span></label>
+                                                <select name="doctor" id="doctor" class="form-control select @error('doctor') is-invalid @enderror">
+                                                    <option value="">-- Please Selected --</option>
+                                                    @foreach ($doctors as $doctor)
+                                                    <option value="{{ $doctor->id }}"
+                                                        {{ old('doctor') == $doctor->id ? 'selected' : null }}>{{ $doctor->name }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('doctor')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-group">
+                                                <label>Clinic <span class="text-danger">*</span></label>
+                                                <select name="hospital" id="hospital" class="form-control select @error('hospital') is-invalid @enderror" data-width="100%">
+                                                    <option selected disabled></option>
+                                                </select>
+                                                @error('hospital')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                                <div id="loading-hospital" style="display: none">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
+                                                        <p>Please wait...</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                
+                                    <div class="row">
+                                        <div class="col-md-4 col-sm-12">
+                                            <input type="hidden" id="booking-day">
+                                            <input type="hidden" id="booking-day-date" name="booking_day_date">
+                                            <div class="form-group">
+                                                <label>Date <span class="text-danger">*</span></label>
+                                                <select name="booking_date" id="booking-date" class="form-control select @error('booking_date') is-invalid @enderror" data-width="100%">
+                                                    <option selected disabled></option>
+                                                </select>
+                                                @error('booking_date')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                                <div id="loading-date" style="display: none">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
+                                                        <p>Please wait...</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12">
+                                            <input type="hidden" id="booking-start-time" name="booking_start_time">
+                                            <input type="hidden" id="booking-end-time" name="booking_end_time">
+                                            <div class="form-group">
+                                                <label>Time <span class="text-danger">*</span></label>
+                                                <select name="booking_time" id="booking-time" class="form-control select @error('booking_time') is-invalid @enderror" data-width="100%">
+                                                    <option selected disabled></option>
+                                                </select>
+                                                @error('booking_time')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                                <span class="text-danger" id="info-time"></span>
+                                                <div id="loading-time" style="display: none">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="spinner-border text-primary spinner-border-sm mr-2" role="status" aria-hidden="true"></div>
+                                                        <p>Please wait...</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="appointment-manual">
+                                    <div class="row form-row">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-group">
+                                                <label>Doctor Name <span class="text-danger">*</span></label>
+                                                <select name="doctor_name" id="doctor-name" class="form-control select @error('doctor_name') is-invalid @enderror">
+                                                    <option value="">-- Please Selected --</option>
+                                                    @foreach ($doctors as $doctor)
+                                                    <option value="{{ $doctor->id }}"
+                                                        {{ old('doctor_name', $data->doctor_id) == $doctor->id ? 'selected' : null }}>{{ $doctor->name }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('doctor_name')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-group">
+                                                <label>Clinic <span class="text-danger">*</span></label>
+                                                <select name="clinic_name" id="clinic-name" class="form-control select @error('clinic_name') is-invalid @enderror" data-width="100%">
+                                                    <option value="">Please Selected</option>
+                                                    @foreach ($hospitals as $hospital)
+                                                    <option value="{{ $hospital->id }}"
+                                                        {{ old('clinic_name', $data->hospital_id) == $hospital->id ? 'selected' : null }}>{{ $hospital->name }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('clinic_name')
+                                                    <span class="text-danger" style="margin-top: .25rem; font-size: 80%;">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-12">
+                                            <div class="form-group">
+                                                <label>Date <span class="text-danger">*</span></label>
+                                                <input name="date_appointment" id="date-appointment" type="date" class="form-control @error('date_appointment') is-invalid @enderror" value="{{ old('date_appointment') ?? $data->date }}">
+                                                @error('date_appointment')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-12">
+                                            <div class="form-group">
+                                                <label>Time <span class="text-danger">*</span></label>
+                                                <input name="time_appointment" id="time-appointment" type="time" class="form-control @error('time_appointment') is-invalid @enderror" value="{{ old('time_appointment') ?? $data->start_time }}">
+                                                @error('time_appointment')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
 
                             <div class="text-right">
                                 <button name="btnSimpan" class="btn btn-primary" type="submit" id="btnSave" style="display: none">{{ $btnSubmit }}</button>
@@ -219,6 +447,7 @@
 
         //-- Get data hospital
         function loadHospitalData(id_doctor, selected, replaceChild) {
+            $('#loading-hospital').show();
 
             let url = "{{ route('client.getBookingHospital') }}";
 
@@ -244,7 +473,7 @@
                 cache: false,
 
                 success: function (response) {
-
+                    $('#loading-hospital').hide();
                     if (response.status == 404) {
                         Toast.fire({
                             icon: 'warning',
@@ -258,6 +487,7 @@
                     }
                 },
                 error: function (response) {
+                    $('#loading-hospital').hide();
                     Toast.fire({
                         icon: 'error',
                         title: response.responseJSON.message ?? 'Oops,.. Something went wrong!',
@@ -265,7 +495,7 @@
                 }
             });
         }
-        //-- End get data date
+        //-- End get data hospital
 
         //-- Get data date
         // function loadDateData(id_hospital, id_doctor, selected, replaceChild) {
@@ -580,6 +810,59 @@
             $('#btnCancel').toggle();
         });
         //end
+
+        // Fungsi Clear form time
+        function clearFormTime()
+        {
+            $('#booking-start-time').val("");
+            $('#booking-end-time').val("");
+            $('#booking-day').val("");
+            $('#booking-day-date').val("");
+
+            $('#doctor').val('').trigger('change');
+            $('#hospital').html('<option></option>');
+            $('#booking-date').html('<option></option>');
+            $('#booking-time').html('<option></option>');
+
+            $('#doctor-name').val('').trigger('change');
+            $('#clinic-name').val('').trigger('change');
+            $('#date-appointment').val('');
+            $('#time-appointment').val('');
+        }
+
+        // Melakukan perubahan saat field time type berubah
+        $("#time-type").on('change', function () {
+            if (this.value == "schedule") {
+                $('#appointment-schedule').show(500);
+                $('#appointment-manual').hide(500);
+
+                clearFormTime();
+            } else {
+                $('#appointment-schedule').hide(500);
+                $('#appointment-manual').show(500);
+
+                clearFormTime();
+            }
+        });
+
+        //Fungsi untuk mengecek dan menampilkan tombol save jika field telah terisi
+        function checkFormInput() {
+            var doctorName = $('#doctor-name').val();
+            var clinicName = $('#clinic-name').val();
+            var dateAppointment = $('#date-appointment').val();
+            var timeAppointment = $('#time-appointment').val();
+
+            if (doctorName !== '' && clinicName !== '' && dateAppointment !== '' && timeAppointment !== '') {
+                $('#btnSave').show();
+            } else {
+                $('#btnSave').hide();
+            }
+        }
+
+        // Memanggil fungsi saat field berubah
+        $('#doctor-name, #clinic-name, #date-appointment, #time-appointment').on('change', function () {
+            checkFormInput();
+        });
     });
 </script>
 @endpush
