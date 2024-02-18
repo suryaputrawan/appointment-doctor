@@ -864,5 +864,30 @@
             checkFormInput();
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var inputTanggal = document.getElementById('date-appointment');
+        var tanggalSekarang = new Date();
+
+        // Mengatur nilai minimum input tanggal
+        inputTanggal.setAttribute('min', formatTanggal(tanggalSekarang));
+
+        // Mengubah warna tanggal yang sudah lewat
+        var tanggalItems = document.querySelectorAll('input[type="date"]');
+        tanggalItems.forEach(function(tanggalItem) {
+            var tanggalValue = new Date(tanggalItem.value);
+            if (tanggalValue < tanggalSekarang && tanggalItem.value !== formatTanggal(tanggalSekarang)) {
+                tanggalItem.classList.add('disabled');
+            }
+        });
+
+        // Fungsi untuk mengubah format tanggal
+        function formatTanggal(date) {
+            var tahun = date.getFullYear();
+            var bulan = (date.getMonth() + 1).toString().padStart(2, '0');
+            var hari = date.getDate().toString().padStart(2, '0');
+            return tahun + '-' + bulan + '-' + hari;
+        }
+    });
 </script>
 @endpush
