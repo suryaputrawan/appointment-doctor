@@ -35,12 +35,12 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="booking-doc-info">
-                                <a href="{{ route('client.doctor.show', Crypt::encryptString($data->id)) }}" class="booking-doc-img">
+                                <a href="{{ route('client.doctor.show', $data->slug) }}" class="booking-doc-img">
                                     <img src="{{ $data->takePicture }}" alt="User Image">
                                 </a>
                                 <div class="booking-info">
                                     <h4>
-                                        <a href="{{ route('client.doctor.show', Crypt::encryptString($data->id)) }}" class="mb-0">{{ $data->name }}</a>
+                                        <a href="{{ route('client.doctor.show', $data->slug) }}" class="mb-0">{{ $data->name }}</a>
                                         <p class="speciality" style="font-size: 12px;">{{ $data->specialization }} - {{ $data->speciality->name }}</p>
                                     </h4>
                                     <p class="text-muted mb-0" style="font-size: 12px;"><i class="fas fa-map-marker-alt"></i>

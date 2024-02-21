@@ -293,7 +293,7 @@
                                             <!-- Clinic Content -->
                                             <div class="col-md-6">
                                                 <div class="clinic-content">
-                                                    <h4 class="clinic-name mb-2"><a href="#">{{ $doctorLocation->hospital->name }}</a></h4>
+                                                    <h4 class="clinic-name mb-2">{{ $doctorLocation->hospital->name }}</h4>
                                                     <div class="clinic-details mb-0">
                                                         <h5 class="clinic-direction mb-2"> <i class="fas fa-map-marker-alt mr-2"></i> {{ $doctorLocation->hospital->address }} - <a href="{{ $doctorLocation->hospital->link_gmap }}" target="_blank" rel="noopener noreferrer">Get Directions</a> <br></h5>
                                                         <h6 class="clinic-direction mb-2"> <i class="fas fa-phone-alt mr-2"></i> {{ $doctorLocation->hospital->phone }} <br></h6>
@@ -305,19 +305,21 @@
                                             
                                             <!-- Clinic Timing -->
                                             <div class="col-md-4">
-                                                @foreach ($doctorLocation->doctorLocationDay as $location)
+                                                @foreach ($doctorLocation->doctorLocationDay->groupBy('day') as $day => $dayLocations)
                                                 <div class="clinic-timing">
                                                     <div>
                                                         <p class="timings-days">
-                                                            <span> {{ $location->day }} </span>
+                                                            <span> {{ $day }} </span>
                                                         </p>
                                                         <p class="timings-times">
                                                             <span>
-                                                                {{ 
-                                                                \Carbon\Carbon::parse($location->start_time)->format('H:i') 
-                                                                .' - '. 
-                                                                \Carbon\Carbon::parse($location->end_time)->format('H:i') . ' WITA'
-                                                                }}
+                                                                @foreach ($dayLocations as $dayLocation)
+                                                                    {{ 
+                                                                        \Carbon\Carbon::parse($dayLocation->start_time)->format('H:i') 
+                                                                        .' - '. 
+                                                                        \Carbon\Carbon::parse($dayLocation->end_time)->format('H:i') . ' WITA'
+                                                                    }} <br>
+                                                                @endforeach
                                                             </span>
                                                         </p>
                                                     </div>
