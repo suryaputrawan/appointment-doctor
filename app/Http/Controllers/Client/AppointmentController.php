@@ -396,11 +396,14 @@ class AppointmentController extends Controller
         $dateDay        = $request->id_day;
 
         // Mengambil lokasi dokter berdasarkan id dokter dan id rumah sakit
-        $doktorLocation = DoctorLocation::where('doctor_id', $id_doctor)->where('hospital_id', $id_hospital)->first();
+        $doktorLocation = DoctorLocation::where('doctor_id', $id_doctor)
+            ->where('hospital_id', $id_hospital)
+            ->first();
 
         // Mengambil jadwal dokter berdasarkan lokasi dokter dan hari
-        $doctorSchedule = DoctorLocationDay::where('doctor_location_id', $doktorLocation->id)
-            ->where('day', $dateDay)->first();
+        $doctorSchedules = DoctorLocationDay::where('doctor_location_id', $doktorLocation->id)
+            ->where('day', $dateDay)
+            ->get();
 
         // Mengambil data rumah sakit berdasarkan id rumah sakit
         $hospital = Hospital::where('id', $id_hospital)->first();
@@ -408,81 +411,89 @@ class AppointmentController extends Controller
         // Menginisialisasi waktu saat ini
         $currentTime = Carbon::now('Asia/Singapore');
 
-        // Mengambil waktu awal dan akhir dari jadwal dokter
-        $waktuAwal = Carbon::parse($doctorSchedule->start_time);
-        $waktuAkhir = Carbon::parse($doctorSchedule->end_time);
-        $duration = $doctorSchedule->duration;
-        $hasilWaktuAwal = [];
-        $waktu = [];
+        if ($doctorSchedules->isNotEmpty()) {
+            $waktu = []; // inisialisasi array di luar loop
 
-        // Looping untuk menentukan waktu yang tersedia
-        while ($waktuAwal < $waktuAkhir) {
-            $hasilWaktuAwal[] = $waktuAwal->copy();
-            $waktuAwal->addMinutes($duration);
-        }
+            foreach ($doctorSchedules as $doctorSchedule) {
+                // Mengambil waktu awal dan akhir dari jadwal dokter
+                $waktuAwal = Carbon::parse($doctorSchedule->start_time);
+                $waktuAkhir = Carbon::parse($doctorSchedule->end_time);
+                $duration = $doctorSchedule->duration;
+                $hasilWaktuAwal = [];
 
-        // Memeriksa konflik waktu dengan janji yang sudah ada
-        foreach ($hasilWaktuAwal as $start) {
-            $end = $start->copy();
-            $end->addMinutes($duration);
+                // Looping untuk menentukan waktu yang tersedia
+                while ($waktuAwal < $waktuAkhir) {
+                    $hasilWaktuAwal[] = $waktuAwal->copy();
+                    $waktuAwal->addMinutes($duration);
+                }
 
-            $conflictExists = Appointment::where('doctor_id', $id_doctor)
-                ->where('hospital_id', $id_hospital)
-                ->where('date', $dateBooking)
-                ->where('start_time', $start)
-                ->where('end_time', $end)
-                ->exists();
+                // Memeriksa konflik waktu dengan janji yang sudah ada
+                foreach ($hasilWaktuAwal as $start) {
+                    $end = $start->copy();
+                    $end->addMinutes($duration);
 
-            // Menambahkan waktu yang tersedia jika tidak ada konflik
-            if (!$conflictExists) {
-                if ($dateBooking == $currentTime->toDateString()) {
-                    if ($start->format('H:i:s') > $currentTime->format('H:i:s')) {
-                        $waktu[] = [
-                            'start_time' => $start,
-                            'end_time' => $end
-                        ];
+                    $conflictExists = Appointment::where('doctor_id', $id_doctor)
+                        ->where('hospital_id', $id_hospital)
+                        ->where('date', $dateBooking)
+                        ->where('start_time', $start)
+                        ->where('end_time', $end)
+                        ->exists();
+
+                    // Menambahkan waktu yang tersedia jika tidak ada konflik
+                    if (!$conflictExists) {
+                        if ($dateBooking == $currentTime->toDateString()) {
+                            if ($start->format('H:i:s') > $currentTime->format('H:i:s')) {
+                                $waktu[] = [
+                                    'start_time' => $start,
+                                    'end_time' => $end
+                                ];
+                            }
+                        } else {
+                            $waktu[] = [
+                                'start_time' => $start,
+                                'end_time' => $end
+                            ];
+                        }
                     }
-                } else {
-                    $waktu[] = [
-                        'start_time' => $start,
-                        'end_time' => $end
-                    ];
                 }
             }
-        }
 
-        // Menyiapkan opsi waktu untuk dikirim sebagai respons JSON
-        $option = "<option selected disabled>Select Time</option>";
-        foreach ($waktu as $index => $item) {
-            $selectedState = '';
-            $index = $index + 1;
+            // Setelah selesai mengolah semua jadwal
+            if (!empty($waktu)) {
+                // Memilih waktu yang tersedia
+                $option = "<option selected disabled>Select Time</option>";
+                foreach ($waktu as $index => $item) {
+                    $selectedState = '';
+                    $index = $index + 1;
 
-            if ($request->selected) {
-                $selectedState = $index == $request->selected ? 'selected' : '';
+                    if ($request->selected) {
+                        $selectedState = $index == $request->selected ? 'selected' : '';
+                    }
+
+                    $start_time = Carbon::parse($item['start_time'])->format('H:i');
+                    $end_time = Carbon::parse($item['end_time'])->format('H:i');
+                    $time = "$start_time - $end_time Wita";
+
+                    $option .=  "<option value='$index' $selectedState data-start-time='$start_time' data-end-time='$end_time'>$time</option>";
+                }
+
+                // Mengirim respons JSON dengan waktu yang tersedia
+                return response()->json([
+                    'status' => 200,
+                    'data' => $option,
+                ]);
+            } else {
+                // Jika tidak ada waktu yang tersedia
+                return response()->json([
+                    'status' => 201,
+                    'message' => 'Fully booked, please whatsapp admin on ' . $hospital->whatsapp . ' to book the appointment',
+                ]);
             }
-
-            $start_time = Carbon::parse($item['start_time'])->format('H:i');
-            $end_time = Carbon::parse($item['end_time'])->format('H:i');
-            $time = "$start_time - $end_time Wita";
-
-            $option .=  "<option value='$index' $selectedState data-start-time='$start_time' data-end-time='$end_time'>$time</option>";
-        }
-
-        // Menyiapkan respons JSON berdasarkan ketersediaan waktu
-        if ($waktu) {
-            return response()->json([
-                'status' => 200,
-                'data' => $option,
-            ]);
-        } elseif (empty($waktu)) {
-            return response()->json([
-                'status' => 201,
-                'message' => 'Fully booked, please whatsapp admin on ' . $hospital->whatsapp . ' to book the appointment',
-            ]);
         } else {
+            // Jika tidak ada jadwal yang tersedia untuk hari tersebut
             return response()->json([
                 'status' => 404,
-                'message' => 'Time Not Found',
+                'message' => 'Doctor Schedule Not Found for the given day, please whatsapp admin on ' . $hospital->whatsapp . ' to book the appointment',
             ]);
         }
     }
