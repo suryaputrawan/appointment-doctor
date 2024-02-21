@@ -564,12 +564,6 @@ class AppointmentController extends Controller
             $decrypt = Crypt::decryptString($id);
             $data = Appointment::find($decrypt);
 
-            $schedule = PracticeSchedule::where('doctor_id', $data->doctor_id)
-                ->where('hospital_id', $data->hospital_id)
-                ->where('start_time', $data->start_time)
-                ->where('end_time', $data->end_time)
-                ->first();
-
             if (!$data) {
                 return response()->json([
                     'status'  => 404,
@@ -580,10 +574,6 @@ class AppointmentController extends Controller
             $data->update([
                 'status'     => 'Cancel',
                 'user_id'    => Auth::user()->id
-            ]);
-
-            $schedule->update([
-                'booking_status'    => 0
             ]);
 
             DB::commit();

@@ -8,7 +8,7 @@
                 <div class="footer-widget footer-about">
                     <div class="footer-logo">
                         <img src="{{ asset('assets/client/img/logo.png') }}" alt="logo" width="100px" height="35px">
-                        <p style="color: white">Appointment Doctor Specialist</p>
+                        <p style="color: white">Appointment Doctor Specialists</p>
                     </div>
                     <div class="footer-about-content">
                         {{-- <div class="social-icon">
