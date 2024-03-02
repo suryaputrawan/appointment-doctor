@@ -95,6 +95,7 @@
                                                                                         <strong>Clinic :</strong> {{ $appointment->hospital->name }} <br>
                                                                                         <strong>Patient Name :</strong> {{ $appointment->patient_name }} <br>
                                                                                         <strong>Patient DOB :</strong> {{ \Carbon\Carbon::parse($appointment->patient_dob)->format('d M Y') }} <br>
+                                                                                        <strong>Symptoms / Notes :</strong> {{ $appointment->patient_symptoms }} <br>
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>
@@ -139,7 +140,7 @@
                                                                 <tr>
                                                                     <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                                                                         <div style="font-family:OpenSans, Helvetica, Tahoma, Arial, sans-serif;font-size:12px;font-weight:400;line-height:20px;text-align:center;color:#4F4F4F;">
-                                                                            <br /> &copy; 2023 ADOS
+                                                                            <br /> &copy; 2024 ADOS
                                                                             <br />
                                                                         </div>
                                                                     </td>

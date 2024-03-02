@@ -318,6 +318,7 @@
                         $('#address-view').text(response.data.patient_address);
                         $('#email-view').text(response.data.patient_email);
                         $('#phone-view').text(response.data.patient_telp);
+                        $('#symptoms-view').text(response.data.patient_symptoms);
                         $('#status-view').text(response.data.status);
                     }
                 },

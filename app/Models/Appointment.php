@@ -27,7 +27,8 @@ class Appointment extends Model
         'patient_telp',
         'status',
         'user_id',
-        'time_type'
+        'time_type',
+        'patient_symptoms'
     ];
 
     public function hospital(): BelongsTo

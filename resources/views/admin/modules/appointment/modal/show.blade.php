@@ -66,6 +66,11 @@
                                     <td><h6 id="phone-view"></h6></td>
                                 </tr>
                                 <tr>
+                                    <td>Patient Symptoms / Notes</td>
+                                    <td class="px-2">:</td>
+                                    <td><h6 id="symptoms-view"></h6></td>
+                                </tr>
+                                <tr>
                                     <td>Status</td>
                                     <td class="px-2">:</td>
                                     <td><h6 id="status-view"></h6></td>

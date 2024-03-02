@@ -91,7 +91,7 @@
 
                                     <div class="row">
                                         <div class="col-md-3 col-sm-12">
-                                            <div class="form-group">
+                                            <div class="form-group card-label">
                                                 <label>Sex <span class="text-danger">*</span></label>
                                                 <select name="sex" id="sex" class="select @error('sex') is-invalid @enderror">
                                                     <option selected disabled>Select</option>
@@ -108,8 +108,8 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-md-3 col-sm-12">
-                                            <div class="form-group">
+                                        <div class="col-md-4 col-sm-12">
+                                            <div class="form-group card-label mt-2">
                                                 <label>Phone <span class="text-danger">*</span></label>
                                                 <input name="phone" class="form-control @error('phone') is-invalid @enderror" type="text" value="{{ old('phone') }}">
                                                 @error('phone')
@@ -118,8 +118,8 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-md-6 col-sm-12">
-                                            <div class="form-group">
+                                        <div class="col-md-5 col-sm-12">
+                                            <div class="form-group card-label mt-2">
                                                 <label>Email <span class="text-danger">*</span></label>
                                                 <input name="email" class="form-control @error('email') is-invalid @enderror" type="text" value="{{ old('email') }}">
                                                 @error('email')
@@ -137,6 +137,19 @@
                                                 @error('address')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12">
+                                            <div class="form-group card-label">
+                                                <label>Symptoms / Notes <span class="text-danger">*</span></label>
+                                                <input name="symptoms" class="form-control @error('symptoms') is-invalid @enderror" type="text" value="{{ old('symptoms') }}">
+                                                @error('symptoms')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                                <span class="text-info" style="margin-top: .25rem; font-size: 80%;">Input the symptoms you are experiencing, or your purpose in meet with the doctor</span>
                                             </div>
                                         </div>
                                     </div>

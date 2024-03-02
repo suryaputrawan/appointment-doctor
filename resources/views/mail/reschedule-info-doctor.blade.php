@@ -77,6 +77,10 @@
                 <td>{{ \Carbon\Carbon::parse($appointment->patient_dob)->format('d M Y') }}</td>
             </tr>
             <tr>
+                <td><strong>Symptoms / Notes:</strong></td>
+                <td>{{ $appointment->patient_symptoms }}</td>
+            </tr>
+            <tr>
                 <td><strong>New Date:</strong></td>
                 <td>{{ \Carbon\Carbon::parse($appointment->date)->format('d M Y') }}</td>
             </tr>

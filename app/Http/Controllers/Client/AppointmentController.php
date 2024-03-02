@@ -63,7 +63,8 @@ class AppointmentController extends Controller
             'address'           => 'required|min:5',
             'hospital'          => 'required',
             'booking_date'      => 'required',
-            'booking_time'      => 'required'
+            'booking_time'      => 'required',
+            'symptoms'          => 'required|min:3'
         ]);
 
         $dateNow = Carbon::now()->format('Y-m-d');
@@ -119,7 +120,8 @@ class AppointmentController extends Controller
                 'patient_email'     => $request->email,
                 'patient_telp'      => $request->phone,
                 'status'            => 'Booking',
-                'time_type'         => 'schedule'
+                'time_type'         => 'schedule',
+                'patient_symptoms'  => $request->symptoms
             ]);
 
             $doctorMail = Doctor::where('id', $appointment->doctor_id)->first();

@@ -106,6 +106,19 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row form-row">
+                                <div class="col-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label>Symptoms / Notes <span class="text-danger">*</span></label>
+                                        <input name="symptoms" class="form-control @error('symptoms') is-invalid @enderror" type="text" value="{{ old('symptoms') }}">
+                                        @error('symptoms')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <span class="text-info" style="margin-top: .25rem; font-size: 80%;">Input symptoms the patient is experiencing or the patient purpose in seeing the doctor</span>
+                                    </div>
+                                </div>
+                            </div>
         
                             <hr>
 

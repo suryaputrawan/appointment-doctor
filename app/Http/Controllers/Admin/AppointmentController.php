@@ -225,6 +225,7 @@ class AppointmentController extends Controller
                     'email'             => 'required|email',
                     'phone'             => 'required|min:7',
                     'address'           => 'required|min:5',
+                    'symptoms'          => 'required|min:3',
                     'doctor'            => 'required',
                     'hospital'          => 'required',
                     'booking_date'      => 'required',
@@ -239,6 +240,7 @@ class AppointmentController extends Controller
                     'email'             => 'required|email',
                     'phone'             => 'required|min:7',
                     'address'           => 'required|min:5',
+                    'symptoms'          => 'required|min:3',
                     'time_type'         => 'required',
                     'doctor_name'       => 'required',
                     'clinic_name'       => 'required',
@@ -283,6 +285,7 @@ class AppointmentController extends Controller
                             'patient_dob'       => $request->dob,
                             'patient_sex'       => $request->gender,
                             'patient_address'   => $request->address,
+                            'patient_symptoms'  => $request->symptoms,
                             'patient_email'     => $request->email,
                             'patient_telp'      => $request->phone,
                             'status'            => 'Booking',
@@ -315,6 +318,7 @@ class AppointmentController extends Controller
                             'patient_dob'       => $request->dob,
                             'patient_sex'       => $request->gender,
                             'patient_address'   => $request->address,
+                            'patient_symptoms'  => $request->symptoms,
                             'patient_email'     => $request->email,
                             'patient_telp'      => $request->phone,
                             'status'            => 'Booking',
@@ -470,6 +474,7 @@ class AppointmentController extends Controller
                 'email'             => 'required|email',
                 'phone'             => 'required|min:7',
                 'address'           => 'required|min:5',
+                'symptoms'          => 'required|min:3'
             ]);
 
             $id = Crypt::decryptString($id);
@@ -491,6 +496,7 @@ class AppointmentController extends Controller
                     'patient_address'       => $request->address,
                     'patient_email'         => $request->email,
                     'patient_telp'          => $request->phone,
+                    'patient_symptoms'      => $request->symptoms
                 ]);
 
                 DB::commit();
