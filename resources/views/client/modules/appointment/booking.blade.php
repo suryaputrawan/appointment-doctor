@@ -145,7 +145,7 @@
                                         <div class="col-md-12 col-sm-12">
                                             <div class="form-group card-label">
                                                 <label>Symptoms / Notes <span class="text-danger">*</span></label>
-                                                <input name="symptoms" class="form-control @error('symptoms') is-invalid @enderror" type="text" value="{{ old('symptoms') }}">
+                                                <textarea name="symptoms" class="form-control @error('symptoms') is-invalid @enderror" rows="3">{{ old('symptoms') }}</textarea>
                                                 @error('symptoms')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
