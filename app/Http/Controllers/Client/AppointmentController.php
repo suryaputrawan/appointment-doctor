@@ -80,6 +80,7 @@ class AppointmentController extends Controller
                 ->where('end_time', Carbon::parse($request->booking_end_time)->format('H:i:s'))
                 ->where('hospital_id', $request->hospital)
                 ->where('doctor_id', $request->doctor)
+                ->where('status', '!=', 'Cancel')
                 ->first();
 
             if ($appointment) {
@@ -439,6 +440,7 @@ class AppointmentController extends Controller
                         ->where('date', $dateBooking)
                         ->where('start_time', $start)
                         ->where('end_time', $end)
+                        ->where('status', '!=', 'Cancel')
                         ->exists();
 
                     // Menambahkan waktu yang tersedia jika tidak ada konflik
