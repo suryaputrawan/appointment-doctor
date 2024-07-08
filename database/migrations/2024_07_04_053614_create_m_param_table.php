@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('appointments', function (Blueprint $table) {
-            if (!Schema::hasColumn('appointments', 'time_type')) {
-                $table->string('time_type', 15)->nullable()->after('user_id');
-            }
+        Schema::create('m_params', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('auto_no_surat');
+            $table->string('format_surat');
+            $table->foreignId('hospital_id')->constrained('hospitals')->cascadeOnDelete();
+            $table->timestamps();
         });
     }
 
@@ -23,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('appointments', function (Blueprint $table) {
-            $table->dropColumn('time_type');
-        });
+        Schema::dropIfExists('m_params');
     }
 };

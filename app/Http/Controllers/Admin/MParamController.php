@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use Throwable;
-use App\Models\Speciality;
+use App\Models\MParam;
+use App\Models\Hospital;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-class SpecialityController extends Controller
+class MParamController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,32 +19,23 @@ class SpecialityController extends Controller
     public function index()
     {
         if (request()->type == 'datatable') {
-            $data = Speciality::query()->orderBy('name', 'asc')->get();
+            $data = MParam::with('hospital')->get();
 
             return datatables()->of($data)
                 ->addColumn('action', function ($data) {
                     $user            = auth()->user();
-                    $editRoute       = 'admin.speciality.edit';
-                    $deleteRoute     = 'admin.speciality.destroy';
-                    $viewRoute       = 'admin.speciality.show';
+                    $editRoute       = 'admin.setting-params.edit';
+                    $deleteRoute     = 'admin.setting-params.destroy';
                     $dataId          = Crypt::encryptString($data->id);
-                    $dataDeleteLabel = $data->name;
+                    $dataDeleteLabel = $data->hospital->name;
 
                     $action = "";
 
-                    if ($user->can('update specialities')) {
+                    if ($user->can('update parameter')) {
                         $action .= '
                             <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
                                 <i class="fe fe-pencil"></i>
                             </a> ';
-                    }
-
-                    if ($user->can('delete specialities')) {
-                        $action .= '
-                            <button class="btn btn-danger delete-item" 
-                                data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
-                                <i class="fe fe-trash"></i>
-                            </button> ';
                     }
 
                     $group = '<div class="btn-group btn-group-sm mb-1 mb-md-0" role="group">
@@ -52,16 +43,17 @@ class SpecialityController extends Controller
                     </div>';
                     return $group;
                 })
-                ->addColumn('speciality', function ($data) {
-                    return $data->picture ? '<img src="' . $data->takePicture . '" alt="Gambar" width="50" class="mr-3">' . $data->name : '';
+                ->addColumn('hospital', function ($data) {
+                    return $data->hospital->name;
                 })
-                ->rawColumns(['action', 'speciality'])
+                ->rawColumns(['action', 'hospital'])
                 ->make(true);
         }
 
-        return view('admin.modules.speciality.index', [
-            'pageTitle'     => 'Specialities',
-            'breadcrumb'    => 'Specialities',
+        return view('admin.modules.settings.parameter.index', [
+            'pageTitle'     => 'Setting Parameter',
+            'breadcrumb'    => 'Setting Parameter',
+            'hospitals'     => Hospital::get()
         ]);
     }
 
@@ -70,11 +62,7 @@ class SpecialityController extends Controller
      */
     public function create()
     {
-        $user = auth()->user();
-
-        if (!$user->can('create specialities')) {
-            abort(403);
-        }
+        abort(403);
     }
 
     /**
@@ -84,13 +72,13 @@ class SpecialityController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->can('create specialities')) {
+        if ($user->can('create parameter')) {
             $validator = Validator::make([
-                'speciality'    => $request->speciality,
-                'picture'       => $request->picture,
+                'format_surat'    => $request->format_surat,
+                'hospital'        => $request->hospital
             ], [
-                'speciality'    => 'required|max:100|min:2|unique:specialities,name,NULL,id',
-                'picture'       => 'required|mimes:png|max:1000',
+                'format_surat'    => 'required|min:2|unique:m_params,format_surat,NULL,id',
+                'hospital'        => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -101,14 +89,15 @@ class SpecialityController extends Controller
             } else {
                 DB::beginTransaction();
                 try {
-                    Speciality::create([
-                        'name'          => $request->speciality,
-                        'picture'       => request('picture') ? $request->file('picture')->store('images/specialities') : null
+                    MParam::create([
+                        'auto_no_surat'     => 1,
+                        'format_surat'      => $request->format_surat,
+                        'hospital_id'       => $request->hospital
                     ]);
                     DB::commit();
                     return response()->json([
                         'status'  => 200,
-                        'message' => 'Speciality has been created',
+                        'message' => 'Parameter has been created',
                     ], 200);
                 } catch (Throwable $th) {
                     DB::rollBack();
@@ -126,9 +115,9 @@ class SpecialityController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Speciality $speciality)
+    public function show(MParam $mParam)
     {
-        //
+        abort(403);
     }
 
     /**
@@ -138,10 +127,10 @@ class SpecialityController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->can('update specialities')) {
+        if ($user->can('update parameter')) {
             try {
                 $id = Crypt::decryptString($id);
-                $data = Speciality::find($id);
+                $data = MParam::find($id);
 
                 if ($data) {
                     return response()->json([
@@ -151,7 +140,7 @@ class SpecialityController extends Controller
                 } else {
                     return response()->json([
                         'status'    => 404,
-                        'message'   => 'Speciality Not Found',
+                        'message'   => 'Data Not Found',
                     ]);
                 }
             } catch (\Throwable $e) {
@@ -172,15 +161,15 @@ class SpecialityController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->can('update specialities')) {
-            $data = Speciality::find($id);
+        if ($user->can('update parameter')) {
+            $data = MParam::find($id);
 
             $validator = Validator::make([
-                'speciality'    => $request->speciality,
-                'picture'       => $request->picture,
+                'format_surat'    => $request->format_surat,
+                'hospital'        => $request->hospital
             ], [
-                'speciality'    => 'required|max:100|min:2|unique:specialities,name,' . $data->id,
-                'picture'       => request('picture') ? 'mimes:png|max:1000' : '',
+                'format_surat'    => 'required|min:2|unique:m_params,format_surat,' . $data->id,
+                'hospital'        => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -192,29 +181,17 @@ class SpecialityController extends Controller
                 if ($data) {
                     DB::beginTransaction();
 
-                    //Membuat kondisi langsung mendelete gambar yang lama pada storage
-                    if (request('picture')) {
-                        if ($data->picture) {
-                            Storage::delete($data->picture);
-                        }
-                        $picture = request()->file('picture')->store('images/specialities');
-                    } elseif ($data->picture) {
-                        $picture = $data->picture;
-                    } else {
-                        $picture = null;
-                    }
-
                     try {
                         $data->update([
-                            'name'          => $request->speciality,
-                            'picture'       => $picture,
+                            'format_surat'      => $request->format_surat,
+                            'hospital_id'       => $request->hospital
                         ]);
 
                         DB::commit();
 
                         return response()->json([
                             'status'  => 200,
-                            'message' => 'Speciality has been updated',
+                            'message' => 'Parameter has been updated',
                         ], 200);
                     } catch (\Throwable $th) {
                         DB::rollBack();
@@ -238,44 +215,8 @@ class SpecialityController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(MParam $mParam)
     {
-        $user = auth()->user();
-
-        if ($user->can('delete specialities')) {
-            DB::beginTransaction();
-            try {
-                $id = Crypt::decryptString($id);
-                $data = Speciality::find($id);
-
-                if (!$data) {
-                    return response()->json([
-                        'status'  => 404,
-                        'message' => "Data not found!",
-                    ], 404);
-                }
-
-                //Kondisi apabila terdapat path gambar pada tabel slider
-                if ($data->picture != null) {
-                    Storage::delete($data->picture);
-                }
-
-                $data->delete();
-
-                DB::commit();
-
-                return response()->json([
-                    'status'  => 200,
-                    'message' => "Speciliaty has been deleted..!",
-                ], 200);
-            } catch (\Throwable $e) {
-                return response()->json([
-                    'status'  => 500,
-                    'message' => "Error on line {$e->getLine()}: {$e->getMessage()}",
-                ], 500);
-            }
-        } else {
-            abort(403);
-        }
+        abort(403);
     }
 }

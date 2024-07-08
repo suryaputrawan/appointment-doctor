@@ -22,6 +22,12 @@
                     </li> 
                 @endcan
 
+                @can('menu sick letter')
+                    <li class="{{ request()->routeIs('admin.sick-letters.index') ? 'active' : '' }}"> 
+                        <a href="{{ route('admin.sick-letters.index') }}"><i class="fa fa-file-text-o" aria-hidden="true"></i> <span>Sick Letter</span></a>
+                    </li> 
+                @endcan
+
                 {{-- Menu Master --}}
                 <li class="menu-title"> 
                     <span>Master</span>
@@ -67,11 +73,24 @@
                         <a href="{{ route('admin.hospitals.index') }}"><i class="fa fa-hospital-o" aria-hidden="true"></i> <span>Hospitals</span></a>
                     </li> 
                 @endcan
+
                 @can('menu users')
                     <li class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}"> 
                         <a href="{{ route('admin.users.index') }}"><i class="fe fe-user" aria-hidden="true"></i> <span>Users</span></a>
                     </li>
                 @endcan
+
+                @can('menu setting')
+                    <li class="submenu">
+                        <a href="#"><i class="fe fe-gear"></i> <span> Settings</span> <span class="menu-arrow"></span></a>
+                        <ul style="display: none;">
+                            <li>
+                                <a class="{{ request()->routeIs('admin.setting-params.index') ? 'active' : '' }}" href="{{ route('admin.setting-params.index') }}">Parameter</a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcan
+                
                 
                 @can('menu role & permission')
                     {{-- Role & Permission --}}

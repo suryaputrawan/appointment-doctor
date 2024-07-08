@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SickLetterController;
 use App\Http\Controllers\Client\AppointmentController;
 use App\Http\Controllers\Client\DoctorController;
 use Illuminate\Support\Facades\Route;
@@ -20,3 +21,6 @@ Route::get('/search-doctor', [DoctorController::class, 'searchDoctor'])->name('d
 Route::post('/booking/store', [AppointmentController::class, 'store'])->name('appointment.store');
 Route::get('/booking/{id}', [AppointmentController::class, 'booking'])->name('patient.booking');
 Route::get('/booking/{id}/success', [AppointmentController::class, 'bookingSuccess'])->name('appointment.success');
+
+Route::get('sick-letter/qr/{slug}/sign', [SickLetterController::class, 'qrSign'])->name('sick-letter.sign');
+Route::get('sick-letter/{id}/download-file', [SickLetterController::class, 'downloadPdf'])->name('sick-letter.download');

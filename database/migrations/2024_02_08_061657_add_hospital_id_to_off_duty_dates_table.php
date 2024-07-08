@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('off_duty_dates', function (Blueprint $table) {
-            $table->foreignId('hospital_id')->nullable()->after('doctor_id')->constrained()->cascadeOnDelete();
+            if (!Schema::hasColumn('off_duty_dates', 'hospital_id')) {
+                $table->foreignId('hospital_id')->nullable()->after('doctor_id')->constrained()->cascadeOnDelete();
+            }
         });
     }
 
