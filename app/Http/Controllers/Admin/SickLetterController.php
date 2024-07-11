@@ -8,7 +8,7 @@ use App\Models\MParam;
 use App\Models\SickLetter;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
+// use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Mail\SickLetterMail;
@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use PDF;
 
 class SickLetterController extends Controller
 {
@@ -96,8 +97,6 @@ class SickLetterController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-
         $user = auth()->user();
 
         if ($user->can('create sick letter')) {
@@ -333,13 +332,13 @@ class SickLetterController extends Controller
         $end = Carbon::parse($endDate);
 
         // Menghitung jumlah hari
-        $dayDifference = $start->diffInDays($end);
+        $dayDifference = $start->diffInDays($end) + 1;
 
         $qrcodeRoute = route('client.sick-letter.sign', $data->slug);
 
         $qrCode = base64_encode(QrCode::format('svg')->size(85)->errorCorrection('H')->generate($qrcodeRoute));
 
-        $pdf = Pdf::loadHTML(view('admin.modules.sick-letter.sick-letter-pdf', compact('data', 'dayDifference', 'qrCode', 'qrcodeRoute')))
+        $pdf = PDF::loadHTML(view('admin.modules.sick-letter.sick-letter-pdf', compact('data', 'dayDifference', 'qrCode', 'qrcodeRoute')))
             ->setPaper('a4', 'potrait');
 
         return $pdf->stream();
@@ -372,13 +371,13 @@ class SickLetterController extends Controller
         $end = Carbon::parse($endDate);
 
         // Menghitung jumlah hari
-        $dayDifference = $start->diffInDays($end);
+        $dayDifference = $start->diffInDays($end) + 1;
 
         $qrcodeRoute = route('client.sick-letter.sign', $data->slug);
 
         $qrCode = base64_encode(QrCode::format('svg')->size(85)->errorCorrection('H')->generate($qrcodeRoute));
 
-        $pdf = Pdf::loadHTML(view('admin.modules.sick-letter.sick-letter-pdf', compact('data', 'dayDifference', 'qrCode', 'qrcodeRoute')))
+        $pdf = PDF::loadHTML(view('admin.modules.sick-letter.sick-letter-pdf', compact('data', 'dayDifference', 'qrCode', 'qrcodeRoute')))
             ->setPaper('a4', 'potrait');
 
         return $pdf->download();
