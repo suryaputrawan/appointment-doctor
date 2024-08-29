@@ -37,7 +37,8 @@
                                         <th style="width: 20px">#</th>
                                         <th>Nomor</th>
                                         <th>Name</th>
-                                        @canany(['update sick letter', 'print sick letter'])
+                                        <th>Created By</th>
+                                        @canany(['update sick letter', 'print sick letter', 'delete sick letter'])
                                             <th style="width: 100px">ACTION</th> 
                                         @endcanany
                                     </tr>
@@ -98,9 +99,10 @@
                     orderable: false, searchable: false,
                     className: "text-center",
                 },
-                { data: "nomor", name: "nomor", orderable: true  },
-                { data: "patient_name", name: "patient_name", orderable: true  },
-                @canany(['update sick letter', 'print sick letter'])
+                { data: "nomor", name: "nomor", orderable: true, searchable:true },
+                { data: "patient_name", name: "patient_name", orderable: true, searchable:true, },
+                @canany(['update sick letter', 'print sick letter', 'delete sick letter'])
+                { data: "user", name: "user", orderable: true, searchable:true, },
                 { data: "action", name: "action", orderable: false, searchable: false, className: "text-center", },
                 @endcanany
             ],

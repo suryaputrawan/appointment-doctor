@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Hospital::class);
     }
+
+    public function sickLetter(): HasMany
+    {
+        return $this->hasMany(SickLetter::class);
+    }
 }

@@ -30,9 +30,11 @@ class SickLetterController extends Controller
 
         if (request()->type == 'datatable') {
             if (!$user->hasRole('Super Admin|Admin')) {
-                $data = SickLetter::where('created_by', $user->id)->get();
+                $data = SickLetter::with('user')
+                    ->where('created_by', $user->id)
+                    ->get();
             } else {
-                $data = SickLetter::get();
+                $data = SickLetter::with('user')->get();
             }
 
             return datatables()->of($data)
@@ -44,21 +46,28 @@ class SickLetterController extends Controller
                     $dataId          = Crypt::encryptString($data->id);
                     $dataDeleteLabel = $data->nomor;
 
+                    $createdDate = Carbon::parse($data->created_at)->format('Y-m-d');
+                    $dateNow = Carbon::now('Asia/Singapore')->format('Y-m-d');
+
                     $action = "";
 
                     if ($user->can('update sick letter')) {
-                        $action .= '
-                            <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
-                                <i class="fe fe-pencil"></i>
-                            </a> ';
+                        if ($createdDate >= $dateNow) {
+                            $action .= '
+                                <a class="btn btn-warning" id="btn-edit" type="button" data-url="' . route($editRoute, $dataId) . '">
+                                    <i class="fe fe-pencil"></i>
+                                </a> ';
+                        }
                     }
 
                     if ($user->can('delete sick letter')) {
-                        $action .= '
+                        if ($createdDate >= $dateNow) {
+                            $action .= '
                             <button class="btn btn-danger delete-item" 
                                 data-label="' . $dataDeleteLabel . '" data-url="' . route($deleteRoute, $dataId) . '">
                                 <i class="fe fe-trash"></i>
                             </button> ';
+                        }
                     }
 
                     if ($user->can('print sick letter')) {
@@ -68,13 +77,15 @@ class SickLetterController extends Controller
                         </a> ';
                     }
 
-
                     $group = '<div class="btn-group btn-group-sm mb-1 mb-md-0" role="group">
                         ' . $action . '
                     </div>';
                     return $group;
                 })
-                ->rawColumns(['action'])
+                ->addColumn('user', function ($data) {
+                    return $data->user->name;
+                })
+                ->rawColumns(['action', 'user'])
                 ->make(true);
         }
 
